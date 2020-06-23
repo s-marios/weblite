@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
+use serde::Deserialize;
 
 pub async fn versions() -> impl Responder {
     HttpResponse::Ok().body("TODO: elapi versions here")
@@ -26,6 +27,34 @@ pub async fn properties(info: web::Path<String>) -> impl Responder {
 
 pub async fn property(info: web::Path<(String, String)>) -> impl Responder {
     let response = format!("Property {}, of device: {}", info.1, info.0);
+    HttpResponse::Ok().body(response)
+}
+
+#[derive(Deserialize, Debug)]
+pub struct EchoCommand {
+    request: EchoRequest,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct EchoRequest {
+    esv: String,
+    operations: Vec<EchoOperation>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct EchoOperation {
+    epc: String,
+    edt: Option<Vec<String>>,
+}
+
+pub async fn echo_commands(
+    device: web::Path<String>,
+    command: web::Json<EchoCommand>,
+) -> impl Responder {
+    let response = format!(
+        "echo commands for device id: {}\nJSON (raw): {:?}",
+        device, command
+    );
     HttpResponse::Ok().body(response)
 }
 

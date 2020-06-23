@@ -18,6 +18,10 @@ async fn main() -> std::io::Result<()> {
                 .route(
                     "/v1/devices/{deviceid}/properties/{propertyid}",
                     web::get().to(property),
+                )
+                .route(
+                    "/v1/devices/{deviceid}/echoCommands",
+                    web::put().to(echo_commands),
                 ),
         )
     })
