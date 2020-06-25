@@ -1,6 +1,9 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::Deserialize;
 
+pub mod line_driver;
+use line_driver::LineDriver;
+
 pub async fn versions() -> impl Responder {
     HttpResponse::Ok().body("TODO: elapi versions here")
 }
@@ -31,14 +34,17 @@ pub async fn property(info: web::Path<(String, String)>) -> impl Responder {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct EchoCommand {
-    request: EchoRequest,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct EchoRequest {
-    esv: String,
-    operations: Vec<EchoOperation>,
+pub enum EchoCommand {
+    #[serde(rename = "request")]
+    Request {
+        esv: String,
+        operations: Vec<EchoOperation>,
+    },
+    #[serde(rename = "response")]
+    Response {
+        esv: String,
+        operations: Vec<EchoOperation>,
+    },
 }
 
 #[derive(Deserialize, Debug)]
@@ -47,15 +53,49 @@ pub struct EchoOperation {
     edt: Option<Vec<String>>,
 }
 
+fn do_command(line: &mut LineDriver, command: &str) -> String {
+    line.exec(command)
+        .unwrap_or_else(|_| String::from("no data"))
+}
+
+fn generate_command(device: String, command: EchoCommand) -> Option<String> {
+    if let EchoCommand::Request { esv, operations } = command {
+        match esv.as_str() {
+            //Get
+            "0x62" => {
+                let mut cmd = String::new();
+                cmd.push_str(&device);
+                cmd.push_str(&format!(":{}", operations[0].epc));
+                cmd.push_str("\n");
+
+                Some(cmd)
+            }
+            //SetGet
+            "0x6E" => unimplemented!(),
+            _ => None,
+        }
+    } else {
+        None
+    }
+}
+
 pub async fn echo_commands(
     device: web::Path<String>,
     command: web::Json<EchoCommand>,
 ) -> impl Responder {
-    let response = format!(
-        "echo commands for device id: {}\nJSON (raw): {:?}",
-        device, command
-    );
-    HttpResponse::Ok().body(response)
+    let connect = line_driver::LineDriver::new("150.65.230.118", 3361);
+    match connect {
+        Err(error) => String::from("failed to connect"),
+        Ok(mut line) => {
+            if let Some(cmd) = generate_command(device.into_inner(), command.into_inner()) {
+                let result = do_command(&mut line, &cmd);
+                print!("result: {}", result);
+                result
+            } else {
+                String::from("bad command")
+            }
+        }
+    }
 }
 
 #[cfg(test)]

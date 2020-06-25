@@ -21,7 +21,7 @@ async fn main() -> std::io::Result<()> {
                 )
                 .route(
                     "/v1/devices/{deviceid}/echoCommands",
-                    web::put().to(echo_commands),
+                    web::post().to(echo_commands),
                 ),
         )
     })
