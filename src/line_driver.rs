@@ -1,6 +1,7 @@
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::net::TcpStream;
 use std::time::Duration;
+use byteorder::{ByteOrder, BigEndian};
 
 pub(crate) struct LineDriver {
     r: BufReader<TcpStream>,
@@ -25,7 +26,19 @@ impl LineDriver {
         writeln!(self.w, "{}", command)?;
         self.w.flush()?;
         let mut response = String::new();
-        let _len = self.r.read_line(&mut response)?;
+        let len = self.r.read_line(&mut response)?;
+        //we have a line, convert this to utf-8
+        assert_eq!(len % 2, 0);
+        let size_for_u16 = len / 2;
+        let mut dst = Vec::<u16>::with_capacity(size_for_u16);
+        for _ in 0..size_for_u16 {
+            dst.push(0);
+        }
+        
+        BigEndian::read_u16_into(response.as_bytes(), &mut dst);
+        let response = String::from_utf16_lossy(&dst); 
+        println!("response: {}", response);
+
         Ok(response)
     }
 }

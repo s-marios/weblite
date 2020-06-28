@@ -1,5 +1,7 @@
 use actix_web::{web, HttpResponse, Responder};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::io::{self, ErrorKind};
 
 pub mod line_driver;
 use line_driver::LineDriver;
@@ -33,7 +35,7 @@ pub async fn property(info: web::Path<(String, String)>) -> impl Responder {
     HttpResponse::Ok().body(response)
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum EchoCommand {
     #[serde(rename = "request")]
     Request {
@@ -47,7 +49,7 @@ pub enum EchoCommand {
     },
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct EchoOperation {
     epc: String,
     edt: Option<Vec<String>>,
@@ -79,18 +81,57 @@ fn generate_command(device: String, command: EchoCommand) -> Option<String> {
     }
 }
 
+fn response_to_echo_result(proxy_response: String) -> Result<EchoCommand, io::Error> {
+    //gather all the pieces of information...
+
+    let mut tokens = proxy_response.split(',');
+    let okng = tokens
+        .next().ok_or(io::Error::new(ErrorKind::InvalidInput, "no result"))?;
+    let target = tokens
+        .next().ok_or(io::Error::new(ErrorKind::InvalidInput, "no target"))?;
+    let epc = target
+        .rsplit(':')
+        .next()
+        .ok_or(io::Error::new(ErrorKind::InvalidInput, "no epc"))?
+        .to_string();
+    let opt_data = tokens.next();
+
+    let edt: Option<Vec<String>> = if let Some(data) = opt_data {
+        Some(
+            //data.iter().chunks(2).collect::<Vec<String>>()
+            data.chars()
+                .skip(2)
+                .collect::<Vec<char>>()
+                .chunks_exact(2)
+                .map(|chunk| chunk.iter().collect::<String>())
+                .map(|hex| String::from("0x") + &hex)
+                .collect::<Vec<String>>(),
+        )
+    } else {
+        None
+    };
+
+    Ok(EchoCommand::Response {
+        esv: okng.to_string(),
+        operations: vec![EchoOperation { epc, edt }],
+    })
+}
+
 pub async fn echo_commands(
     device: web::Path<String>,
     command: web::Json<EchoCommand>,
 ) -> impl Responder {
     let connect = line_driver::LineDriver::new("150.65.230.118", 3361);
     match connect {
-        Err(error) => String::from("failed to connect"),
+        Err(error) => format!("failed to connect: {}", error),
         Ok(mut line) => {
             if let Some(cmd) = generate_command(device.into_inner(), command.into_inner()) {
                 let result = do_command(&mut line, &cmd);
-                print!("result: {}", result);
-                result
+                print!("len:{}, result: {}", result.len(), result);
+                match response_to_echo_result(result) {
+                    Ok(res) => serde_json::to_string_pretty(&res).unwrap(),
+                    Err(error) => format!("error generating response: {}", error),
+                }
             } else {
                 String::from("bad command")
             }
