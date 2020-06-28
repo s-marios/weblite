@@ -1,7 +1,7 @@
+use byteorder::{BigEndian, ByteOrder};
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::net::TcpStream;
 use std::time::Duration;
-use byteorder::{ByteOrder, BigEndian};
 
 pub(crate) struct LineDriver {
     r: BufReader<TcpStream>,
@@ -22,6 +22,7 @@ impl LineDriver {
         })
     }
 
+    ///execute a command using the backend
     pub fn exec(&mut self, command: &str) -> io::Result<String> {
         writeln!(self.w, "{}", command)?;
         self.w.flush()?;
@@ -34,10 +35,9 @@ impl LineDriver {
         for _ in 0..size_for_u16 {
             dst.push(0);
         }
-        
+
         BigEndian::read_u16_into(response.as_bytes(), &mut dst);
-        let response = String::from_utf16_lossy(&dst); 
-        println!("response: {}", response);
+        let response = String::from_utf16_lossy(&dst);
 
         Ok(response)
     }

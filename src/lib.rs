@@ -1,6 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
-use serde_json;
 use std::io::{self, ErrorKind};
 
 pub mod line_driver;
@@ -55,23 +54,27 @@ pub struct EchoOperation {
     edt: Option<Vec<String>>,
 }
 
-fn do_command(line: &mut LineDriver, command: &str) -> String {
+fn do_command(line: &mut LineDriver, command: &str) -> io::Result<String> {
     line.exec(command)
-        .unwrap_or_else(|_| String::from("no data"))
 }
 
-fn generate_command(device: String, command: EchoCommand) -> Option<String> {
+fn generate_commands(
+    device: String,
+    service: &mut String,
+    command: EchoCommand,
+) -> Option<Vec<String>> {
     if let EchoCommand::Request { esv, operations } = command {
+        *service = esv.clone();
         match esv.as_str() {
             //Get
-            "0x62" => {
+            "0x62" => Some(operations.iter().fold(vec![], |mut v, op| {
                 let mut cmd = String::new();
                 cmd.push_str(&device);
-                cmd.push_str(&format!(":{}", operations[0].epc));
+                cmd.push_str(&format!(":{}", op.epc));
                 cmd.push_str("\n");
-
-                Some(cmd)
-            }
+                v.push(cmd);
+                v
+            })),
             //SetGet
             "0x6E" => unimplemented!(),
             _ => None,
@@ -81,40 +84,52 @@ fn generate_command(device: String, command: EchoCommand) -> Option<String> {
     }
 }
 
-fn response_to_echo_result(proxy_response: String) -> Result<EchoCommand, io::Error> {
+fn response_to_echo_result(
+    mut _service: String,
+    responses: Vec<String>,
+) -> Result<EchoCommand, io::Error> {
     //gather all the pieces of information...
 
-    let mut tokens = proxy_response.split(',');
-    let okng = tokens
-        .next().ok_or(io::Error::new(ErrorKind::InvalidInput, "no result"))?;
-    let target = tokens
-        .next().ok_or(io::Error::new(ErrorKind::InvalidInput, "no target"))?;
-    let epc = target
-        .rsplit(':')
-        .next()
-        .ok_or(io::Error::new(ErrorKind::InvalidInput, "no epc"))?
-        .to_string();
-    let opt_data = tokens.next();
+    let mut esv = "0x72".to_string();
+    let ops = responses
+        .iter()
+        .map(|response| {
+            let mut tokens = response.split(',');
+            let okng = tokens.next()?;
+            //TODO: why this doesn't work with
+            //starts_with, == etc? and only works with contains?!?
+            if okng.contains("NG") {
+                esv = "0x52".to_string();
+            }
 
-    let edt: Option<Vec<String>> = if let Some(data) = opt_data {
-        Some(
-            //data.iter().chunks(2).collect::<Vec<String>>()
-            data.chars()
-                .skip(2)
-                .collect::<Vec<char>>()
-                .chunks_exact(2)
-                .map(|chunk| chunk.iter().collect::<String>())
-                .map(|hex| String::from("0x") + &hex)
-                .collect::<Vec<String>>(),
-        )
-    } else {
-        None
-    };
+            let target = tokens.next()?;
+            let epc = target.rsplit(':').next()?.to_string();
+            let opt_data = tokens.next();
 
-    Ok(EchoCommand::Response {
-        esv: okng.to_string(),
-        operations: vec![EchoOperation { epc, edt }],
-    })
+            let edt: Option<Vec<String>> = if let Some(data) = opt_data {
+                Some(
+                    data.chars()
+                        .skip(2)
+                        .collect::<Vec<char>>()
+                        .chunks_exact(2)
+                        .map(|chunk| chunk.iter().collect::<String>())
+                        .map(|hex| String::from("0x") + &hex)
+                        .collect::<Vec<String>>(),
+                )
+            } else {
+                None
+            };
+            Some(EchoOperation { epc, edt })
+        })
+        .collect::<Option<Vec<EchoOperation>>>();
+
+    match ops {
+        None => Err(io::Error::new(
+            ErrorKind::InvalidInput,
+            "an op was malformed!",
+        )),
+        Some(operations) => Ok(EchoCommand::Response { esv, operations }),
+    }
 }
 
 pub async fn echo_commands(
@@ -125,12 +140,35 @@ pub async fn echo_commands(
     match connect {
         Err(error) => format!("failed to connect: {}", error),
         Ok(mut line) => {
-            if let Some(cmd) = generate_command(device.into_inner(), command.into_inner()) {
-                let result = do_command(&mut line, &cmd);
-                print!("len:{}, result: {}", result.len(), result);
-                match response_to_echo_result(result) {
-                    Ok(res) => serde_json::to_string_pretty(&res).unwrap(),
-                    Err(error) => format!("error generating response: {}", error),
+            let command = command.into_inner();
+            let device = device.into_inner();
+
+            let mut service = String::new();
+            if let Some(commands) = generate_commands(device, &mut service, command) {
+                let mut keep_going = true;
+                let results = commands
+                    .iter()
+                    .map(|cmd| do_command(&mut line, cmd))
+                    .try_fold(vec![], |mut acc, cmd_res| {
+                        if !keep_going {
+                            return Err("stop");
+                        }
+                        match cmd_res {
+                            Ok(res) => {
+                                keep_going = res.starts_with("OK");
+                                acc.push(res);
+                                Ok(acc)
+                            }
+                            _ => Err("transmition error"),
+                        }
+                    });
+
+                match results {
+                    Ok(strings) => serde_json::to_string_pretty(
+                        &response_to_echo_result(service, strings).unwrap(),
+                    )
+                    .unwrap(),
+                    Err(error) => error.to_string(),
                 }
             } else {
                 String::from("bad command")
