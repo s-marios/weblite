@@ -26,7 +26,8 @@ async fn main() -> std::io::Result<()> {
                 .route(
                     "/v1/devices/{deviceid}/echoCommands",
                     web::post().to(echo_commands),
-                ),
+                )
+                .route("/scan", web::get().to(scan)),
         )
     })
     .bind("127.0.0.1:8088")?

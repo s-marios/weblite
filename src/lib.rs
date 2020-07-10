@@ -50,6 +50,20 @@ pub async fn property(info: web::Path<(String, String)>) -> impl Responder {
     HttpResponse::Ok().body(response)
 }
 
+pub async fn scan(config: web::Data<Config>) -> impl Responder {
+    let response = format!("scan results:");
+    let line = LineDriver::from(&config.backend);
+    if let Err(err) = line {
+        return HttpResponse::Ok().body(response);
+    }
+    let mut line = line.unwrap();
+    let res = line.exec_multi("224.0.23.0:0ef000:d6");
+    match res {
+        Err(error) => unimplemented!(),
+        Ok(lines) => HttpResponse::Ok().body(format!("resp: {}", lines.join(""))),
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub enum EchoCommand {
     #[serde(rename = "request")]
