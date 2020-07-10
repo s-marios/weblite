@@ -3,9 +3,13 @@ use weblite::*;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let config = web::Data::new(init_config()?);
+    println!("backend endpoint: {}", config.backend);
+
+    HttpServer::new(move || {
         App::new().service(
             web::scope("/elapi")
+                .app_data(config.clone())
                 .route("", web::get().to(versions))
                 .route("/v1", web::get().to(resources))
                 .route("/v1/controllers", web::get().to(controllers))

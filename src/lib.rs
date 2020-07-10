@@ -1,9 +1,25 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::prelude::*;
 use std::io::{self, ErrorKind};
 
 pub mod line_driver;
 use line_driver::LineDriver;
+
+#[derive(Deserialize, Debug)]
+pub struct Config {
+    pub backend: String,
+}
+
+pub fn init_config() -> std::io::Result<Config> {
+    let mut file = File::open("./config.json")?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+    let config: Config = serde_json::from_str(&contents)?;
+    Ok(config)
+}
 
 pub async fn versions() -> impl Responder {
     HttpResponse::Ok().body("TODO: elapi versions here")
