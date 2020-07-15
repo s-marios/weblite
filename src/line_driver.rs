@@ -66,10 +66,6 @@ impl LineDriver {
     pub fn exec_multi(&mut self, command: &str) -> io::Result<Vec<String>> {
         self.send(command)?;
         let mut responses = vec![];
-        //let mut response = String::new();
-        //while let Ok(_len) = self.r.read_line(&mut response) {
-        //    responses.push(LineDriver::to_utf8(&response));
-        //}
         loop {
             let mut response = String::new();
             match self.r.read_line(&mut response) {

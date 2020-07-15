@@ -1,9 +1,8 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::io::prelude::*;
 use std::io::{self, ErrorKind};
 
+pub mod descriptions;
 pub mod line_driver;
 use line_driver::LineDriver;
 
@@ -13,10 +12,7 @@ pub struct Config {
 }
 
 pub fn init_config() -> std::io::Result<Config> {
-    let mut file = File::open("./config.json")?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-
+    let contents = std::fs::read_to_string("./config.json")?;
     let config: Config = serde_json::from_str(&contents)?;
     Ok(config)
 }
@@ -51,7 +47,7 @@ pub async fn property(info: web::Path<(String, String)>) -> impl Responder {
 }
 
 pub async fn scan(config: web::Data<Config>) -> impl Responder {
-    let response = format!("scan results:");
+    let response = String::from("scan results:");
     let line = LineDriver::from(&config.backend);
     if let Err(err) = line {
         return HttpResponse::Ok().body(response);
@@ -209,6 +205,7 @@ pub async fn echo_commands(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     #[test]
     fn it_works() {
         assert_eq!(2 + 2, 4);
