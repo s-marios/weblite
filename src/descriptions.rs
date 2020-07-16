@@ -1,5 +1,4 @@
 use serde::Deserialize;
-use serde_json::Value;
 use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
@@ -47,9 +46,19 @@ pub enum Schema {
         edt: String,
     },
     Object {
-        properties: HashMap<String, Value>,
+        properties: HashMap<String, Schema>,
     },
-    //TODO OneOf, Array
+    Array {
+        #[serde(rename = "minItems")]
+        min_items: Option<u8>,
+        #[serde(rename = "maxItems")]
+        max_items: Option<u8>,
+        items: Box<Schema>,
+    },
+    #[serde(rename = "oneOf")]
+    OneOf {
+        options: Vec<Schema>,
+    },
 }
 
 #[derive(Deserialize, Debug)]
@@ -171,6 +180,63 @@ mod tests {
                 values: _,
             } => {
                 assert_eq!(format.as_ref().unwrap(), "date-time");
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
+
+    #[test]
+    fn read_floor_heater_v110_array_and_oneof_schema() {
+        let heater = read_def("tests/dd/floorHeater_mod_v110.json").unwrap();
+        //check the contents of an array schema
+        match &heater.properties["controllableZone"].schema {
+            Schema::Array {
+                min_items,
+                max_items,
+                items,
+            } => {
+                //what the ...
+                match &**items {
+                    Schema::Boolean { values } => {
+                        assert_eq!(values[0].value, true);
+                        assert_eq!(values[1].value, false);
+                    }
+                    _ => panic!("unexpected array item!"),
+                }
+            }
+            _ => panic!("unexpected schema!"),
+        };
+
+        //check the contents of an "oneOf" schema
+        match &heater.properties["targetTemperature1"].schema {
+            Schema::OneOf { options } => {
+                assert_eq!(options.len(), 2);
+                match &options[0] {
+                    Schema::Number {
+                        unit,
+                        minimum,
+                        maximum,
+                        multiple_of,
+                    } => {
+                        assert_eq!(unit.as_ref().unwrap(), "Celsius");
+                        assert_eq!(minimum.unwrap(), 0f32);
+                        assert_eq!(maximum.unwrap(), 50f32);
+                        assert_eq!(multiple_of.unwrap(), 1f32);
+                    }
+                    _ => panic!("unexpected option!"),
+                };
+                match &options[1] {
+                    Schema::String {
+                        format,
+                        enumlist,
+                        values,
+                    } => {
+                        assert_eq!(enumlist.as_ref().unwrap().len(), 1);
+                        assert_eq!(enumlist.as_ref().unwrap()[0], "auto");
+                        assert_eq!(values.as_ref().unwrap()[0].edt.as_ref().unwrap(), "0x41");
+                    }
+                    _ => panic!("unexpected option!"),
+                }
             }
             _ => panic!("unexpected schema!"),
         }
