@@ -25,7 +25,7 @@ pub struct PropertyValue<T> {
 
 #[derive(Deserialize, Debug)]
 #[serde(tag = "type", rename_all = "lowercase")]
-pub enum Schema {
+pub enum TypedSchema {
     Boolean {
         values: Vec<PropertyValue<bool>>,
     },
@@ -55,12 +55,21 @@ pub enum Schema {
         max_items: Option<u8>,
         items: Box<Schema>,
     },
-    #[serde(rename = "oneOf")]
-    OneOf {
-        options: Vec<Schema>,
-    },
 }
 
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "lowercase")]
+pub struct Options {
+    #[serde(rename = "oneOf")]
+    one_of: Vec<Schema>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(untagged)]
+pub enum Schema {
+    T(TypedSchema),
+    OneOf(Options),
+}
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceDescription {
@@ -102,12 +111,12 @@ mod tests {
         assert_eq!(light.properties["brightness"].writable, true);
         assert_eq!(light.properties["brightness"].observable, false);
         match &light.properties["brightness"].schema {
-            Schema::Number {
+            Schema::T(TypedSchema::Number {
                 unit,
                 minimum,
                 maximum,
                 multiple_of,
-            } => {
+            }) => {
                 assert_eq!(unit.as_ref().unwrap(), "%");
                 assert_eq!(*minimum, Some(0f32));
                 assert_eq!(*maximum, Some(100f32));
@@ -122,11 +131,11 @@ mod tests {
         assert_eq!(light.device_type, "generalLighting");
         assert_eq!(light.properties["brightness"].writable, true);
         match &light.properties["operationMode"].schema {
-            Schema::String {
+            Schema::T(TypedSchema::String {
                 format,
                 enumlist,
                 values,
-            } => {
+            }) => {
                 assert_eq!(format.is_none(), true);
                 assert_eq!(enumlist.as_ref().unwrap().len(), 4);
                 assert_eq!(enumlist.as_ref().unwrap()[2], "night");
@@ -149,7 +158,7 @@ mod tests {
         let common = read_def("tests/dd/commonItems_v110.json").unwrap();
         //check a boolean field
         match &common.properties["powerSaving"].schema {
-            Schema::Boolean { values } => {
+            Schema::T(TypedSchema::Boolean { values }) => {
                 assert_eq!(values.len(), 2);
                 assert_eq!(values[0].value, true);
                 assert_eq!(values[1].value, false);
@@ -162,11 +171,11 @@ mod tests {
         };
         //find a "date" string def and make sure it's ok
         match &common.properties["productionDate"].schema {
-            Schema::String {
+            Schema::T(TypedSchema::String {
                 format,
                 enumlist: _,
                 values: _,
-            } => {
+            }) => {
                 assert_eq!(format.as_ref().unwrap(), "date");
             }
             _ => panic!("unexpected schema!"),
@@ -174,11 +183,11 @@ mod tests {
 
         //find a "date-time" string def and make sure it's ok
         match &common.properties["currentDateAndTime"].schema {
-            Schema::String {
+            Schema::T(TypedSchema::String {
                 format,
                 enumlist: _,
                 values: _,
-            } => {
+            }) => {
                 assert_eq!(format.as_ref().unwrap(), "date-time");
             }
             _ => panic!("unexpected schema!"),
@@ -187,17 +196,17 @@ mod tests {
 
     #[test]
     fn read_floor_heater_v110_array_and_oneof_schema() {
-        let heater = read_def("tests/dd/floorHeater_mod_v110.json").unwrap();
+        let heater = read_def("tests/dd/floorHeater_v110.json").unwrap();
         //check the contents of an array schema
         match &heater.properties["controllableZone"].schema {
-            Schema::Array {
+            Schema::T(TypedSchema::Array {
                 min_items,
                 max_items,
                 items,
-            } => {
+            }) => {
                 //what the ...
                 match &**items {
-                    Schema::Boolean { values } => {
+                    Schema::T(TypedSchema::Boolean { values }) => {
                         assert_eq!(values[0].value, true);
                         assert_eq!(values[1].value, false);
                     }
@@ -209,28 +218,29 @@ mod tests {
 
         //check the contents of an "oneOf" schema
         match &heater.properties["targetTemperature1"].schema {
-            Schema::OneOf { options } => {
-                assert_eq!(options.len(), 2);
-                match &options[0] {
-                    Schema::Number {
+            Schema::OneOf(opts) => {
+                assert_eq!(opts.one_of.len(), 2);
+                match &opts.one_of[0] {
+                    Schema::T(TypedSchema::Number {
                         unit,
                         minimum,
                         maximum,
                         multiple_of,
-                    } => {
+                    }) => {
+                        let error = 0.0001;
                         assert_eq!(unit.as_ref().unwrap(), "Celsius");
-                        assert_eq!(minimum.unwrap(), 0f32);
-                        assert_eq!(maximum.unwrap(), 50f32);
-                        assert_eq!(multiple_of.unwrap(), 1f32);
+                        assert!((minimum.unwrap() - 0f32) < error);
+                        assert!((maximum.unwrap() - 50f32) < error);
+                        assert!((multiple_of.unwrap() - 1f32) < error);
                     }
                     _ => panic!("unexpected option!"),
                 };
-                match &options[1] {
-                    Schema::String {
+                match &opts.one_of[1] {
+                    Schema::T(TypedSchema::String {
                         format,
                         enumlist,
                         values,
-                    } => {
+                    }) => {
                         assert_eq!(enumlist.as_ref().unwrap().len(), 1);
                         assert_eq!(enumlist.as_ref().unwrap()[0], "auto");
                         assert_eq!(values.as_ref().unwrap()[0].edt.as_ref().unwrap(), "0x41");
