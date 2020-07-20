@@ -1,0 +1,19 @@
+{
+    "deviceType":"CO2 Sensor",
+    "eoj":"0x001B",
+    "descriptions":{"ja":"CO2 センサ","en":"CO2 Sensor"},
+    "properties":{
+        "co2":{
+            "epc":"0xE0",
+            "descriptions":{"ja":"CO2 濃度計測値","en":"CO2 Concentration"},
+            "writable":false,
+            "observable":false,
+            "schema":{
+                "type":"number",
+                "unit":"ppm",
+                "minimum": 0,
+                "maximum": 65533
+            }
+        }
+    }
+}

@@ -1,7 +1,7 @@
 {
     "deviceType":"humiditySensor",
     "eoj":"0x0012",
-    "descriptions":{"ja":"湿度センサー","en":"Humidity Sensor"},
+    "descriptions":{"ja":"湿度センサ","en":"Humidity Sensor"},
     "properties":{
         "humidity":{
             "epc":"0xE0",

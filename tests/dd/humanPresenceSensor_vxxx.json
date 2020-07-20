@@ -1,0 +1,31 @@
+{
+    "deviceType":"humanPresenceSensor",
+    "eoj":"0x0007",
+    "descriptions":{"ja":"人感検知センサ","en":"Human Presence Sensor"},
+    "properties":{
+        "threshold": {
+            "epc":"0xB0",
+            "writable": true,
+            "observable": false,
+            "descriptions":{"ja":"検知閾値","en":"Detection Threshold"},
+            "schema": {
+                "type":"number",
+                "minimum": 49,
+                "maximum": 56
+            }
+        },
+        "detection": {
+            "epc":"0xB1",
+            "writable":false,
+            "observable":true,
+            "descriptions":{"ja":"人体検知状態","en":"Human Detection"},
+            "schema": {
+                "type":"boolean",
+                "values": [
+                    {"value":true, "descriptions":{"ja":"人体検知有","en":"Human Presence Detected"}, "edt":"0x41"},
+                    {"value":false, "descriptions":{"ja":"人体検知無","en":"Human Presence Not Detected"}, "edt":"0x42"}
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "deviceType":"VOC Sensor",
+    "eoj":"0x001D",
+    "descriptions":{"ja":"VOC センサ","en":"VOC Sensor"},
+    "properties":{
+        "threshold": {
+            "epc":"0xB0",
+            "writable": true,
+            "observable": false,
+            "descriptions":{"ja":"VOC 検知閾値","en":"VOC Detection Threshold"},
+            "schema": {
+                "type":"number",
+                "minimum": 49,
+                "maximum": 56
+            }
+        },
+        "detection": {
+            "epc":"0xB1",
+            "writable":false,
+            "observable":true,
+            "descriptions":{"ja":"VOC 検知","en":"VOC Detection"},
+            "schema": {
+                "type":"boolean",
+                "values": [
+                    {"value":true, "descriptions":{"ja":"VOC検知有","en":"VOC Detected"}, "edt":"0x41"},
+                    {"value":false, "descriptions":{"ja":"VOC検知無","en":"VOC Not Detected"}, "edt":"0x42"}
+                ]
+            }
+        },
+        "voc":{
+            "epc":"0xE0",
+            "descriptions":{"ja":"VOC 濃度計測値","en":"VOC Concentration"},
+            "writable":false,
+            "observable":false,
+            "schema":{
+                "type":"number",
+                "unit":"ppm",
+                "minimum": 0,
+                "maximum": 65533
+            }
+        }
+    }
+}

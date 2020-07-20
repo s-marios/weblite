@@ -1,7 +1,7 @@
 {
     "deviceType":"temperatureSensor",
     "eoj":"0x0011",
-    "descriptions":{"ja":"温度センサー","en":"Temeprature Sensor"},
+    "descriptions":{"ja":"温度センサ","en":"Temeprature Sensor"},
     "properties":{
         "temperature":{
             "epc":"0xE0",
@@ -11,8 +11,8 @@
             "schema":{
                 "type":"number",
                 "unit":"Celcius",
-                "minimum": -2732,
-                "maximum": 32766,
+                "minimum": -273.2,
+                "maximum": 3276.6,
                 "multipleOf": 0.1
             }
         }

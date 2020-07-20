@@ -1,0 +1,31 @@
+{
+    "deviceType":"illuminationSensor",
+    "eoj":"0x000D",
+    "descriptions":{"ja":"照度センサ","en":"Illumination Sensor"},
+    "properties":{
+        "illumination_1":{
+            "epc":"0xE0",
+            "descriptions":{"ja":"照度計測値(ルクス単位)","en":"Illumination (Lux)"},
+            "writable":false,
+            "observable":false,
+            "schema":{
+                "type":"number",
+                "unit":"Lux",
+                "minimum": 0,
+                "maximum": 65533
+            }
+        },
+        "illumination_2":{
+            "epc":"0xE1",
+            "descriptions":{"ja":"照度計測値(Kルクス単位)","en":"Illumination (KLux)"},
+            "writable":false,
+            "observable":false,
+            "schema":{
+                "type":"number",
+                "unit":"KLux",
+                "minimum": 0,
+                "maximum": 65533
+            }
+        }
+    }
+}

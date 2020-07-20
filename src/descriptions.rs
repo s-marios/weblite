@@ -112,14 +112,14 @@ mod tests {
         assert_eq!(light.properties["brightness"].observable, false);
         match &light.properties["brightness"].schema {
             Schema::T(TypedSchema::Number {
-                unit,
-                minimum,
-                maximum,
-                multiple_of,
+                unit: Some(u),
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
             }) => {
-                assert_eq!(unit.as_ref().unwrap(), "%");
-                assert_eq!(*minimum, Some(0f32));
-                assert_eq!(*maximum, Some(100f32));
+                assert_eq!(u, "%");
+                assert!(min.abs() < 0.00001);
+                assert!((max - 100f32).abs() < 0.00001);
             }
             _ => panic!("schema is not a number!!!"),
         }
@@ -200,10 +200,12 @@ mod tests {
         //check the contents of an array schema
         match &heater.properties["controllableZone"].schema {
             Schema::T(TypedSchema::Array {
-                min_items,
-                max_items,
+                min_items: Some(min),
+                max_items: Some(max),
                 items,
             }) => {
+                assert_eq!(*min, 8);
+                assert_eq!(*max, 8);
                 //what the ...
                 match &**items {
                     Schema::T(TypedSchema::Boolean { values }) => {
@@ -237,7 +239,7 @@ mod tests {
                 };
                 match &opts.one_of[1] {
                     Schema::T(TypedSchema::String {
-                        format,
+                        format: None,
                         enumlist,
                         values,
                     }) => {
@@ -255,6 +257,8 @@ mod tests {
     #[test]
     fn read_temperature_sensor() {
         let sensor = read_def("tests/dd/temperatureSensor_vxxx.json").unwrap();
+        assert_eq!(sensor.eoj, "0x0011");
+        assert_eq!(sensor.properties["temperature"].epc, "0xE0");
         assert_eq!(sensor.properties["temperature"].writable, false);
         assert_eq!(sensor.properties["temperature"].observable, false);
         match &sensor.properties["temperature"].schema {
@@ -265,8 +269,8 @@ mod tests {
                 multiple_of,
             }) => {
                 assert_eq!(unit.as_ref().unwrap(), "Celcius");
-                assert!((minimum.unwrap() + 2732.0).abs() < 0.00001);
-                assert!((maximum.unwrap() - 32766.0).abs() < 0.00001);
+                assert!((minimum.unwrap() + 273.2).abs() < 0.00001);
+                assert!((maximum.unwrap() - 3276.6).abs() < 0.00001);
                 assert!((multiple_of.unwrap() - 0.1).abs() < 0.00001);
             }
             _ => panic!("unexpected schema!"),
@@ -276,6 +280,8 @@ mod tests {
     #[test]
     fn read_humidity_sensor() {
         let sensor = read_def("tests/dd/humiditySensor_vxxx.json").unwrap();
+        assert_eq!(sensor.eoj, "0x0012");
+        assert_eq!(sensor.properties["humidity"].epc, "0xE0");
         assert_eq!(sensor.properties["humidity"].writable, false);
         assert_eq!(sensor.properties["humidity"].observable, false);
         match &sensor.properties["humidity"].schema {
@@ -289,6 +295,155 @@ mod tests {
                 assert!(min.abs() < 0.00001);
                 assert!((max - 100.0).abs() < 0.00001);
                 assert_eq!(multiple_of.as_ref(), None);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
+
+    #[test]
+    fn read_co2_sensor() {
+        let sensor = read_def("tests/dd/co2Sensor_vxxx.json").unwrap();
+        assert_eq!(sensor.eoj, "0x001B");
+        assert_eq!(sensor.properties["co2"].epc, "0xE0");
+        assert_eq!(sensor.properties["co2"].writable, false);
+        assert_eq!(sensor.properties["co2"].observable, false);
+        match &sensor.properties["co2"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: Some(u),
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
+            }) => {
+                assert_eq!(u, "ppm");
+                assert!(min.abs() < 0.00001);
+                assert!(max - 65533.0 < 0.00001);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
+
+    #[test]
+    fn read_voc_sensor() {
+        let sensor = read_def("tests/dd/vocSensor_vxxx.json").unwrap();
+        assert_eq!(sensor.eoj, "0x001D");
+        assert_eq!(sensor.properties["voc"].epc, "0xE0");
+        assert_eq!(sensor.properties["voc"].writable, false);
+        assert_eq!(sensor.properties["voc"].observable, false);
+        match &sensor.properties["voc"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: Some(u),
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
+            }) => {
+                assert_eq!(u, "ppm");
+                assert!(min.abs() < 0.00001);
+                assert!(max - 65533.0 < 0.00001);
+            }
+            _ => panic!("unexpected schema!"),
+        };
+
+        assert_eq!(sensor.properties["threshold"].epc, "0xB0");
+        assert_eq!(sensor.properties["threshold"].writable, true);
+        assert_eq!(sensor.properties["threshold"].observable, false);
+        match &sensor.properties["threshold"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: None,
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
+            }) => {
+                assert!((min - 49.0).abs() < 0.00001);
+                assert!((max - 56.0).abs() < 0.00001);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+
+        assert_eq!(sensor.properties["detection"].epc, "0xB1");
+        assert_eq!(sensor.properties["detection"].writable, false);
+        assert_eq!(sensor.properties["detection"].observable, true);
+        match &sensor.properties["detection"].schema {
+            Schema::T(TypedSchema::Boolean { values }) => {
+                assert_eq!(values.len(), 2);
+                assert_eq!(values[0].value, true);
+                assert_eq!(values[0].edt.as_ref().unwrap(), "0x41");
+                assert_eq!(values[1].value, false);
+                assert_eq!(values[1].edt.as_ref().unwrap(), "0x42");
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
+
+    #[test]
+    fn read_human_presence_sensor() {
+        let sensor = read_def("tests/dd/humanPresenceSensor_vxxx.json").unwrap();
+        assert_eq!(sensor.eoj, "0x0007");
+
+        assert_eq!(sensor.properties["threshold"].epc, "0xB0");
+        assert_eq!(sensor.properties["threshold"].writable, true);
+        assert_eq!(sensor.properties["threshold"].observable, false);
+        match &sensor.properties["threshold"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: None,
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
+            }) => {
+                assert!((min - 49.0).abs() < 0.00001);
+                assert!((max - 56.0).abs() < 0.00001);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+
+        assert_eq!(sensor.properties["detection"].epc, "0xB1");
+        assert_eq!(sensor.properties["detection"].writable, false);
+        assert_eq!(sensor.properties["detection"].observable, true);
+        match &sensor.properties["detection"].schema {
+            Schema::T(TypedSchema::Boolean { values }) => {
+                assert_eq!(values.len(), 2);
+                assert_eq!(values[0].value, true);
+                assert_eq!(values[0].edt.as_ref().unwrap(), "0x41");
+                assert_eq!(values[1].value, false);
+                assert_eq!(values[1].edt.as_ref().unwrap(), "0x42");
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
+
+    #[test]
+    fn read_illumination_sensor() {
+        let sensor = read_def("tests/dd/illuminationSensor_vxxx.json").unwrap();
+        assert_eq!(sensor.eoj, "0x000D");
+        assert_eq!(sensor.properties["illumination_1"].epc, "0xE0");
+        assert_eq!(sensor.properties["illumination_1"].writable, false);
+        assert_eq!(sensor.properties["illumination_1"].observable, false);
+        match &sensor.properties["illumination_1"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: Some(u),
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
+            }) => {
+                assert_eq!(u, "Lux");
+                assert!(min.abs() < 0.00001);
+                assert!(max - 65533.0 < 0.00001);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+
+        assert_eq!(sensor.properties["illumination_2"].epc, "0xE1");
+        assert_eq!(sensor.properties["illumination_2"].writable, false);
+        assert_eq!(sensor.properties["illumination_2"].observable, false);
+        match &sensor.properties["illumination_2"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: Some(u),
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of: None,
+            }) => {
+                assert_eq!(u, "KLux");
+                assert!(min.abs() < 0.00001);
+                assert!(max - 65533.0 < 0.00001);
             }
             _ => panic!("unexpected schema!"),
         }
