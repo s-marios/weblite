@@ -1,0 +1,19 @@
+{
+    "deviceType":"humiditySensor",
+    "eoj":"0x0012",
+    "descriptions":{"ja":"湿度センサー","en":"Humidity Sensor"},
+    "properties":{
+        "humidity":{
+            "epc":"0xE0",
+            "descriptions":{"ja":"相対湿度計測値","en":"Relative Humidity"},
+            "writable":false,
+            "observable":false,
+            "schema":{
+                "type":"number",
+                "unit":"Percentage (%)",
+                "minimum": 0,
+                "maximum": 100
+            }
+        }
+    }
+}

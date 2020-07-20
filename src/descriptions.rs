@@ -251,4 +251,46 @@ mod tests {
             _ => panic!("unexpected schema!"),
         }
     }
+
+    #[test]
+    fn read_temperature_sensor() {
+        let sensor = read_def("tests/dd/temperatureSensor_vxxx.json").unwrap();
+        assert_eq!(sensor.properties["temperature"].writable, false);
+        assert_eq!(sensor.properties["temperature"].observable, false);
+        match &sensor.properties["temperature"].schema {
+            Schema::T(TypedSchema::Number {
+                unit,
+                minimum,
+                maximum,
+                multiple_of,
+            }) => {
+                assert_eq!(unit.as_ref().unwrap(), "Celcius");
+                assert!((minimum.unwrap() + 2732.0).abs() < 0.00001);
+                assert!((maximum.unwrap() - 32766.0).abs() < 0.00001);
+                assert!((multiple_of.unwrap() - 0.1).abs() < 0.00001);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
+
+    #[test]
+    fn read_humidity_sensor() {
+        let sensor = read_def("tests/dd/humiditySensor_vxxx.json").unwrap();
+        assert_eq!(sensor.properties["humidity"].writable, false);
+        assert_eq!(sensor.properties["humidity"].observable, false);
+        match &sensor.properties["humidity"].schema {
+            Schema::T(TypedSchema::Number {
+                unit: Some(u),
+                minimum: Some(min),
+                maximum: Some(max),
+                multiple_of,
+            }) => {
+                assert_eq!(u, "Percentage (%)");
+                assert!(min.abs() < 0.00001);
+                assert!((max - 100.0).abs() < 0.00001);
+                assert_eq!(multiple_of.as_ref(), None);
+            }
+            _ => panic!("unexpected schema!"),
+        }
+    }
 }
