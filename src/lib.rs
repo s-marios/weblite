@@ -4,11 +4,13 @@ use std::io::{self, ErrorKind};
 
 pub mod descriptions;
 pub mod line_driver;
+pub mod echoinfo;
 use line_driver::LineDriver;
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
     pub backend: String,
+    pub dd_dir: String,
 }
 
 pub fn init_config() -> std::io::Result<Config> {

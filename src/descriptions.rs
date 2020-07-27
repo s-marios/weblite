@@ -1,5 +1,8 @@
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::path::Path;
+use std::fs::{self, DirEntry};
+use std::ffi::OsStr;
 
 #[derive(Deserialize, Debug)]
 pub struct TextDescription {
@@ -79,10 +82,26 @@ pub struct DeviceDescription {
     pub properties: HashMap<String, DeviceProperty>,
 }
 
-pub fn read_def(filename: &str) -> std::io::Result<DeviceDescription> {
+pub type Descriptions = Vec<DeviceDescription>;
+
+pub fn read_def<P: AsRef<Path>>(filename: P) -> std::io::Result<DeviceDescription> {
     let dd_string = std::fs::read_to_string(filename)?;
     let dd: DeviceDescription = serde_json::from_str(&dd_string)?;
     Ok(dd)
+}
+
+pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descriptions> {
+    println!("dir: {}", dir.as_ref().display());
+    let mut dds = vec![];
+    for entry in fs::read_dir(dir)?.filter_map(|x| x.ok()) {
+        let path = entry.path();
+        println!("path: {:?}", path);
+        if path.is_file() && path.extension() == Some(OsStr::new("json")){
+            //we probably have a device description here. Try to read this
+            dds.push(read_def(path)?);
+        }
+    }
+    Ok(dds)
 }
 
 #[cfg(test)]
@@ -447,5 +466,14 @@ mod tests {
             }
             _ => panic!("unexpected schema!"),
         }
+    }
+
+    #[test]
+    fn read_device_descriptions_all_succeeds() {
+        let path = "./tests/dd/";
+        let dds = read_device_descriptions(path).expect("bad device description directory!");
+        assert!(dds.len() > 0);
+        //currently we have... ten or so?
+        assert_eq!(dds.len(), 10);
     }
 }
