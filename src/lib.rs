@@ -1,11 +1,21 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use std::io::{self, ErrorKind};
+use std::path::Path;
 
 pub mod descriptions;
-pub mod line_driver;
 pub mod echoinfo;
+pub mod hex;
+pub mod line_driver;
+
+pub use descriptions::*;
+pub use hex::*;
 use line_driver::LineDriver;
+#[derive(Debug)]
+pub struct AppData {
+    pub config: Config,
+    pub descriptions: Descriptions,
+}
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
@@ -13,10 +23,23 @@ pub struct Config {
     pub dd_dir: String,
 }
 
+pub fn init() -> std::io::Result<AppData> {
+    let config = init_config()?;
+    let descriptions = read_device_descriptions(&config.dd_dir)?;
+    Ok(AppData {
+        config,
+        descriptions,
+    })
+}
+
 pub fn init_config() -> std::io::Result<Config> {
     let contents = std::fs::read_to_string("./config.json")?;
     let config: Config = serde_json::from_str(&contents)?;
     Ok(config)
+}
+
+pub fn init_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descriptions> {
+    read_device_descriptions(dir)
 }
 
 pub async fn versions() -> impl Responder {
@@ -43,7 +66,10 @@ pub async fn properties(info: web::Path<String>) -> impl Responder {
     HttpResponse::Ok().body(response)
 }
 
-pub async fn property(info: web::Path<(String, String)>) -> impl Responder {
+pub async fn property(
+    info: web::Path<(String, String)>,
+    data: web::Data<AppData>,
+) -> impl Responder {
     let response = format!("Property {}, of device: {}", info.1, info.0);
     HttpResponse::Ok().body(response)
 }
@@ -163,8 +189,9 @@ fn response_to_echo_result(
 pub async fn echo_commands(
     device: web::Path<String>,
     command: web::Json<EchoCommand>,
+    data: web::Data<AppData>,
 ) -> impl Responder {
-    let connect = line_driver::LineDriver::new("150.65.230.118", 3361);
+    let connect = line_driver::LineDriver::from(&data.config.backend);
     match connect {
         Err(error) => format!("failed to connect: {}", error),
         Ok(mut line) => {

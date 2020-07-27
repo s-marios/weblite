@@ -9,7 +9,8 @@ pub struct EchonetDevice {
 
 impl EchonetDevice {
     pub fn has_property(&self, property: &str, descriptions: Descriptions) -> bool {
-        descriptions.get(self.description_id)
+        descriptions
+            .get(self.description_id)
             .expect("corrupt descriptions!")
             .properties
             .contains_key(property)

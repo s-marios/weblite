@@ -1,8 +1,8 @@
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::path::Path;
-use std::fs::{self, DirEntry};
 use std::ffi::OsStr;
+use std::fs::{self, DirEntry};
+use std::path::Path;
 
 #[derive(Deserialize, Debug)]
 pub struct TextDescription {
@@ -96,7 +96,7 @@ pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descr
     for entry in fs::read_dir(dir)?.filter_map(|x| x.ok()) {
         let path = entry.path();
         println!("path: {:?}", path);
-        if path.is_file() && path.extension() == Some(OsStr::new("json")){
+        if path.is_file() && path.extension() == Some(OsStr::new("json")) {
             //we probably have a device description here. Try to read this
             dds.push(read_def(path)?);
         }
