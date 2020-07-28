@@ -53,9 +53,9 @@ pub enum TypedSchema {
     },
     Array {
         #[serde(rename = "minItems")]
-        min_items: Option<u8>,
+        min_items: Option<u32>,
         #[serde(rename = "maxItems")]
-        max_items: Option<u8>,
+        max_items: Option<u32>,
         items: Box<Schema>,
     },
 }
@@ -91,12 +91,11 @@ pub fn read_def<P: AsRef<Path>>(filename: P) -> std::io::Result<DeviceDescriptio
 }
 
 pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descriptions> {
-    println!("dir: {}", dir.as_ref().display());
     let mut dds = vec![];
     for entry in fs::read_dir(dir)?.filter_map(|x| x.ok()) {
         let path = entry.path();
-        println!("path: {:?}", path);
         if path.is_file() && path.extension() == Some(OsStr::new("json")) {
+            println!("path: {:?}", path);
             //we probably have a device description here. Try to read this
             dds.push(read_def(path)?);
         }
@@ -471,7 +470,7 @@ mod tests {
     #[test]
     fn read_device_descriptions_all_succeeds() {
         let path = "./tests/dd/";
-        let dds = read_device_descriptions(path).expect("bad device description directory!");
+        let dds = read_device_descriptions(path).expect("parsing dds failed!");
         assert!(dds.len() > 0);
         //currently we have... ten or so?
         assert_eq!(dds.len(), 10);

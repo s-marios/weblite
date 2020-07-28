@@ -1,4 +1,4 @@
 {
   "backend" : "150.65.230.118:3361",
-  "dd_dir" : "tests/dd/"
+  "dd_dir" : "./tests/dd/"
 }
