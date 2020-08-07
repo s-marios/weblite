@@ -1,4 +1,4 @@
-pub fn to_usize(hex: &str) -> Option<usize> {
+fn check(hex: &str) -> Option<&str> {
     let mut hex = &hex[..];
     if hex.starts_with("0x") || hex.starts_with("0X") {
         hex = &hex[2..];
@@ -9,16 +9,33 @@ pub fn to_usize(hex: &str) -> Option<usize> {
     if !hex.chars().all(|x| x.is_ascii_hexdigit()) {
         return None;
     }
+    Some(hex)
+}
+
+pub fn to_usize(hex: &str) -> Option<usize> {
     Some(
-        hex.chars()
+        check(hex)?
+            .chars()
             .map(|x| x.to_digit(16).unwrap())
             .fold(0usize, |acc, digit| (acc << 4) + digit as usize),
     )
 }
 
-#[cfg(debug)]
+pub fn to_bytes(hex: &str) -> Option<Vec<u8>> {
+    Some(
+        check(hex)?
+            .chars()
+            .map(|x| x.to_digit(16).unwrap() as u8)
+            .collect::<Vec<u8>>()
+            .chunks_exact(2)
+            .map(|chunk| ((chunk[0] << 4) + chunk[1]) as u8)
+            .collect::<Vec<u8>>(),
+    )
+}
+
+#[cfg(test)]
 mod tests {
-    use super::to_usize;
+    use super::*;
 
     #[test]
     fn is_zero() {
@@ -32,8 +49,24 @@ mod tests {
         assert_eq!(to_usize(hex).unwrap(), 255usize);
     }
 
+    #[test]
     fn is_511() {
-        let hex = "0xfFfF";
+        let hex = "0x01fF";
         assert_eq!(to_usize(hex).unwrap(), 511usize);
+    }
+
+    #[test]
+    fn is_511_to_bytes() {
+        let res = to_bytes("0x01fF").unwrap();
+        assert_eq!(res[0], 1u8);
+        assert_eq!(res[1], 255u8);
+    }
+
+    #[test]
+    fn ffff_is_two_bytes_255() {
+        let hex = "FFFF";
+        let res = to_bytes(hex).unwrap();
+        assert_eq!(res[0], 255);
+        assert_eq!(res[1], 255);
     }
 }

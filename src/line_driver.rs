@@ -38,6 +38,8 @@ impl LineDriver {
     }
 
     fn to_utf8(utf16: &str) -> String {
+        //ooof this is horror, remove trailling newline
+        let utf16 = utf16.trim_end_matches("\x00\n");
         //size checks
         let len = utf16.len();
         assert!(len > 0);

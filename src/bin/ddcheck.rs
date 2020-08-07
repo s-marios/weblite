@@ -7,7 +7,7 @@ pub fn main() {
         .iter()
         .skip(1)
         .inspect(|path| print!("Checking path: {} ", path))
-        .map(|path| descriptions::read_def(path))
+        .map(descriptions::read_def)
         .for_each(|res| match res {
             Ok(_) => println!("OK"),
             Err(err) => println!("ERROR!\n  {}", err),

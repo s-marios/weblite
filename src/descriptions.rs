@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::ffi::OsStr;
-use std::fs::{self, DirEntry};
+use std::fs;
 use std::path::Path;
 
 #[derive(Deserialize, Debug)]
@@ -95,9 +95,11 @@ pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descr
     for entry in fs::read_dir(dir)?.filter_map(|x| x.ok()) {
         let path = entry.path();
         if path.is_file() && path.extension() == Some(OsStr::new("json")) {
-            println!("path: {:?}", path);
             //we probably have a device description here. Try to read this
-            dds.push(read_def(path)?);
+            match read_def(&path) {
+                Ok(dd) => dds.push(dd),
+                Err(error) => println!("Failed to parse Device Description: {:?}", path),
+            }
         }
     }
     Ok(dds)
@@ -468,6 +470,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn read_device_descriptions_all_succeeds() {
         let path = "./tests/dd/";
         let dds = read_device_descriptions(path).expect("parsing dds failed!");

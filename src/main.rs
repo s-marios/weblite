@@ -4,7 +4,7 @@ use weblite::*;
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let data = web::Data::new(init()?);
-    println!("backend endpoint: {}", data.config.backend);
+    println!("backend: {}", data.config.backend);
 
     HttpServer::new(move || {
         App::new().service(

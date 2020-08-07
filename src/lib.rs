@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::io::{self, ErrorKind};
 use std::path::Path;
 
@@ -7,10 +8,12 @@ pub mod descriptions;
 pub mod echoinfo;
 pub mod hex;
 pub mod line_driver;
+mod lineproto;
 
 pub use descriptions::*;
 pub use hex::*;
 use line_driver::LineDriver;
+
 #[derive(Debug)]
 pub struct AppData {
     pub config: Config,
@@ -25,7 +28,25 @@ pub struct Config {
 
 pub fn init() -> std::io::Result<AppData> {
     let config = init_config()?;
+    let mut driver = LineDriver::from(&config.backend)?;
     let descriptions = read_device_descriptions(&config.dd_dir)?;
+    println!("available device descriptions:");
+    descriptions
+        .iter()
+        .for_each(|dd| println!("type (class): {} ({})", dd.device_type, dd.eoj));
+
+    let discovered = lineproto::get_all_classes(&mut driver)?;
+    println!("discovered classes: {:?}", discovered);
+
+    //get all available device description classes
+    let available = descriptions
+        .iter()
+        .map(|dd| dd.eoj[2..].to_string())
+        .collect::<HashSet<String>>();
+
+    let intersection = lineproto::class_intersect(&available, &discovered);
+    lineproto::scan_classes(intersection, &mut driver);
+
     Ok(AppData {
         config,
         descriptions,
