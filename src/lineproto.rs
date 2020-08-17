@@ -103,3 +103,73 @@ pub(super) fn scan_classes(classes: HashSet<String>, driver: &mut LineDriver) ->
     println!("scan results:\n{:?}", res);
     unimplemented!()
 }
+
+pub fn parse_property_map(property_map: &[u8]) -> Option<Vec<u8>> {
+    let howmany = *property_map.get(0)?;
+    if howmany < 16u8 {
+        //we trust that whatever we were sent is .. correct..
+        //we don't check if declared length actually matches
+        Some(property_map[1..].to_vec())
+    } else {
+        parse_binary_map(property_map)
+    }
+}
+
+fn parse_binary_map(property_map: &[u8]) -> Option<Vec<u8>> {
+    if property_map.len() != 17 {
+        return None;
+    }
+    Some(
+        property_map[1..]
+            .iter()
+            .enumerate()
+            .fold(vec![], |mut acc, (nth, byte)| {
+                (0..8).for_each(|i| {
+                    if byte & (1u8 << i) != 0 {
+                        acc.push(0x80u8 + (nth as u8) + (0x10u8 * i))
+                    }
+                });
+                acc
+            }),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_property_map_is_none() {
+        assert_eq!(parse_property_map(&vec![]).is_none(), true);
+    }
+
+    #[test]
+    fn zero_properties_is_ok() {
+        let res = parse_property_map(&vec![0]).unwrap();
+        assert!(res.is_empty());
+    }
+
+    #[test]
+    fn property_maps_simple_ok() {
+        let pmap = [3u8, 0x80u8, 0x9Eu8, 0x9Du8];
+        let expected = [0x80u8, 0x9Eu8, 0x9D];
+        assert_eq!(parse_property_map(&pmap).unwrap(), expected);
+    }
+
+    #[test]
+    fn property_maps_binary_check() {
+        let bmap = [
+            24, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0xFF,
+        ];
+        let result = parse_property_map(&bmap).unwrap();
+        let expected = vec![
+            0x80u8, 0x90u8, 0xA0u8, 0xB0u8, 0xC0u8, 0xD0u8, 0xE0u8, 0xF0u8, 0x81u8, 0x91u8, 0xA1u8,
+            0xB1u8, 0xC1u8, 0xD1u8, 0xE1u8, 0xF1u8, 0x8Fu8, 0x9Fu8, 0xAFu8, 0xBFu8, 0xCFu8, 0xDFu8,
+            0xEFu8, 0xFFu8,
+        ];
+        println!("result: {:?}", result);
+        assert_eq!(result.len(), 24);
+        assert_eq!(result, expected);
+    }
+}

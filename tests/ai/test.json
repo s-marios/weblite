@@ -1,0 +1,22 @@
+{
+	"entries": [{
+		"eoj":"0290",
+		"ai": []
+	},
+	{
+		"eoj":"0011",
+		"ai": [
+		]
+	},
+	{
+		"eoj":"don't care",
+		"ai": [{ 
+			"code" : "0x80",
+			"info" : {
+				"type": "number",
+				"min" : 34,
+				"max" : 48
+			}
+		}]
+	}]
+}

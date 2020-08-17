@@ -90,6 +90,16 @@ pub fn read_def<P: AsRef<Path>>(filename: P) -> std::io::Result<DeviceDescriptio
     Ok(dd)
 }
 
+pub fn read_def_generic<P, T>(filename: P) -> std::io::Result<T>
+where
+    P: AsRef<Path>,
+    T: serde::de::DeserializeOwned,
+{
+    let dd_string = std::fs::read_to_string(filename)?;
+    let dd: T = serde_json::from_str(&dd_string)?;
+    Ok(dd)
+}
+
 pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descriptions> {
     let mut dds = vec![];
     for entry in fs::read_dir(dir)?.filter_map(|x| x.ok()) {

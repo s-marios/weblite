@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::io::{self, ErrorKind};
 use std::path::Path;
 
+mod converters;
 pub mod descriptions;
 pub mod echoinfo;
 pub mod hex;
