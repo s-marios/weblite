@@ -1,7 +1,19 @@
 {
 	"entries": [{
 		"eoj":"0290",
-		"ai": []
+		"ai": [{
+			"epc" : "0xC0",
+			"info" : {
+				"type": "object",
+				"order": [{
+					"property" : "red"
+				}, {
+					"property" : "green"
+				}, {
+					"property" : "blue"
+				}]
+			}
+		}]
 	},
 	{
 		"eoj":"0011",
@@ -11,7 +23,7 @@
 	{
 		"eoj":"don't care",
 		"ai": [{ 
-			"code" : "0x80",
+			"epc" : "0x80",
 			"info" : {
 				"type": "number",
 				"min" : 34,

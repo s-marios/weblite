@@ -22,14 +22,14 @@ pub struct Entry {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct PropertyValue<T> {
-    pub value: T,
-    pub edt: String,
+pub struct PropertyInfo {
+    pub epc: String,
+    pub info: AdditionalInfo,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct PropertyInfo {
-    pub code: String,
+pub struct NamedInfo {
+    pub property: String,
     pub info: Option<AdditionalInfo>,
 }
 
@@ -55,7 +55,7 @@ pub enum AdditionalInfo {
     },
 
     Object {
-        order: Vec<PropertyInfo>,
+        order: Vec<NamedInfo>,
     },
     Array,
 }
