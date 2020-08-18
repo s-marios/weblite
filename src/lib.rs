@@ -90,7 +90,7 @@ pub async fn properties(info: web::Path<String>) -> impl Responder {
 
 pub async fn property(
     info: web::Path<(String, String)>,
-    data: web::Data<AppData>,
+    _data: web::Data<AppData>,
 ) -> impl Responder {
     let response = format!("Property {}, of device: {}", info.1, info.0);
     HttpResponse::Ok().body(response)
@@ -99,13 +99,13 @@ pub async fn property(
 pub async fn scan(config: web::Data<Config>) -> impl Responder {
     let response = String::from("scan results:");
     let line = LineDriver::from(&config.backend);
-    if let Err(err) = line {
+    if let Err(_err) = line {
         return HttpResponse::Ok().body(response);
     }
     let mut line = line.unwrap();
     let res = line.exec_multi("224.0.23.0:0ef000:d6");
     match res {
-        Err(error) => unimplemented!(),
+        Err(_error) => unimplemented!(),
         Ok(lines) => HttpResponse::Ok().body(format!("resp: {}", lines.join(""))),
     }
 }

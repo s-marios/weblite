@@ -1,10 +1,10 @@
 use crate::descriptions::*;
 
 pub struct EchonetDevice {
-    host: String,
-    eoj: String,
-    properties: Vec<String>,
-    description_id: usize,
+    pub host: String,
+    pub eoj: String,
+    pub properties: Vec<String>,
+    pub description_id: usize,
 }
 
 impl EchonetDevice {

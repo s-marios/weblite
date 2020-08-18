@@ -37,7 +37,7 @@ impl LineDriver {
         Ok(())
     }
 
-    fn to_utf8(utf16: &str) -> String {
+    fn get_owned_utf8(utf16: &str) -> String {
         //ooof this is horror, remove trailling newline
         let utf16 = utf16.trim_end_matches("\x00\n");
         //size checks
@@ -60,7 +60,7 @@ impl LineDriver {
         self.send(command)?;
         let mut response = String::new();
         let _len = self.r.read_line(&mut response)?;
-        let response = LineDriver::to_utf8(&response).trim().to_string();
+        let response = LineDriver::get_owned_utf8(&response).trim().to_string();
         Ok(response)
     }
 
@@ -74,7 +74,7 @@ impl LineDriver {
                 Err(_) => break,
                 Ok(len) => {
                     if len > 0 {
-                        responses.push(LineDriver::to_utf8(&response))
+                        responses.push(LineDriver::get_owned_utf8(&response))
                     }
                 }
             };
