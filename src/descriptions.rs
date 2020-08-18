@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct TextDescription {
     pub ja: String,
     pub en: String,
@@ -19,7 +19,7 @@ pub struct DeviceProperty {
     pub schema: Schema,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct PropertyValue<T> {
     pub value: T,
     pub descriptions: TextDescription,
@@ -46,7 +46,7 @@ pub enum TypedSchema {
         multiple_of: Option<f32>,
     },
     Null {
-        edt: String,
+        edt: Option<String>,
     },
     Object {
         properties: HashMap<String, Schema>,
@@ -64,7 +64,7 @@ pub enum TypedSchema {
 #[serde(rename_all = "lowercase")]
 pub struct Options {
     #[serde(rename = "oneOf")]
-    one_of: Vec<Schema>,
+    pub one_of: Vec<Schema>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -108,7 +108,10 @@ pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descr
             //we probably have a device description here. Try to read this
             match read_def(&path) {
                 Ok(dd) => dds.push(dd),
-                Err(error) => println!("Failed to parse Device Description: {:?}", path),
+                Err(error) => println!(
+                    "Failed to parse Device Description: {:?}, error {}",
+                    path, error
+                ),
             }
         }
     }
@@ -164,20 +167,20 @@ mod tests {
             Schema::T(TypedSchema::String {
                 format,
                 enumlist,
-                values,
+                values: Some(values),
             }) => {
                 assert_eq!(format.is_none(), true);
                 assert_eq!(enumlist.as_ref().unwrap().len(), 4);
                 assert_eq!(enumlist.as_ref().unwrap()[2], "night");
-                assert_eq!(values.as_ref().unwrap().len(), 4);
-                assert_eq!(values.as_ref().unwrap()[0].value, "auto");
-                assert_eq!(values.as_ref().unwrap()[1].value, "normal");
-                assert_eq!(values.as_ref().unwrap()[2].value, "night");
-                assert_eq!(values.as_ref().unwrap()[3].value, "color");
-                assert_eq!(values.as_ref().unwrap()[0].edt.as_ref().unwrap(), "0x41");
-                assert_eq!(values.as_ref().unwrap()[1].edt.as_ref().unwrap(), "0x42");
-                assert_eq!(values.as_ref().unwrap()[2].edt.as_ref().unwrap(), "0x43");
-                assert_eq!(values.as_ref().unwrap()[3].edt.as_ref().unwrap(), "0x45");
+                assert_eq!(values.len(), 4);
+                assert_eq!(values[0].value, "auto");
+                assert_eq!(values[1].value, "normal");
+                assert_eq!(values[2].value, "night");
+                assert_eq!(values[3].value, "color");
+                assert_eq!(values[0].edt.as_ref().unwrap(), "0x41");
+                assert_eq!(values[1].edt.as_ref().unwrap(), "0x42");
+                assert_eq!(values[2].edt.as_ref().unwrap(), "0x43");
+                assert_eq!(values[3].edt.as_ref().unwrap(), "0x45");
             }
             _ => panic!("unexpected schema!"),
         }
@@ -271,11 +274,11 @@ mod tests {
                     Schema::T(TypedSchema::String {
                         format: None,
                         enumlist,
-                        values,
+                        values: Some(values),
                     }) => {
                         assert_eq!(enumlist.as_ref().unwrap().len(), 1);
                         assert_eq!(enumlist.as_ref().unwrap()[0], "auto");
-                        assert_eq!(values.as_ref().unwrap()[0].edt.as_ref().unwrap(), "0x41");
+                        assert_eq!(values[0].edt.as_ref().unwrap(), "0x41");
                     }
                     _ => panic!("unexpected option!"),
                 }
