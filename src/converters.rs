@@ -102,8 +102,8 @@ impl<T> TryFrom<descriptions::PropertyValue<T>> for PropertyValue<T> {
 #[derive(Deserialize, Debug)]
 pub enum Converter {
     Boolean {
-        true_value: PropertyValue<bool>,
-        false_value: PropertyValue<bool>,
+        true_value: String,
+        false_value: String,
     },
     Time {
         format: String,
@@ -192,19 +192,18 @@ impl TryFrom<Schema> for Converter {
             Schema::T(TypedSchema::Boolean { values }) => {
                 //find the two true/false values, that's all we care
 
-                let true_v = values
+                let true_value = values
                     .iter()
                     .find(|v| v.value && v.edt.is_some())
                     .cloned()
+                    .map(|v| v.edt.unwrap())
                     .ok_or_else(|| "No true value".to_string())?;
-                let false_v = values
+                let false_value = values
                     .iter()
                     .find(|v| !v.value && v.edt.is_some())
                     .cloned()
+                    .map(|v| v.edt.unwrap())
                     .ok_or_else(|| "No false value".to_string())?;
-                //these should not fail, because of the checks above
-                let true_value = PropertyValue::try_from(true_v)?;
-                let false_value = PropertyValue::try_from(false_v)?;
                 Ok(Converter::Boolean {
                     true_value,
                     false_value,
@@ -255,7 +254,7 @@ impl TryFrom<Schema> for Converter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::descriptions::{self, Schema, TypedSchema};
+    use crate::descriptions::{self, read_def, Schema, TypedSchema};
 
     #[test]
     fn ai_api() {
@@ -314,10 +313,8 @@ mod tests {
                 true_value,
                 false_value,
             } => {
-                assert_eq!(true_value.value, true);
-                assert_eq!(true_value.edt, "edt_true");
-                assert_eq!(false_value.value, false);
-                assert_eq!(false_value.edt, "edt_false");
+                assert_eq!(true_value, "edt_true");
+                assert_eq!(false_value, "edt_false");
             }
             _ => panic!("should match a boolean converter!"),
         }
