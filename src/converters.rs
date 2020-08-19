@@ -1,6 +1,6 @@
 use crate::descriptions::{self, Schema, TypedSchema};
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
 
 #[repr(u8)]
@@ -32,7 +32,7 @@ pub struct PropertyInfo {
 
 #[derive(Deserialize, Debug)]
 pub struct NamedInfo {
-    pub property: String,
+    pub name: String,
     pub info: Option<AdditionalInfo>,
 }
 
@@ -123,7 +123,7 @@ pub enum Converter {
         edt: String,
     },
     Object {
-        properties: HashMap<String, Converter>,
+        properties: Vec<(String, Converter)>,
     },
     Array {
         #[serde(rename = "minItems")]
@@ -251,6 +251,88 @@ impl TryFrom<Schema> for Converter {
     }
 }
 
+pub fn fuse(description: &Schema, ai: &AdditionalInfo) -> Result<Converter, String> {
+    //smash bits together..
+    //this is horrible due to the matching of enum variants...
+    match (description, ai) {
+        (Schema::T(TypedSchema::Object { properties }), AdditionalInfo::Object { order }) => {
+            fuse_objects(properties, order)
+        }
+        //the matching is horrible
+        (
+            Schema::T(TypedSchema::Number {
+                unit: _,
+                minimum: smin,
+                maximum: smax,
+                multiple_of: smof,
+            }),
+            AdditionalInfo::Number {
+                size: _,
+                min: amin,
+                max: amax,
+                multiple_of: amof,
+            },
+        ) => {
+            let min = smin
+                .or(*amin)
+                .ok_or("fuse numbers: no min spec!".to_string())?;
+            let max = smax
+                .or(*amax)
+                .ok_or("fuse numbers: no max spec!".to_string())?;
+            let mof = smof
+                .or(*amof)
+                .ok_or("fuse numbers: no multipe_of spec!".to_string())?;
+            Ok(Converter::Number {
+                minimum: min,
+                maximum: max,
+                multiple_of: mof,
+            })
+        }
+        _ => unimplemented!(),
+    }
+}
+
+fn fuse_objects(
+    properties: &HashMap<String, Schema>,
+    order: &[NamedInfo],
+) -> Result<Converter, String> {
+    if properties.len() != order.len() {
+        return Err("fuse objects: ordering info different from properties".to_string());
+    }
+    //check that all properties are covered
+    let key_set = properties.keys().collect::<HashSet<_>>();
+    if order.iter().any(|ni| !key_set.contains(&ni.name)) {
+        return Err("fuse objects: properties/order mismatch".to_string());
+    }
+    //everything aligns, try to convert
+    //for each thing as specified in the order, try to get a converter
+    let converters = order
+        .iter()
+        .map(|ni| {
+            //we know this exists
+            let prop_schema = properties.get(&ni.name).unwrap();
+
+            //do we have additional info?
+            if ni.info.is_some() {
+                //yes, fuse
+                fuse(prop_schema, ni.info.as_ref().unwrap())
+            } else {
+                //no, try to promote to converter
+                Converter::try_from(prop_schema.clone())
+            }
+        })
+        .collect::<Result<Vec<Converter>, String>>()
+        .map_err(|err| format!("fuse objects: some converter failed: {}", err))?;
+    //we have our converters, zip them with names and make a hashmap out of them
+    Ok(Converter::Object {
+        properties: order
+            .iter()
+            .map(|ni| ni.name.clone())
+            .zip(converters)
+            .collect(),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -262,6 +344,30 @@ mod tests {
         let ais: Entries = descriptions::read_def_generic("./tests/ai/test.json").unwrap();
         assert_eq!(ais.entries[0].eoj, "0290");
         assert_eq!(ais.entries[1].ai.is_empty(), true);
+    }
+
+    fn convert_properties(filepath: &str) -> Vec<Result<Converter, String>> {
+        read_def(filepath)
+            .unwrap()
+            .properties
+            .into_iter()
+            .inspect(|prop| {
+                println!(
+                    "prop: {} {}, {}, {}",
+                    prop.0, prop.1.epc, prop.1.writable, prop.1.observable
+                )
+            })
+            .map(|prop| Converter::try_from(prop.1.schema))
+            .inspect(|res| println!("conversion: {:?}", res))
+            .collect::<Vec<Result<Converter, String>>>()
+    }
+
+    #[test]
+    fn try_convert_properties() {
+        println!("\ncommon:\n");
+        convert_properties("tests/dd/commonItems_v110.json");
+        println!("\nlighting:\n");
+        convert_properties("tests/dd/generalLighting_v100.json");
     }
 
     #[test]
@@ -335,5 +441,50 @@ mod tests {
         let converter: Result<Converter, String> = schema.try_into();
         assert!(converter.is_err());
         assert_eq!(converter.unwrap_err(), "No false value");
+    }
+
+    #[test]
+    fn fuse_objects_ok() {
+        let ais: Entries = descriptions::read_def_generic("./tests/ai/test.json").unwrap();
+        let ldd = descriptions::read_def("./tests/dd/generalLighting_v100.json").unwrap();
+        //get "rgb" property
+        let color = &ldd.properties["rgb"];
+        //get rgb additional info
+        let rgb_entry = &ais
+            .entries
+            .iter()
+            .find(|entry| entry.eoj == "0290")
+            .unwrap()
+            .ai[0];
+
+        assert_eq!(rgb_entry.epc, "0xC0");
+        let fused = fuse(&color.schema, &rgb_entry.info).expect("failed to fuse rgb!");
+        //it fused!! check stuff
+        match fused {
+            Converter::Object { properties } => {
+                assert_eq!(properties.len(), 3);
+                properties
+                    .iter()
+                    .zip(vec!["red", "green", "blue"].iter())
+                    .for_each(|((name, conv), exp_name)| {
+                        //check name
+                        assert_eq!(name, exp_name);
+                        //check converter
+                        match conv {
+                            Converter::Number {
+                                minimum,
+                                maximum,
+                                multiple_of,
+                            } => {
+                                assert!(minimum.abs() < 0.00001);
+                                assert!((maximum - 255.).abs() < 0.00001);
+                                assert!((multiple_of - 1.).abs() < 0.00001);
+                            }
+                            _ => panic!("rgb converter, inner converters not numbers!"),
+                        }
+                    });
+            }
+            _ => panic!("should match an object converter!"),
+        }
     }
 }

@@ -10,7 +10,7 @@ pub struct TextDescription {
     pub en: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct DeviceProperty {
     pub epc: String,
     pub descriptions: TextDescription,
@@ -26,7 +26,7 @@ pub struct PropertyValue<T> {
     pub edt: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum TypedSchema {
     Boolean {
@@ -60,14 +60,14 @@ pub enum TypedSchema {
     },
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 pub struct Options {
     #[serde(rename = "oneOf")]
     pub one_of: Vec<Schema>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum Schema {
     T(TypedSchema),

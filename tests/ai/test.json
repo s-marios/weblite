@@ -6,11 +6,11 @@
 			"info" : {
 				"type": "object",
 				"order": [{
-					"property" : "red"
+					"name" : "red"
 				}, {
-					"property" : "green"
+					"name" : "green"
 				}, {
-					"property" : "blue"
+					"name" : "blue"
 				}]
 			}
 		}]
