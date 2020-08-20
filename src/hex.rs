@@ -33,6 +33,14 @@ pub fn to_bytes(hex: &str) -> Option<Vec<u8>> {
     )
 }
 
+pub fn bytes_as_u32(bytes: &[u8]) -> u32 {
+    bytes
+        .iter()
+        .take(4)
+        .map(|byte| *byte as u32)
+        .fold(0u32, |acc, byte| byte + (acc << 8))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

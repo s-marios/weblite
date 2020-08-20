@@ -1,16 +1,12 @@
 use crate::descriptions::{self, Schema, TypedSchema};
+use crate::hex::bytes_as_u32 as accumulate;
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
+use std::path::Path;
 
-#[repr(u8)]
-#[derive(Deserialize, Debug)]
-enum NumberSize {
-    Zero = 0,
-    One = 1,
-    Two = 2,
-    Three = 3,
-    Four = 4,
+pub(crate) fn read_ais<P: AsRef<Path>>(filename: P) -> std::io::Result<Entries> {
+    descriptions::read_def_generic::<P, Entries>(filename)
 }
 
 #[derive(Deserialize, Debug)]
@@ -43,6 +39,7 @@ pub enum AdditionalInfo {
         true_value: String,
         false_value: String,
     },
+    //TODO
     String,
     Number {
         #[serde(default = "AdditionalInfo::default_size")]
@@ -135,6 +132,79 @@ pub enum Converter {
     OneOf {
         opts: Vec<Converter>,
     },
+}
+
+pub struct BinaryContext<'a> {
+    data: &'a [u8],
+}
+
+//impl <'a>BinaryContext<'a> {
+//}
+
+impl Converter {
+    pub fn convert_json(&self, _value: serde_json::Value) -> Result<Vec<u8>, String> {
+        unimplemented!()
+    }
+
+    pub fn convert_binary<'a, 's>(
+        &self,
+        context: &'a mut BinaryContext<'s>,
+    ) -> Result<serde_json::Value, String> {
+        match self {
+            Converter::Number {
+                minimum: _,
+                maximum: _,
+                multiple_of: _,
+            } => self.convert_number(context),
+            _ => unimplemented!("not yet!"),
+        }
+    }
+
+    fn convert_number<'a, 's>(
+        &self,
+        context: &'a mut BinaryContext<'s>,
+    ) -> Result<serde_json::Value, String> {
+        if let Converter::Number {
+            minimum: min,
+            maximum: max,
+            multiple_of: mof,
+        } = self
+        {
+            let size = Converter::range_calculate(*min, *max, *mof);
+            //get our data...
+            let data = &context.data[..size];
+            //...and update context i.e. advance data slice
+            context.data = &context.data[size..];
+            //make a number from the data
+
+            //TODO look this up, but I dont think we have anything more than an u32
+            let value = accumulate(data) as f32;
+            //massage it..
+            let value = (value * *mof) + min;
+            //TODO handle above max?
+            if value > *max {
+                println!("TODO: we've generated a value greater than max");
+            }
+            Ok(serde_json::from_str(&value.to_string())
+                .map_err(|err| format!("converter: serde json error: {}", err))?)
+        } else {
+            panic!("this can never happen!")
+        }
+    }
+
+    fn range_calculate(min: f32, max: f32, mof: f32) -> usize {
+        assert!(!(mof.abs() < 0.00001));
+        let range = (max - min) / mof;
+        if range < 255.0001 {
+            1
+        } else if range < 65536.001 {
+            2
+        } else if range < 16777216.1 {
+            3
+        } else {
+            4
+        }
+    }
 }
 
 impl TryFrom<Schema> for Converter {
@@ -275,13 +345,13 @@ pub fn fuse(description: &Schema, ai: &AdditionalInfo) -> Result<Converter, Stri
         ) => {
             let min = smin
                 .or(*amin)
-                .ok_or("fuse numbers: no min spec!".to_string())?;
+                .ok_or_else(|| "fuse numbers: no min spec!".to_string())?;
             let max = smax
                 .or(*amax)
-                .ok_or("fuse numbers: no max spec!".to_string())?;
+                .ok_or_else(|| "fuse numbers: no max spec!".to_string())?;
             let mof = smof
                 .or(*amof)
-                .ok_or("fuse numbers: no multipe_of spec!".to_string())?;
+                .ok_or_else(|| "fuse numbers: no multipe_of spec!".to_string())?;
             Ok(Converter::Number {
                 minimum: min,
                 maximum: max,
@@ -485,6 +555,90 @@ mod tests {
                     });
             }
             _ => panic!("should match an object converter!"),
+        }
+    }
+
+    #[test]
+    fn convert_number_from_binary_ok() {
+        let bytes = b"\x11\xff"; //this is 17, the second byte should not matter
+        let conv = Converter::Number {
+            minimum: -10.,
+            maximum: 150.,
+            multiple_of: 1.,
+        };
+
+        let mut context = BinaryContext { data: &bytes[..] };
+
+        let result = conv.convert_binary(&mut context).unwrap();
+        match result {
+            serde_json::Value::Number(num) => {
+                let num64 = num.as_f64().unwrap();
+                println!("num is: {}, f64: {}", num, num64);
+                //since minimum is -10 and our raw value is 17
+                //this should be seven...
+                assert!((num64 - 7.).abs() < 0.00001)
+            }
+            _ => panic!("we were supposed to get a number back!"),
+        }
+
+        //did the context advance?
+        assert_eq!(context.data.len(), 1);
+        assert_eq!(context.data[0], 0xff);
+        //whew... everything is fine
+    }
+
+    #[test]
+    fn convert_number_from_bytes_with_mof_ok() {
+        let bytes = b"\xff\xff\xff\xff"; //this is 17, the second byte should not matter
+        let conv = Converter::Number {
+            minimum: 25.6,
+            maximum: 51.1,
+            multiple_of: 0.1,
+        };
+
+        let mut context = BinaryContext { data: &bytes[..] };
+
+        let result = conv.convert_binary(&mut context).unwrap();
+        //did the context advance?
+        assert_eq!(context.data.len(), 3);
+        assert_eq!(context.data[0], 0xff);
+        //check the conversion result
+        match result {
+            serde_json::Value::Number(num) => {
+                let num64 = num.as_f64().unwrap();
+                println!("num is: {}, f64: {}", num, num64);
+                //since minimum is -10 and our raw value is 17
+                //this should be seven...
+                assert!((num64 - 51.1).abs() < 0.00001)
+            }
+            _ => panic!("we were supposed to get a number back!"),
+        }
+    }
+
+    #[test]
+    fn convert_number_from_4_bytes_ok() {
+        let bytes = b"\x01\x01\x01\x01"; //this is 17, the second byte should not matter
+        let conv = Converter::Number {
+            minimum: 0.,
+            maximum: std::u32::MAX as f32,
+            multiple_of: 0.1,
+        };
+
+        let mut context = BinaryContext { data: &bytes[..] };
+
+        let result = conv.convert_binary(&mut context).unwrap();
+        //did the context advance?
+        assert_eq!(context.data.len(), 0);
+        //check the conversion result
+        match result {
+            serde_json::Value::Number(num) => {
+                let num64 = num.as_f64().unwrap();
+                println!("num is: {}, f64: {}", num, num64);
+                //since minimum is -10 and our raw value is 17
+                //this should be seven...
+                assert!((num64 - 1684300.9).abs() < 0.00001)
+            }
+            _ => panic!("we were supposed to get a number back!"),
         }
     }
 }
