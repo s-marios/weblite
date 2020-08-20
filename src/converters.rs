@@ -142,8 +142,34 @@ pub struct BinaryContext<'a> {
 //}
 
 impl Converter {
-    pub fn convert_json(&self, _value: serde_json::Value) -> Result<Vec<u8>, String> {
-        unimplemented!()
+    pub fn convert_json(&self, value: serde_json::Value) -> Result<Vec<u8>, String> {
+        match self {
+            Converter::Number {
+                minimum,
+                maximum,
+                multiple_of,
+            } => Converter::convert_json_number(value, *minimum, *maximum, *multiple_of),
+            _ => unimplemented!(),
+        }
+    }
+
+    fn convert_json_number(
+        value: serde_json::Value,
+        min: f32,
+        max: f32,
+        mof: f32,
+    ) -> Result<Vec<u8>, String> {
+        //TODO figure out Value::Number and to what it'd better be mapped
+        //hopefully this will not bite me
+        if let Some(num) = value.as_f64() {
+            let range = Converter::range_calculate(min, max, mof);
+            //TODO this bites me, maybe keep everything as f64?
+            //let num = num as f32
+            let binary = (((num - min as f64) / mof as f64).round() as u32).to_be_bytes();
+            Ok(binary[4 - range..].to_owned())
+        } else {
+            Err("serde_json_number: couldn't get number as f64!".to_string())
+        }
     }
 
     pub fn convert_binary<'a, 's>(
@@ -155,12 +181,12 @@ impl Converter {
                 minimum: _,
                 maximum: _,
                 multiple_of: _,
-            } => self.convert_number(context),
+            } => self.convert_binary_number(context),
             _ => unimplemented!("not yet!"),
         }
     }
 
-    fn convert_number<'a, 's>(
+    fn convert_binary_number<'a, 's>(
         &self,
         context: &'a mut BinaryContext<'s>,
     ) -> Result<serde_json::Value, String> {
@@ -407,6 +433,7 @@ fn fuse_objects(
 mod tests {
     use super::*;
     use crate::descriptions::{self, read_def, Schema, TypedSchema};
+    use serde_json::json;
 
     #[test]
     fn ai_api() {
@@ -640,5 +667,56 @@ mod tests {
             }
             _ => panic!("we were supposed to get a number back!"),
         }
+    }
+
+    #[test]
+    fn convert_number_to_1_byte_ok() {
+        let value = json!(255);
+        let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap();
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0], 255);
+    }
+
+    #[test]
+    fn convert_number_after_rounding_to_1_byte_ok() {
+        let value = json!(254.9999999);
+        let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap();
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0], 255);
+    }
+
+    #[test]
+    fn convert_512_after_rounding_to_2_bytes_ok() {
+        let value = json!(511);
+        let result = Converter::convert_json_number(value, 0., 1024., 1.).unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0], 1);
+        assert_eq!(result[1], 255);
+    }
+
+    #[test]
+    fn convert_65793_to_3_bytes_ok() {
+        let value = json!(65793);
+        let result = Converter::convert_json_number(value, 0., 128000., 1.).unwrap();
+        assert_eq!(result.len(), 3);
+        assert_eq!(result, b"\x01\x01\x01");
+    }
+
+    #[test]
+    fn convert_16843009_to_4_bytes_ok() {
+        let value = json!(16843009);
+        let result = Converter::convert_json_number(value, 0., 36843009., 1.).unwrap();
+        assert_eq!(result.len(), 4);
+        assert_eq!(result, b"\x01\x01\x01\x01");
+    }
+
+    #[ignore]
+    #[test]
+    //TODO accuracy bites me!!!
+    fn convert_16843009_to_4_bytes_with_translation_ok() {
+        let value = json!(16843.009);
+        let result = Converter::convert_json_number(value, 0.0, 36843.009, 0.001).unwrap();
+        assert_eq!(result.len(), 4);
+        assert_eq!(result, b"\x01\x01\x01\x01");
     }
 }
