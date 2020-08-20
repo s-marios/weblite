@@ -76,7 +76,7 @@ impl AdditionalInfo {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct PropertyValue<T> {
     pub value: T,
     pub edt: String,
@@ -96,7 +96,7 @@ impl<T> TryFrom<descriptions::PropertyValue<T>> for PropertyValue<T> {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 pub enum Converter {
     Boolean {
         true_value: String,
@@ -138,8 +138,11 @@ pub struct BinaryContext<'a> {
     data: &'a [u8],
 }
 
-//impl <'a>BinaryContext<'a> {
-//}
+impl<'a> From<&'a [u8]> for BinaryContext<'a> {
+    fn from(data: &'a [u8]) -> Self {
+        BinaryContext { data }
+    }
+}
 
 impl Converter {
     pub fn convert_json(&self, value: serde_json::Value) -> Result<Vec<u8>, String> {
@@ -149,26 +152,8 @@ impl Converter {
                 maximum,
                 multiple_of,
             } => Converter::convert_json_number(value, *minimum, *maximum, *multiple_of),
+            Converter::Object { properties } => Converter::convert_json_object(value, properties),
             _ => unimplemented!(),
-        }
-    }
-
-    fn convert_json_number(
-        value: serde_json::Value,
-        min: f32,
-        max: f32,
-        mof: f32,
-    ) -> Result<Vec<u8>, String> {
-        //TODO figure out Value::Number and to what it'd better be mapped
-        //hopefully this will not bite me
-        if let Some(num) = value.as_f64() {
-            let range = Converter::range_calculate(min, max, mof);
-            //TODO this bites me, maybe keep everything as f64?
-            //let num = num as f32
-            let binary = (((num - min as f64) / mof as f64).round() as u32).to_be_bytes();
-            Ok(binary[4 - range..].to_owned())
-        } else {
-            Err("serde_json_number: couldn't get number as f64!".to_string())
         }
     }
 
@@ -182,8 +167,52 @@ impl Converter {
                 maximum: _,
                 multiple_of: _,
             } => self.convert_binary_number(context),
+            Converter::Object { properties: _ } => self.convert_binary_object(context),
             _ => unimplemented!("not yet!"),
         }
+    }
+
+    fn convert_json_number(
+        value: serde_json::Value,
+        min: f32,
+        max: f32,
+        mof: f32,
+    ) -> Result<Vec<u8>, String> {
+        //TODO figure out Value::Number and to what it'd better be mapped
+        //hopefully this will not bite me
+        if let Some(num) = value.as_f64() {
+            Converter::check_in_range(num as f32, min, max)?;
+            let range = Converter::range_calculate(min, max, mof);
+            //TODO this bites me, maybe keep everything as f64?
+            //let num = num as f32
+            let binary = (((num - min as f64) / mof as f64).round() as u32).to_be_bytes();
+            Ok(binary[4 - range..].to_owned())
+        } else {
+            Err("serde_json_number: couldn't get number as f64!".to_string())
+        }
+    }
+
+    fn check_in_range(val: f32, min: f32, max: f32) -> Result<(), String> {
+        if val < min {
+            Err("less than min".to_string())
+        } else if val > max {
+            Err("greater than max".to_string())
+        } else {
+            Ok(())
+        }
+    }
+
+    fn convert_json_object(
+        value: serde_json::Value,
+        properties: &[(String, Converter)],
+    ) -> Result<Vec<u8>, String> {
+        Ok(properties
+            .iter()
+            .map(|(name, conv)| conv.convert_json(value[name].clone()))
+            .collect::<Result<Vec<Vec<u8>>, String>>()?
+            .into_iter()
+            .flatten()
+            .collect())
     }
 
     fn convert_binary_number<'a, 's>(
@@ -213,6 +242,26 @@ impl Converter {
             }
             Ok(serde_json::from_str(&value.to_string())
                 .map_err(|err| format!("converter: serde json error: {}", err))?)
+        } else {
+            panic!("this can never happen!")
+        }
+    }
+
+    fn convert_binary_object<'a, 's>(
+        &self,
+        context: &'a mut BinaryContext<'s>,
+    ) -> Result<serde_json::Value, String> {
+        if let Converter::Object { properties } = self {
+            let mut map = serde_json::map::Map::with_capacity(properties.len());
+            //TODO there's some inference problems here, I don't know why
+            let _: Result<(), String> = properties.iter().try_for_each(|(name, conv)| {
+                let conv_res: serde_json::Value = conv
+                    .convert_binary(context)
+                    .map_err(|err| format!("cbo: sub-converter failed {}", err))?;
+                map.insert(name.clone(), conv_res);
+                Ok(())
+            });
+            Ok(serde_json::Value::Object(map))
         } else {
             panic!("this can never happen!")
         }
@@ -678,6 +727,20 @@ mod tests {
     }
 
     #[test]
+    fn convert_number_that_exceeds_max_fails() {
+        let value = json!(300);
+        let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap_err();
+        assert!(result.contains("greater"));
+    }
+
+    #[test]
+    fn convert_number_that_is_less_than_min_fails() {
+        let value = json!(-300);
+        let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap_err();
+        assert!(result.contains("less"));
+    }
+
+    #[test]
     fn convert_number_after_rounding_to_1_byte_ok() {
         let value = json!(254.9999999);
         let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap();
@@ -710,13 +773,94 @@ mod tests {
         assert_eq!(result, b"\x01\x01\x01\x01");
     }
 
+    #[test]
+    fn convert_2313_to_2_bytes_ok() {
+        let value = json!(3.13);
+        let result = Converter::convert_json_number(value, -20., 40., 0.01).unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result, b"\x09\x09");
+    }
+
     #[ignore]
     #[test]
     //TODO accuracy bites me!!!
+    //UPDATE clippy reports excessive accuracy, we may need to switch to f64
     fn convert_16843009_to_4_bytes_with_translation_ok() {
         let value = json!(16843.009);
         let result = Converter::convert_json_number(value, 0.0, 36843.009, 0.001).unwrap();
         assert_eq!(result.len(), 4);
         assert_eq!(result, b"\x01\x01\x01\x01");
+    }
+
+    fn make_rgb_conv() -> Converter {
+        Converter::Object {
+            properties: vec!["red".to_string(), "green".to_string(), "blue".to_string()]
+                .into_iter()
+                .zip(std::iter::repeat(Converter::Number {
+                    minimum: 0.,
+                    maximum: 255.,
+                    multiple_of: 1.,
+                }))
+                .collect(),
+        }
+    }
+
+    #[test]
+    fn convert_rgb_to_3_bytes_ok() {
+        //first, make the object converter
+        let obj_conv = make_rgb_conv();
+
+        //let's make our input
+        let value = json!({
+            "red": 0,
+            "green":128,
+            "blue": 255
+        });
+
+        let result = obj_conv.convert_json(value).unwrap();
+        assert_eq!(result, b"\x00\x80\xff");
+    }
+
+    #[test]
+    fn convert_rgb_to_3_bytes_exceeds_max_fails() {
+        //first, make the object converter
+        let obj_conv = make_rgb_conv();
+
+        //let's make our invalid input
+        //green exceeds max
+        let value = json!({
+            "red": 0,
+            "green":1280,
+            "blue": 255000
+        });
+
+        let result = obj_conv.convert_json(value).unwrap_err();
+        assert!(result.contains("greater"));
+    }
+
+    #[test]
+    fn convert_rgb_from_3_bytes_ok() {
+        //first, make the object converter
+        let obj_conv = make_rgb_conv();
+
+        //let's make our input
+        //
+        ////original
+        //let data = b"\x01\x02\x03";
+        //let mut context = BinaryContext { data: &data[..] };
+        //let value = obj_conv.convert_binary(&mut context).unwrap();
+        //
+        ////this is horrible
+        //let mut data = b"\x01\x02\x03";
+        //let value = obj_conv.convert_binary(&mut (&data[..]).into()).unwrap();
+        //
+        //perfect!
+        let mut context = b"\x01\x02\x03"[..].into();
+        let value = obj_conv.convert_binary(&mut context).unwrap();
+
+        assert_eq!(value["red"], 1);
+        assert_eq!(value["green"], 2);
+        assert_eq!(value["blue"], 3);
+        println!("value: {}", value);
     }
 }

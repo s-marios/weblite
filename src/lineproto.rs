@@ -140,12 +140,12 @@ mod tests {
 
     #[test]
     fn empty_property_map_is_none() {
-        assert_eq!(parse_property_map(&vec![]).is_none(), true);
+        assert_eq!(parse_property_map(&[]).is_none(), true);
     }
 
     #[test]
     fn zero_properties_is_ok() {
-        let res = parse_property_map(&vec![0]).unwrap();
+        let res = parse_property_map(&[0]).unwrap();
         assert!(res.is_empty());
     }
 

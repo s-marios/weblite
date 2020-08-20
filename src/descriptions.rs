@@ -487,7 +487,7 @@ mod tests {
     fn read_device_descriptions_all_succeeds() {
         let path = "./tests/dd/";
         let dds = read_device_descriptions(path).expect("parsing dds failed!");
-        assert!(dds.len() > 0);
+        assert!(!dds.is_empty());
         //currently we have... ten or so?
         assert_eq!(dds.len(), 10);
     }
