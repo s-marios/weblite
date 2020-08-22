@@ -1,5 +1,5 @@
 use crate::descriptions::{self, Schema, TypedSchema};
-use crate::hex::bytes_as_u32 as accumulate;
+use crate::hex::{self, bytes_as_u32 as accumulate};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
@@ -106,10 +106,8 @@ pub enum Converter {
         format: String,
     },
     Passthrough,
-    Enumlist {
-        enumlist: Vec<String>,
-        values: Vec<PropertyValue<String>>,
-    },
+    //hashmap is <enum-name, edt>
+    Enumlist(HashMap<String, String>),
     Number {
         minimum: f32,
         maximum: f32,
@@ -153,6 +151,13 @@ impl Converter {
                 multiple_of,
             } => Converter::convert_json_number(value, *minimum, *maximum, *multiple_of),
             Converter::Object { properties } => Converter::convert_json_object(value, properties),
+            Converter::Passthrough => Converter::json_passthrough(
+                value.as_str().ok_or("passthrough: input not a string!")?,
+            ),
+            Converter::Enumlist(map) => Converter::json_enumlist(
+                value.as_str().ok_or("enumlist: input not a string!")?,
+                map,
+            ),
             _ => unimplemented!(),
         }
     }
@@ -168,6 +173,8 @@ impl Converter {
                 multiple_of: _,
             } => self.convert_binary_number(context),
             Converter::Object { properties: _ } => self.convert_binary_object(context),
+            Converter::Passthrough => Converter::binary_passthrough(context),
+            Converter::Enumlist(map) => Converter::binary_enumlist(context, map),
             _ => unimplemented!("not yet!"),
         }
     }
@@ -213,6 +220,19 @@ impl Converter {
             .into_iter()
             .flatten()
             .collect())
+    }
+
+    fn json_passthrough(input: &str) -> Result<Vec<u8>, String> {
+        Ok(input.bytes().collect())
+    }
+
+    fn json_enumlist(input: &str, map: &HashMap<String, String>) -> Result<Vec<u8>, String> {
+        Ok(vec![hex::to_usize(
+            map.get(input)
+                .ok_or(format!("json_enum: no entry for: {}", input))?,
+        )
+        .ok_or(format!("json_enum: invalid entry for {}, fix ASAP!", input))?
+            as u8])
     }
 
     fn convert_binary_number<'a, 's>(
@@ -267,6 +287,41 @@ impl Converter {
         }
     }
 
+    fn binary_passthrough<'s>(
+        context: &mut BinaryContext<'s>,
+    ) -> Result<serde_json::Value, String> {
+        //get our data out
+        let data = &context.data[..];
+        //consume the whole thing, advance context
+        context.data = &context.data[data.len()..];
+        Ok(serde_json::Value::String(
+            String::from_utf8_lossy(&data).to_string(),
+        ))
+    }
+
+    fn binary_enumlist<'s>(
+        context: &mut BinaryContext<'s>,
+        map: &HashMap<String, String>,
+    ) -> Result<serde_json::Value, String> {
+        //now this is interesting..
+        //do we have enums that are more than one byte?
+        //TODO check above
+
+        //our data as a string..
+        let data_string = format!("0x{:2x}", context.data[0]);
+        println!("datastring: {}", data_string);
+        //advance context
+        context.data = &context.data[1..];
+        //..just go through the map and find the thing
+        Ok(serde_json::Value::String(
+            map.iter()
+                .find(|(_, v)| *v == &data_string)
+                .ok_or(format!("binary_enumlist: no key for edt: {}", data_string))?
+                .0
+                .clone(),
+        ))
+    }
+
     fn range_calculate(min: f32, max: f32, mof: f32) -> usize {
         assert!(!(mof.abs() < 0.00001));
         let range = (max - min) / mof;
@@ -307,7 +362,9 @@ impl TryFrom<Schema> for Converter {
             //String-enums & time
             Schema::T(TypedSchema::String {
                 format: None,
-                enumlist,
+                //TODO we are ignoring the enumlist completely
+                //and rely on the values themselves, is this ok?
+                enumlist: _,
                 values: Some(values),
             }) => {
                 if let Ok(vres) = values
@@ -316,15 +373,11 @@ impl TryFrom<Schema> for Converter {
                     .map(|p| p.try_into())
                     .collect::<Result<Vec<PropertyValue<String>>, String>>()
                 {
-                    let enumlist = enumlist.unwrap_or_else(|| {
-                        vres.iter()
-                            .map(|property| property.value.clone())
-                            .collect::<Vec<String>>()
-                    });
-                    Ok(Converter::Enumlist {
-                        enumlist,
-                        values: vres,
-                    })
+                    Ok(Converter::Enumlist(
+                        vres.into_iter()
+                            .map(|property| (property.value, property.edt))
+                            .collect::<HashMap<String, String>>(),
+                    ))
                 } else {
                     Err(String::from("Enumlist: not all values had edt"))
                 }
@@ -862,5 +915,35 @@ mod tests {
         assert_eq!(value["green"], 2);
         assert_eq!(value["blue"], 3);
         println!("value: {}", value);
+    }
+
+    #[test]
+    fn passthrough_conversions_ok() {
+        let vs = "test";
+        let data = b"test";
+
+        //value->binary
+        let bd = Converter::json_passthrough(vs).unwrap();
+        assert_eq!(bd, data);
+        let mut context = bd.as_slice().into();
+        let vbd = Converter::binary_passthrough(&mut context).unwrap();
+        assert_eq!(vbd, vs);
+    }
+
+    #[test]
+    fn enum_conversions_ok() {
+        //value-to-binary
+        //let's make our map
+        let mut map: HashMap<String, String> = HashMap::new();
+        map.insert("test".to_string(), "0x41".to_string());
+
+        let res = Converter::json_enumlist("test", &map).unwrap();
+        assert_eq!(res[0], b'A');
+        assert_eq!(res.len(), 1);
+
+        //binary-to-value
+        let mut context = (&res[..]).into();
+        let bres = Converter::binary_enumlist(&mut context, &map).unwrap();
+        assert_eq!(bres.as_str().unwrap(), "test");
     }
 }
