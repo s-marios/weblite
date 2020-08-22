@@ -19,18 +19,23 @@ use line_driver::LineDriver;
 pub struct AppData {
     pub config: Config,
     pub descriptions: Descriptions,
+    pub superclass_dd: DeviceDescription,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
     pub backend: String,
     pub dd_dir: String,
+    pub superclass_dd: String,
+    pub ai_file: String,
 }
 
 pub fn init() -> std::io::Result<AppData> {
     let config = init_config()?;
     let mut driver = LineDriver::from(&config.backend)?;
+    let superclass_dd = read_def(&config.superclass_dd)?;
     let descriptions = read_device_descriptions(&config.dd_dir)?;
+    let ais = converters::read_ais(&config.ai_file)?;
     println!("available device descriptions:");
     descriptions
         .iter()
@@ -46,11 +51,17 @@ pub fn init() -> std::io::Result<AppData> {
         .collect::<HashSet<String>>();
 
     let intersection = lineproto::class_intersect(&available, &discovered);
-    lineproto::scan_classes(intersection, &mut driver);
+
+    let devices = lineproto::scan_classes(intersection, &mut driver);
+    println!("\n\n Detected devices\n------------");
+    devices
+        .iter()
+        .for_each(|(name, ed)| println!("dev:{}, details: {:?}", name, ed));
 
     Ok(AppData {
         config,
         descriptions,
+        superclass_dd,
     })
 }
 

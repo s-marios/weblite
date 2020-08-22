@@ -1,4 +1,6 @@
 {
   "backend" : "150.65.230.118:3361",
-  "dd_dir" : "./tests/dd/"
+  "dd_dir" : "./tests/dd/",
+  "superclass_dd" : "./tests/dd/commonItems_v110.json",
+  "ai_file" : "./tests/ai/test.json"
 }

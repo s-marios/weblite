@@ -5,12 +5,13 @@ use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
 use std::path::Path;
 
-pub(crate) fn read_ais<P: AsRef<Path>>(filename: P) -> std::io::Result<Entries> {
-    descriptions::read_def_generic::<P, Entries>(filename)
+pub(crate) fn read_ais<P: AsRef<Path>>(filename: P) -> std::io::Result<Ais> {
+    descriptions::read_def_generic::<P, Ais>(filename)
 }
 
+/// All the Additional Information entries available
 #[derive(Deserialize, Debug)]
-pub struct Entries {
+pub struct Ais {
     entries: Vec<Entry>,
 }
 
@@ -540,8 +541,8 @@ mod tests {
     #[test]
     fn ai_api() {
         println!("test!!!");
-        let ais: Entries = descriptions::read_def_generic("./tests/ai/test.json").unwrap();
-        assert_eq!(ais.entries[0].eoj, "0290");
+        let ais: Ais = read_ais("./tests/ai/test.json").unwrap();
+        assert_eq!(ais.entries[0].eoj, "0x0290");
         assert_eq!(ais.entries[1].ai.is_empty(), true);
     }
 
@@ -644,7 +645,7 @@ mod tests {
 
     #[test]
     fn fuse_objects_ok() {
-        let ais: Entries = descriptions::read_def_generic("./tests/ai/test.json").unwrap();
+        let ais: Ais = read_ais("./tests/ai/test.json").unwrap();
         let ldd = descriptions::read_def("./tests/dd/generalLighting_v100.json").unwrap();
         //get "rgb" property
         let color = &ldd.properties["rgb"];
@@ -652,7 +653,7 @@ mod tests {
         let rgb_entry = &ais
             .entries
             .iter()
-            .find(|entry| entry.eoj == "0290")
+            .find(|entry| entry.eoj == "0x0290")
             .unwrap()
             .ai[0];
 

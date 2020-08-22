@@ -64,6 +64,7 @@ impl LineDriver {
         Ok(response)
     }
 
+    //TODO what's with the result that never fails? think about it
     ///execute a command, expect multiple replies
     pub fn exec_multi(&mut self, command: &str) -> io::Result<Vec<String>> {
         self.send(command)?;

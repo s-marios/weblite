@@ -1,18 +1,27 @@
 use crate::descriptions::*;
 
-pub struct EchonetDevice {
+#[derive(Debug)]
+pub(crate) struct DeviceInfo {
     pub host: String,
     pub eoj: String,
-    pub properties: Vec<String>,
-    pub description_id: usize,
+    pub r_prop: Vec<String>,
+    pub w_prop: Vec<String>,
 }
 
-impl EchonetDevice {
-    pub fn has_property(&self, property: &str, descriptions: Descriptions) -> bool {
-        descriptions
-            .get(self.description_id)
-            .expect("corrupt descriptions!")
-            .properties
-            .contains_key(property)
+impl DeviceInfo {
+    pub fn new(host: String, eoj: String) -> Self {
+        DeviceInfo {
+            host,
+            eoj,
+            r_prop: Vec::new(),
+            w_prop: Vec::new(),
+        }
     }
 }
+
+//#[derive(Debug)]
+//pub(crate) struct EchonetDevice {
+//    pub host: String,
+//    pub eoj: String,
+//    //pub r_conv:
+//}

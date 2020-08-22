@@ -1,8 +1,10 @@
+use crate::echoinfo::DeviceInfo;
+use crate::hex;
 use crate::line_driver::LineDriver;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::convert::TryFrom;
 
-#[derive(Debug)]
+#[derive(PartialEq, Eq, Debug)]
 enum LineResult {
     OK,
     NG,
@@ -15,6 +17,16 @@ struct LineResponse<'a> {
     eoj: &'a str,
     property: &'a str,
     data: Option<&'a str>,
+}
+
+impl LineResponse<'_> {
+    fn hosteoj(&self) -> String {
+        format!("{}:0x{}", self.host, self.eoj)
+    }
+
+    fn hexclass(&self) -> String {
+        format!("0x{}", &self.eoj[..4])
+    }
 }
 
 impl<'a> TryFrom<&'a str> for LineResponse<'a> {
@@ -91,17 +103,65 @@ pub(super) fn class_intersect(
     intersection.cloned().collect::<HashSet<String>>()
 }
 
-pub(super) fn scan_classes(classes: HashSet<String>, driver: &mut LineDriver) -> Vec<String> {
+pub(super) fn scan_classes(
+    classes: HashSet<String>,
+    driver: &mut LineDriver,
+) -> HashMap<String, DeviceInfo> {
     let cmd = classes
         .into_iter()
         //add the "00" instance to them
         //and generate the get property map command
-        .map(|eoj| format!("224.0.23.0:{}00:0x9F\n", eoj))
+        //two commands
+        .map(|eoj| format!("224.0.23.0:{}00:0x9F\n224.0.23.0:{0}00:0x9E\n", eoj))
         .collect::<String>();
     println!("Generated Scan command:\n{}", cmd);
-    let res = driver.exec_multi(&cmd);
+
+    //for the unwrap, see TODO in line_driver
+    let res = driver.exec_multi(&cmd).unwrap();
     println!("scan results:\n{:?}", res);
-    unimplemented!()
+
+    let parsed = res
+        .iter()
+        .map(|r| LineResponse::try_from(r as &str).unwrap())
+        .collect::<Vec<LineResponse>>();
+
+    generate_devices(parsed)
+}
+
+fn generate_devices(parsed: Vec<LineResponse>) -> HashMap<String, DeviceInfo> {
+    let mut set = HashMap::with_capacity(parsed.len());
+    for resp in parsed {
+        //check for valid data
+        if resp.result == LineResult::NG || resp.data == None {
+            continue;
+        }
+
+        //we're good to go
+        let mut entry = set
+            .entry(resp.hosteoj())
+            .or_insert(DeviceInfo::new(resp.host.to_string(), resp.eoj.to_string()));
+
+        let props_u8 = hex::to_bytes(resp.data.unwrap());
+        if props_u8 == None {
+            println!("hex to bytes conversion failed!");
+            continue;
+        }
+
+        //safe to unwrap because of the above
+        if let Some(props) = parse_property_map(&props_u8.unwrap()) {
+            let text_props = props
+                .into_iter()
+                .map(|prop| format!("0x{:2x}", prop))
+                .collect::<Vec<String>>();
+            match resp.property {
+                "0x9F" => entry.r_prop.extend(text_props.into_iter()),
+                "0x9E" => entry.w_prop.extend(text_props.into_iter()),
+                other => println!("generate_devices: suspicious property: {}", other),
+            }
+        }
+    }
+
+    set
 }
 
 pub fn parse_property_map(property_map: &[u8]) -> Option<Vec<u8>> {
