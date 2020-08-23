@@ -165,6 +165,10 @@ impl Converter {
                 value.as_str().ok_or("enumlist: input not a string!")?,
                 map,
             ),
+            Converter::Boolean {
+                true_value,
+                false_value,
+            } => Converter::json_boolean(value, true_value, false_value),
             _ => unimplemented!(),
         }
     }
@@ -244,6 +248,24 @@ impl Converter {
         )
         .ok_or(format!("json_enum: invalid entry for {}, fix ASAP!", input))?
             as u8])
+    }
+
+    fn json_boolean(
+        value: serde_json::Value,
+        true_value: &str,
+        false_value: &str,
+    ) -> Result<Vec<u8>, String> {
+        Ok(hex::to_bytes(
+            if value
+                .as_bool()
+                .ok_or_else(|| "json bool: not a boolean!".to_string())?
+            {
+                true_value
+            } else {
+                false_value
+            },
+        )
+        .ok_or_else(|| "json bool: conversion failed".to_string())?)
     }
 
     //TODO deal with negative numbers!

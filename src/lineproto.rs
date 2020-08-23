@@ -35,6 +35,13 @@ impl LineResponse<'_> {
     pub fn host(&self) -> String {
         self.host.to_string()
     }
+
+    pub fn is_ok(&self) -> bool {
+        match self.result {
+            LineResult::OK => true,
+            LineResult::NG => false,
+        }
+    }
 }
 
 impl<'a> TryFrom<&'a str> for LineResponse<'a> {

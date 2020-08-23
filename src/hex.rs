@@ -41,6 +41,13 @@ pub fn bytes_as_u32(bytes: &[u8]) -> u32 {
         .fold(0u32, |acc, byte| byte + (acc << 8))
 }
 
+pub fn to_string(bytes: Vec<u8>) -> String {
+    bytes
+        .iter()
+        .map(|byte| format!("{:2X}", byte))
+        .collect::<String>()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

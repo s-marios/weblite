@@ -12,7 +12,7 @@ pub mod hex;
 pub mod line_driver;
 mod lineproto;
 
-use converters::{AdditionalInfo, BinaryContext, Converter, PropertyInfo};
+use converters::{AdditionalInfo, Converter, PropertyInfo};
 pub use descriptions::*;
 use echoinfo::{DeviceInfo, EchonetDevice, EchonetProperty};
 pub use hex::*;
@@ -204,7 +204,8 @@ async fn get_property_inner(
 ) -> Result<serde_json::Value, NetError> {
     let dev = get_device(&data.instances, &info.0).ok_or_else(|| NetError::NoDevice)?;
     let prop = get_dev_prop(&dev, &info.1).ok_or_else(|| NetError::NoProperty)?;
-    read_property(&data.config.backend, dev, prop).await
+    let mut line = get_line(&data.config.backend)?;
+    read_property(&mut line, dev, prop).await
 }
 
 pub async fn get_property(
@@ -228,14 +229,15 @@ pub enum NetError {
     //404s
     NoProperty,
     NoDevice,
+    //400
+    BadRequest,
 }
 
-pub async fn read_property(
-    backend: &str,
+async fn read_property(
+    line: &mut LineDriver,
     dev: &EchonetDevice,
     prop: &EchonetProperty,
 ) -> Result<serde_json::Value, NetError> {
-    let mut line = get_line(backend)?;
     //generate command
     let command = format!("{}:{}", dev.hosteoj(), prop.epc);
     let res = line
@@ -268,14 +270,53 @@ fn get_dev_prop<'a>(dev: &'a EchonetDevice, name: &str) -> Option<&'a EchonetPro
     dev.properties.iter().find(|prop| prop.name == name)
 }
 
-fn set_property_inner(
+async fn set_property_inner(
     info: web::Path<(String, String)>,
     data: web::Data<AppData>,
-    command: web::Json<serde_json::Value>,
+    value: web::Json<serde_json::Value>,
 ) -> Result<serde_json::Value, NetError> {
     let dev = get_device(&data.instances, &info.0).ok_or_else(|| NetError::NoDevice)?;
     let prop = get_dev_prop(&dev, &info.1).ok_or_else(|| NetError::NoProperty)?;
-    unimplemented!()
+    let mut line = get_line(&data.config.backend)?;
+    //we've got to serialize there two... right?
+    //I hope I'm right..
+    let _ = write_property(&mut line, dev, prop, value).await?;
+    read_property(&mut line, dev, prop).await
+}
+
+async fn write_property(
+    line: &mut LineDriver,
+    dev: &EchonetDevice,
+    prop: &EchonetProperty,
+    value: web::Json<serde_json::Value>,
+) -> Result<serde_json::Value, NetError> {
+    //we're receiving an object
+    //get the the value of the property out of it
+    let value = value.into_inner();
+    let value = value.as_object().ok_or_else(|| NetError::BadRequest)?;
+    let value = value.get(&prop.name).ok_or_else(|| NetError::BadRequest)?;
+    //convert from value first
+
+    let hex_data = hex::to_string(
+        prop.converter
+            .convert_json(value.clone())
+            .map_err(NetError::Conversion)?,
+    );
+
+    //generate command
+    let command = format!("{}:{},{}", dev.hosteoj(), prop.epc, hex_data);
+    //exec command
+    let res = line
+        .exec(&command)
+        .map_err(|err| NetError::Comm(err.to_string()))?;
+    let lr = LineResponse::try_from(&res as &str)
+        .map_err(|_| NetError::Comm("Bad Line Response".to_string()))?;
+    if lr.is_ok() {
+        //this will be unused, but for signature's sake put something in
+        Ok(serde_json::Value::Null)
+    } else {
+        Err(NetError::Comm("Set command failed!".to_string()))
+    }
 }
 
 fn to_response(res: Result<serde_json::Value, NetError>) -> impl Responder {
@@ -293,6 +334,7 @@ fn to_response(res: Result<serde_json::Value, NetError>) -> impl Responder {
         }
         Err(NetError::NoDevice) => HttpResponse::NotFound().body("no such device"),
         Err(NetError::NoProperty) => HttpResponse::NotFound().body("no such property"),
+        Err(NetError::BadRequest) => HttpResponse::BadRequest().body("bad request"),
     }
 }
 
@@ -301,24 +343,10 @@ pub async fn set_property(
     data: web::Data<AppData>,
     command: web::Json<serde_json::Value>,
 ) -> impl Responder {
-    to_response(set_property_inner(info, data, command))
+    to_response(set_property_inner(info, data, command).await)
 }
 
-pub async fn scan(config: web::Data<Config>) -> impl Responder {
-    let line = LineDriver::from(&config.backend);
-    if let Err(err) = line {
-        //TODO error handling
-        return HttpResponse::InternalServerError().body(err.to_string());
-    }
-    let mut line = line.unwrap();
-    let res = line.exec_multi("224.0.23.0:0ef000:d6");
-    match res {
-        Err(_error) => unimplemented!(),
-        Ok(lines) => HttpResponse::Ok().body(format!("resp: {}", lines.join(""))),
-    }
-}
-
-//This is the first thing, it's getting old & ugly
+//This is the old ugly stuff, don't look at it too closely.
 //TODO refarctor sometime
 #[derive(Serialize, Deserialize, Debug)]
 pub enum EchoCommand {
