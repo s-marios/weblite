@@ -21,7 +21,11 @@ async fn main() -> std::io::Result<()> {
                 )
                 .route(
                     "/v1/devices/{deviceid}/properties/{propertyid}",
-                    web::get().to(property),
+                    web::get().to(get_property),
+                )
+                .route(
+                    "/v1/devices/{deviceid}/properties/{propertyid}",
+                    web::put().to(set_property),
                 )
                 .route(
                     "/v1/devices/{deviceid}/echoCommands",

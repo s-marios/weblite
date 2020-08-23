@@ -1,5 +1,5 @@
 use crate::descriptions::{self, Schema, TypedSchema};
-use crate::hex::{self, bytes_as_u32 as accumulate};
+use crate::hex::{self, bytes_as_u32};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
@@ -13,6 +13,12 @@ pub(crate) fn read_ais<P: AsRef<Path>>(filename: P) -> std::io::Result<Ais> {
 #[derive(Deserialize, Debug)]
 pub struct Ais {
     entries: Vec<Entry>,
+}
+
+impl Ais {
+    pub fn properties(&self, eoj: &str) -> Option<&Vec<PropertyInfo>> {
+        Some(&self.entries.iter().find(|entry| entry.eoj == eoj)?.ai)
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -176,6 +182,10 @@ impl Converter {
             Converter::Object { properties: _ } => self.convert_binary_object(context),
             Converter::Passthrough => Converter::binary_passthrough(context),
             Converter::Enumlist(map) => Converter::binary_enumlist(context, map),
+            Converter::Boolean {
+                true_value,
+                false_value,
+            } => Converter::binary_boolean(context, true_value, false_value),
             _ => unimplemented!("not yet!"),
         }
     }
@@ -193,7 +203,7 @@ impl Converter {
             let range = Converter::range_calculate(min, max, mof);
             //TODO this bites me, maybe keep everything as f64?
             //let num = num as f32
-            let binary = (((num - min as f64) / mof as f64).round() as u32).to_be_bytes();
+            let binary = ((num as f64 / mof as f64).round() as u32).to_be_bytes();
             Ok(binary[4 - range..].to_owned())
         } else {
             Err("serde_json_number: couldn't get number as f64!".to_string())
@@ -236,6 +246,7 @@ impl Converter {
             as u8])
     }
 
+    //TODO deal with negative numbers!
     fn convert_binary_number<'a, 's>(
         &self,
         context: &'a mut BinaryContext<'s>,
@@ -254,9 +265,10 @@ impl Converter {
             //make a number from the data
 
             //TODO look this up, but I dont think we have anything more than an u32
-            let value = accumulate(data) as f32;
+            //TODO worse than that, how do we deal with negative numbers?
+            let value = bytes_as_u32(data) as f32;
             //massage it..
-            let value = (value * *mof) + min;
+            let value = value * *mof;
             //TODO handle above max?
             if value > *max {
                 println!("TODO: we've generated a value greater than max");
@@ -321,6 +333,29 @@ impl Converter {
                 .0
                 .clone(),
         ))
+    }
+
+    fn binary_boolean<'s>(
+        context: &mut BinaryContext<'s>,
+        true_value: &str,
+        false_value: &str,
+    ) -> Result<serde_json::Value, String> {
+        //get our value
+        let val = context.data.get(0).ok_or_else(|| "no data!".to_string())?;
+        //advance
+        context.data = &context.data[1..];
+
+        //Ok this is getting stupid
+        let tv = hex::to_bytes(true_value).ok_or_else(|| "bad data".to_string())?[0];
+        let fv = hex::to_bytes(false_value).ok_or_else(|| "bad data".to_string())?[0];
+
+        if *val == tv {
+            Ok(serde_json::Value::Bool(true))
+        } else if *val == fv {
+            Ok(serde_json::Value::Bool(false))
+        } else {
+            Err(format!("binary_boolean: Invalid binary value: {}", val))
+        }
     }
 
     fn range_calculate(min: f32, max: f32, mof: f32) -> usize {
@@ -706,7 +741,7 @@ mod tests {
                 println!("num is: {}, f64: {}", num, num64);
                 //since minimum is -10 and our raw value is 17
                 //this should be seven...
-                assert!((num64 - 7.).abs() < 0.00001)
+                assert!((num64 - 17.).abs() < 0.00001)
             }
             _ => panic!("we were supposed to get a number back!"),
         }
@@ -719,10 +754,10 @@ mod tests {
 
     #[test]
     fn convert_number_from_bytes_with_mof_ok() {
-        let bytes = b"\xff\xff\xff\xff"; //this is 17, the second byte should not matter
+        let bytes = b"\xff\xff\xff\xff";
         let conv = Converter::Number {
-            minimum: 25.6,
-            maximum: 51.1,
+            minimum: 0.,
+            maximum: 25.5,
             multiple_of: 0.1,
         };
 
@@ -737,9 +772,7 @@ mod tests {
             serde_json::Value::Number(num) => {
                 let num64 = num.as_f64().unwrap();
                 println!("num is: {}, f64: {}", num, num64);
-                //since minimum is -10 and our raw value is 17
-                //this should be seven...
-                assert!((num64 - 51.1).abs() < 0.00001)
+                assert!((num64 - 25.5).abs() < 0.00001)
             }
             _ => panic!("we were supposed to get a number back!"),
         }
@@ -829,10 +862,22 @@ mod tests {
 
     #[test]
     fn convert_2313_to_2_bytes_ok() {
-        let value = json!(3.13);
+        let value = json!(23.13);
         let result = Converter::convert_json_number(value, -20., 40., 0.01).unwrap();
         assert_eq!(result.len(), 2);
         assert_eq!(result, b"\x09\x09");
+    }
+
+    #[test]
+    fn convert_temperature_ok() {
+        let mut context = b"\x01\x00"[..].into();
+        let converter = Converter::Number {
+            minimum: -273.2,
+            maximum: 3276.6,
+            multiple_of: 0.1,
+        };
+        let result = converter.convert_binary_number(&mut context).unwrap();
+        assert_eq!(result.to_string(), "25.6");
     }
 
     #[ignore]

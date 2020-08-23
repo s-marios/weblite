@@ -73,7 +73,7 @@ pub enum Schema {
     T(TypedSchema),
     OneOf(Options),
 }
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceDescription {
     pub device_type: String,

@@ -5,27 +5,35 @@ use std::collections::{HashMap, HashSet};
 use std::convert::TryFrom;
 
 #[derive(PartialEq, Eq, Debug)]
-enum LineResult {
+pub enum LineResult {
     OK,
     NG,
 }
 
 #[derive(Debug)]
-struct LineResponse<'a> {
-    result: LineResult,
-    host: &'a str,
-    eoj: &'a str,
-    property: &'a str,
-    data: Option<&'a str>,
+pub(crate) struct LineResponse<'a> {
+    pub result: LineResult,
+    pub host: &'a str,
+    pub eoj: &'a str,
+    pub property: &'a str,
+    pub data: Option<&'a str>,
 }
 
 impl LineResponse<'_> {
-    fn hosteoj(&self) -> String {
+    pub fn hosteoj(&self) -> String {
         format!("{}:0x{}", self.host, self.eoj)
     }
 
-    fn hexclass(&self) -> String {
+    pub fn hexclass(&self) -> String {
         format!("0x{}", &self.eoj[..4])
+    }
+
+    pub fn eoj(&self) -> String {
+        format!("0x{}", &self.eoj)
+    }
+
+    pub fn host(&self) -> String {
+        self.host.to_string()
     }
 }
 
@@ -83,6 +91,7 @@ pub(super) fn get_all_classes(driver: &mut LineDriver) -> std::io::Result<HashSe
 pub(super) fn class_intersect(
     available: &HashSet<String>,
     discovered: &HashSet<String>,
+    //eojs have "0x" prefix in the response
 ) -> HashSet<String> {
     //do we cover all the discovered eojs?
     let diff_string = discovered
@@ -98,14 +107,17 @@ pub(super) fn class_intersect(
     }
 
     let intersection = available.intersection(discovered);
-    println!("classes to search for: {:?}", intersection);
 
-    intersection.cloned().collect::<HashSet<String>>()
+    //we need to map to "0x00000" format
+    intersection
+        .map(|class| format!("0x{}", class))
+        .collect::<HashSet<String>>()
 }
 
 pub(super) fn scan_classes(
     classes: HashSet<String>,
     driver: &mut LineDriver,
+    //eojs have "0x" prefix in the response
 ) -> HashMap<String, DeviceInfo> {
     let cmd = classes
         .into_iter()
@@ -128,6 +140,7 @@ pub(super) fn scan_classes(
     generate_devices(parsed)
 }
 
+//eojs have "0x" prefix in the response
 fn generate_devices(parsed: Vec<LineResponse>) -> HashMap<String, DeviceInfo> {
     let mut set = HashMap::with_capacity(parsed.len());
     for resp in parsed {
@@ -137,9 +150,9 @@ fn generate_devices(parsed: Vec<LineResponse>) -> HashMap<String, DeviceInfo> {
         }
 
         //we're good to go
-        let mut entry = set
+        let entry = set
             .entry(resp.hosteoj())
-            .or_insert(DeviceInfo::new(resp.host.to_string(), resp.eoj.to_string()));
+            .or_insert_with(|| DeviceInfo::new(resp.host(), resp.eoj()));
 
         let props_u8 = hex::to_bytes(resp.data.unwrap());
         if props_u8 == None {
@@ -151,11 +164,11 @@ fn generate_devices(parsed: Vec<LineResponse>) -> HashMap<String, DeviceInfo> {
         if let Some(props) = parse_property_map(&props_u8.unwrap()) {
             let text_props = props
                 .into_iter()
-                .map(|prop| format!("0x{:2x}", prop))
+                .map(|prop| format!("0x{:2X}", prop))
                 .collect::<Vec<String>>();
             match resp.property {
-                "0x9F" => entry.r_prop.extend(text_props.into_iter()),
-                "0x9E" => entry.w_prop.extend(text_props.into_iter()),
+                "0x9F" => entry.r.extend(text_props.into_iter()),
+                "0x9E" => entry.w.extend(text_props.into_iter()),
                 other => println!("generate_devices: suspicious property: {}", other),
             }
         }

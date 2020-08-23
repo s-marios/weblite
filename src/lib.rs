@@ -1,6 +1,7 @@
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::convert::TryFrom;
 use std::io::{self, ErrorKind};
 use std::path::Path;
 
@@ -11,15 +12,19 @@ pub mod hex;
 pub mod line_driver;
 mod lineproto;
 
+use converters::{AdditionalInfo, BinaryContext, Converter, PropertyInfo};
 pub use descriptions::*;
+use echoinfo::{DeviceInfo, EchonetDevice, EchonetProperty};
 pub use hex::*;
 use line_driver::LineDriver;
+use lineproto::LineResponse;
 
 #[derive(Debug)]
 pub struct AppData {
     pub config: Config,
-    pub descriptions: Descriptions,
-    pub superclass_dd: DeviceDescription,
+    pub instances: Vec<EchonetDevice>,
+    //pub descriptions: Descriptions,
+    //pub superclass_dd: DeviceDescription,
 }
 
 #[derive(Deserialize, Debug)]
@@ -34,35 +39,129 @@ pub fn init() -> std::io::Result<AppData> {
     let config = init_config()?;
     let mut driver = LineDriver::from(&config.backend)?;
     let superclass_dd = read_def(&config.superclass_dd)?;
-    let descriptions = read_device_descriptions(&config.dd_dir)?;
+    let available_descriptions = read_device_descriptions(&config.dd_dir)?;
     let ais = converters::read_ais(&config.ai_file)?;
     println!("available device descriptions:");
-    descriptions
+    available_descriptions
         .iter()
         .for_each(|dd| println!("type (class): {} ({})", dd.device_type, dd.eoj));
 
-    let discovered = lineproto::get_all_classes(&mut driver)?;
-    println!("discovered classes: {:?}", discovered);
+    let discovered_classes = lineproto::get_all_classes(&mut driver)?;
+    println!("discovered classes: {:?}", discovered_classes);
 
     //get all available device description classes
-    let available = descriptions
+    let available_classes = available_descriptions
         .iter()
         .map(|dd| dd.eoj[2..].to_string())
         .collect::<HashSet<String>>();
 
-    let intersection = lineproto::class_intersect(&available, &discovered);
+    let classes = lineproto::class_intersect(&available_classes, &discovered_classes);
+    //here we know which classes we have, generate converters?
+    //1. filter available descriptions
+    println!("classes to search for: {:?}\n", classes);
+    let descriptions = available_descriptions
+        .into_iter()
+        .filter(|desc| classes.contains(&desc.eoj))
+        //add the superclass thingie
+        .chain(std::iter::once(superclass_dd))
+        .collect::<Vec<DeviceDescription>>();
+    //2. for the above descriptions, generate Converters
+    //TODO enter clone-city.. (fix this)
+    let prop_sets = fuse_them(descriptions, ais);
+    println!("\nEOJ: converters");
+    prop_sets.iter().for_each(|(name, props)| {
+        print!("conv: {}, props: ", name);
+        props.iter().for_each(|prop| {
+            print!("{},", prop.epc);
+        });
+        println!();
+    });
 
-    let devices = lineproto::scan_classes(intersection, &mut driver);
-    println!("\n\n Detected devices\n------------");
-    devices
-        .iter()
-        .for_each(|(name, ed)| println!("dev:{}, details: {:?}", name, ed));
+    let scanned_devices = lineproto::scan_classes(classes, &mut driver);
+
+    let devices = scanned_devices
+        .into_iter()
+        .map(|(_, v)| v)
+        .collect::<Vec<DeviceInfo>>();
+    //"instantiate" devices
+    println!("\nInstances:--------\n");
+    let instances = instantiate_devices(devices, prop_sets);
+    instances.iter().for_each(|inst| {
+        println!(
+            "instance: {} {} props: {}",
+            inst.host,
+            inst.eoj,
+            inst.properties.len()
+        )
+    });
 
     Ok(AppData {
         config,
-        descriptions,
-        superclass_dd,
+        instances,
+        //descriptions,
+        //superclass_dd,
     })
+}
+
+fn instantiate_devices(
+    devices: Vec<DeviceInfo>,
+    prop_sets: HashMap<String, Vec<EchonetProperty>>,
+) -> Vec<EchonetDevice> {
+    devices
+        .into_iter()
+        .map(|di| {
+            //chop the instance bit and get the device properties
+            let mut properties = prop_sets.get(&di.eoj[..6]).unwrap().clone();
+            //..and add the generic stuff
+            properties.extend(prop_sets.get("0x00").unwrap().clone());
+            print!("plen: {} ", properties.len());
+            EchonetDevice::combine(di, properties)
+        })
+        .inspect(|ed| println!("After: h{} eoj{}\n   {:?}\n", ed.host, ed.eoj, ed))
+        .collect()
+}
+
+fn fuse_them(
+    descriptions: Vec<DeviceDescription>,
+    ais: converters::Ais,
+    //key is eoj
+) -> HashMap<String, Vec<EchonetProperty>> {
+    let mut map = HashMap::new();
+    for dd in descriptions {
+        //println!("fuse_them: dd {}", dd.eoj);
+        //0. set up an array
+        let mut props = vec![];
+        let dd_ais = ais.properties(&dd.eoj);
+        for (name, prop) in dd.properties {
+            //println!("inner: {}, {:?}", name, prop);
+            let conv_res = if let Some(ai) = get_ai(&prop.epc, dd_ais) {
+                converters::fuse(&prop.schema, ai)
+            //we have an ai, fuse!
+            } else {
+                //attempt to advance to a converter on its own
+                Converter::try_from(prop.schema.clone())
+            };
+
+            match conv_res {
+                Ok(conv) => {
+                    let prop = EchonetProperty::new(name, prop.epc, prop.writable, conv);
+                    props.push(prop);
+                }
+                Err(err) => {
+                    println!(
+                        "* Conversion Error! eoj/prop: {}/{} {}, consider Additional Info",
+                        dd.eoj, prop.epc, err
+                    );
+                }
+            }
+        }
+        map.insert(dd.eoj, props);
+    }
+    map
+}
+
+fn get_ai<'a>(dd: &str, ai: Option<&'a Vec<PropertyInfo>>) -> Option<&'a AdditionalInfo> {
+    ai?.iter().find(|i| i.epc == dd).map(|i| &i.info)
 }
 
 pub fn init_config() -> std::io::Result<Config> {
@@ -99,19 +198,117 @@ pub async fn properties(info: web::Path<String>) -> impl Responder {
     HttpResponse::Ok().body(response)
 }
 
-pub async fn property(
+async fn get_property_inner(
     info: web::Path<(String, String)>,
-    _data: web::Data<AppData>,
+    data: web::Data<AppData>,
+) -> Result<serde_json::Value, NetError> {
+    let dev = get_device(&data.instances, &info.0).ok_or_else(|| NetError::NoDevice)?;
+    let prop = get_dev_prop(&dev, &info.1).ok_or_else(|| NetError::NoProperty)?;
+    read_property(&data.config.backend, dev, prop).await
+}
+
+pub async fn get_property(
+    info: web::Path<(String, String)>,
+    data: web::Data<AppData>,
 ) -> impl Responder {
-    let response = format!("Property {}, of device: {}", info.1, info.0);
-    HttpResponse::Ok().body(response)
+    to_response(get_property_inner(info, data).await)
+}
+
+fn get_line(backend: &str) -> Result<LineDriver, NetError> {
+    line_driver::LineDriver::from(&backend).map_err(|_| NetError::NoBackend)
+}
+
+#[derive(Debug)]
+pub enum NetError {
+    //internal errors
+    Comm(String),
+    NoBackend,
+    NoResponse,
+    Conversion(String),
+    //404s
+    NoProperty,
+    NoDevice,
+}
+
+pub async fn read_property(
+    backend: &str,
+    dev: &EchonetDevice,
+    prop: &EchonetProperty,
+) -> Result<serde_json::Value, NetError> {
+    let mut line = get_line(backend)?;
+    //generate command
+    let command = format!("{}:{}", dev.hosteoj(), prop.epc);
+    let res = line
+        .exec(&command)
+        .map_err(|err| NetError::Comm(err.to_string()))?;
+    let lr = LineResponse::try_from(&res as &str)
+        .map_err(|_| NetError::Comm("Bad Line Response".to_string()))?;
+    let data_str = lr
+        .data
+        .ok_or_else(|| NetError::Comm("No data".to_string()))?;
+    let data_u8 =
+        hex::to_bytes(data_str).ok_or_else(|| NetError::Comm("Data-to-u8".to_string()))?;
+
+    let mut context = data_u8[..].into();
+    let value = prop
+        .converter
+        .convert_binary(&mut context)
+        .map_err(NetError::Conversion)?;
+    //we succeded! wrap up the value in a top level value and send it back up
+    let mut map = serde_json::map::Map::with_capacity(1);
+    map.insert(prop.name.clone(), value);
+    Ok(serde_json::Value::Object(map))
+}
+
+fn get_device<'a>(devs: &'a [EchonetDevice], hosteoj: &str) -> Option<&'a EchonetDevice> {
+    devs.iter().find(|dev| dev.hosteoj() == hosteoj)
+}
+
+fn get_dev_prop<'a>(dev: &'a EchonetDevice, name: &str) -> Option<&'a EchonetProperty> {
+    dev.properties.iter().find(|prop| prop.name == name)
+}
+
+fn set_property_inner(
+    info: web::Path<(String, String)>,
+    data: web::Data<AppData>,
+    command: web::Json<serde_json::Value>,
+) -> Result<serde_json::Value, NetError> {
+    let dev = get_device(&data.instances, &info.0).ok_or_else(|| NetError::NoDevice)?;
+    let prop = get_dev_prop(&dev, &info.1).ok_or_else(|| NetError::NoProperty)?;
+    unimplemented!()
+}
+
+fn to_response(res: Result<serde_json::Value, NetError>) -> impl Responder {
+    match res {
+        Ok(data) => HttpResponse::Ok().json(data),
+        Err(NetError::NoBackend) => {
+            HttpResponse::InternalServerError().body("no backend".to_string())
+        }
+        Err(NetError::NoResponse) => HttpResponse::InternalServerError().body("no response"),
+        Err(NetError::Comm(err)) => {
+            HttpResponse::InternalServerError().body(format!("communications error: {}", err))
+        }
+        Err(NetError::Conversion(err)) => {
+            HttpResponse::InternalServerError().body(format!("conversion error: {}", err))
+        }
+        Err(NetError::NoDevice) => HttpResponse::NotFound().body("no such device"),
+        Err(NetError::NoProperty) => HttpResponse::NotFound().body("no such property"),
+    }
+}
+
+pub async fn set_property(
+    info: web::Path<(String, String)>,
+    data: web::Data<AppData>,
+    command: web::Json<serde_json::Value>,
+) -> impl Responder {
+    to_response(set_property_inner(info, data, command))
 }
 
 pub async fn scan(config: web::Data<Config>) -> impl Responder {
-    let response = String::from("scan results:");
     let line = LineDriver::from(&config.backend);
-    if let Err(_err) = line {
-        return HttpResponse::Ok().body(response);
+    if let Err(err) = line {
+        //TODO error handling
+        return HttpResponse::InternalServerError().body(err.to_string());
     }
     let mut line = line.unwrap();
     let res = line.exec_multi("224.0.23.0:0ef000:d6");
@@ -121,6 +318,8 @@ pub async fn scan(config: web::Data<Config>) -> impl Responder {
     }
 }
 
+//This is the first thing, it's getting old & ugly
+//TODO refarctor sometime
 #[derive(Serialize, Deserialize, Debug)]
 pub enum EchoCommand {
     #[serde(rename = "request")]
