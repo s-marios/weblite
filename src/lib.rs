@@ -305,6 +305,7 @@ async fn write_property(
 
     //generate command
     let command = format!("{}:{},{}", dev.hosteoj(), prop.epc, hex_data);
+    println!("comand & hex_data: {}", command);
     //exec command
     let res = line
         .exec(&command)

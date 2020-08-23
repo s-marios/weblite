@@ -44,7 +44,7 @@ pub fn bytes_as_u32(bytes: &[u8]) -> u32 {
 pub fn to_string(bytes: Vec<u8>) -> String {
     bytes
         .iter()
-        .map(|byte| format!("{:2X}", byte))
+        .map(|byte| format!("{:02X}", byte))
         .collect::<String>()
 }
 
