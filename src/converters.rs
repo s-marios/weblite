@@ -1,5 +1,6 @@
 use crate::descriptions::{self, Schema, TypedSchema};
 use crate::hex::{self, bytes_as_u32};
+use crate::NetError;
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::convert::{TryFrom, TryInto};
@@ -150,7 +151,7 @@ impl<'a> From<&'a [u8]> for BinaryContext<'a> {
 }
 
 impl Converter {
-    pub fn convert_json(&self, value: serde_json::Value) -> Result<Vec<u8>, String> {
+    pub fn convert_json(&self, value: serde_json::Value) -> Result<Vec<u8>, NetError> {
         match self {
             Converter::Number {
                 minimum,
@@ -159,24 +160,31 @@ impl Converter {
             } => Converter::convert_json_number(value, *minimum, *maximum, *multiple_of),
             Converter::Object { properties } => Converter::convert_json_object(value, properties),
             Converter::Passthrough => Converter::json_passthrough(
-                value.as_str().ok_or("passthrough: input not a string!")?,
+                value
+                    .as_str()
+                    .ok_or_else(|| NetError::BadRequest("input not a string!".to_string()))?,
             ),
             Converter::Enumlist(map) => Converter::json_enumlist(
-                value.as_str().ok_or("enumlist: input not a string!")?,
+                value
+                    .as_str()
+                    .ok_or_else(|| NetError::BadRequest("input not a string!".to_string()))?,
                 map,
             ),
             Converter::Boolean {
                 true_value,
                 false_value,
             } => Converter::json_boolean(value, true_value, false_value),
-            _ => unimplemented!(),
+            _ => Err(NetError::Internal(format!(
+                "unimplemented conversion for: {}",
+                value
+            ))),
         }
     }
 
     pub fn convert_binary<'a, 's>(
         &self,
         context: &'a mut BinaryContext<'s>,
-    ) -> Result<serde_json::Value, String> {
+    ) -> Result<serde_json::Value, NetError> {
         match self {
             Converter::Number {
                 minimum: _,
@@ -199,7 +207,7 @@ impl Converter {
         min: f32,
         max: f32,
         mof: f32,
-    ) -> Result<Vec<u8>, String> {
+    ) -> Result<Vec<u8>, NetError> {
         //TODO figure out Value::Number and to what it'd better be mapped
         //hopefully this will not bite me
         if let Some(num) = value.as_f64() {
@@ -210,15 +218,17 @@ impl Converter {
             let binary = ((num as f64 / mof as f64).round() as u32).to_be_bytes();
             Ok(binary[4 - range..].to_owned())
         } else {
-            Err("serde_json_number: couldn't get number as f64!".to_string())
+            Err(NetError::BadRequest(
+                "couldn't get number as f64!".to_string(),
+            ))
         }
     }
 
-    fn check_in_range(val: f32, min: f32, max: f32) -> Result<(), String> {
+    fn check_in_range(val: f32, min: f32, max: f32) -> Result<(), NetError> {
         if val < min {
-            Err("less than min".to_string())
+            Err(NetError::Range("less than min".to_string()))
         } else if val > max {
-            Err("greater than max".to_string())
+            Err(NetError::Range("greater than max".to_string()))
         } else {
             Ok(())
         }
@@ -227,52 +237,67 @@ impl Converter {
     fn convert_json_object(
         value: serde_json::Value,
         properties: &[(String, Converter)],
-    ) -> Result<Vec<u8>, String> {
+    ) -> Result<Vec<u8>, NetError> {
         Ok(properties
             .iter()
-            .map(|(name, conv)| conv.convert_json(value[name].clone()))
-            .collect::<Result<Vec<Vec<u8>>, String>>()?
+            .map(|(name, conv)| {
+                conv.convert_json(
+                    value
+                        .get(name)
+                        .ok_or_else(|| {
+                            NetError::BadRequest(format!(
+                                "required property not present: \'{}\'",
+                                name
+                            ))
+                        })?
+                        .clone(),
+                )
+            })
+            .collect::<Result<Vec<Vec<u8>>, NetError>>()?
             .into_iter()
             .flatten()
             .collect())
     }
 
-    fn json_passthrough(input: &str) -> Result<Vec<u8>, String> {
+    fn json_passthrough(input: &str) -> Result<Vec<u8>, NetError> {
         Ok(input.bytes().collect())
     }
 
-    fn json_enumlist(input: &str, map: &HashMap<String, String>) -> Result<Vec<u8>, String> {
+    fn json_enumlist(input: &str, map: &HashMap<String, String>) -> Result<Vec<u8>, NetError> {
         Ok(vec![hex::to_usize(
             map.get(input)
-                .ok_or(format!("json_enum: no entry for: {}", input))?,
+                .ok_or_else(|| NetError::BadRequest(format!("no entry for: {}", input)))?,
         )
-        .ok_or(format!("json_enum: invalid entry for {}, fix ASAP!", input))?
-            as u8])
+        .ok_or_else(|| {
+            NetError::Internal(format!("json_enum: invalid entry for {}, fix ASAP!", input))
+        })? as u8])
     }
 
     fn json_boolean(
         value: serde_json::Value,
         true_value: &str,
         false_value: &str,
-    ) -> Result<Vec<u8>, String> {
+    ) -> Result<Vec<u8>, NetError> {
         Ok(hex::to_bytes(
             if value
                 .as_bool()
-                .ok_or_else(|| "json bool: not a boolean!".to_string())?
+                .ok_or_else(|| NetError::BadRequest("not a boolean!".to_string()))?
             {
                 true_value
             } else {
                 false_value
             },
         )
-        .ok_or_else(|| "json bool: conversion failed".to_string())?)
+        .ok_or_else(|| {
+            NetError::Internal("json_boolean: failed to convert to hex, fix asap!".to_string())
+        })?)
     }
 
     //TODO deal with negative numbers!
     fn convert_binary_number<'a, 's>(
         &self,
         context: &'a mut BinaryContext<'s>,
-    ) -> Result<serde_json::Value, String> {
+    ) -> Result<serde_json::Value, NetError> {
         if let Converter::Number {
             minimum: min,
             maximum: max,
@@ -295,8 +320,9 @@ impl Converter {
             if value > *max {
                 println!("TODO: we've generated a value greater than max");
             }
-            Ok(serde_json::from_str(&value.to_string())
-                .map_err(|err| format!("converter: serde json error: {}", err))?)
+            Ok(serde_json::from_str(&value.to_string()).map_err(|err| {
+                NetError::Conversion(format!("converter: serde json error: {}", err))
+            })?)
         } else {
             panic!("this can never happen!")
         }
@@ -305,14 +331,14 @@ impl Converter {
     fn convert_binary_object<'a, 's>(
         &self,
         context: &'a mut BinaryContext<'s>,
-    ) -> Result<serde_json::Value, String> {
+    ) -> Result<serde_json::Value, NetError> {
         if let Converter::Object { properties } = self {
             let mut map = serde_json::map::Map::with_capacity(properties.len());
             //TODO there's some inference problems here, I don't know why
-            let _: Result<(), String> = properties.iter().try_for_each(|(name, conv)| {
-                let conv_res: serde_json::Value = conv
-                    .convert_binary(context)
-                    .map_err(|err| format!("cbo: sub-converter failed {}", err))?;
+            let _: Result<(), NetError> = properties.iter().try_for_each(|(name, conv)| {
+                let conv_res: serde_json::Value = conv.convert_binary(context).map_err(|err| {
+                    NetError::Conversion(format!("cbo: sub-converter failed {:?}", err))
+                })?;
                 map.insert(name.clone(), conv_res);
                 Ok(())
             });
@@ -324,7 +350,7 @@ impl Converter {
 
     fn binary_passthrough<'s>(
         context: &mut BinaryContext<'s>,
-    ) -> Result<serde_json::Value, String> {
+    ) -> Result<serde_json::Value, NetError> {
         //get our data out
         let data = &context.data[..];
         //consume the whole thing, advance context
@@ -337,7 +363,7 @@ impl Converter {
     fn binary_enumlist<'s>(
         context: &mut BinaryContext<'s>,
         map: &HashMap<String, String>,
-    ) -> Result<serde_json::Value, String> {
+    ) -> Result<serde_json::Value, NetError> {
         //now this is interesting..
         //do we have enums that are more than one byte?
         //TODO check above
@@ -351,7 +377,12 @@ impl Converter {
         Ok(serde_json::Value::String(
             map.iter()
                 .find(|(_, v)| *v == &data_string)
-                .ok_or(format!("binary_enumlist: no key for edt: {}", data_string))?
+                .ok_or_else(|| {
+                    NetError::Conversion(format!(
+                        "binary_enumlist: no key for edt: {}",
+                        data_string
+                    ))
+                })?
                 .0
                 .clone(),
         ))
@@ -361,22 +392,27 @@ impl Converter {
         context: &mut BinaryContext<'s>,
         true_value: &str,
         false_value: &str,
-    ) -> Result<serde_json::Value, String> {
+    ) -> Result<serde_json::Value, NetError> {
         //get our value
-        let val = context.data.get(0).ok_or_else(|| "no data!".to_string())?;
+        let val = context.data.get(0).ok_or_else(|| NetError::WriteNG)?;
         //advance
         context.data = &context.data[1..];
 
         //Ok this is getting stupid
-        let tv = hex::to_bytes(true_value).ok_or_else(|| "bad data".to_string())?[0];
-        let fv = hex::to_bytes(false_value).ok_or_else(|| "bad data".to_string())?[0];
+        let tv =
+            hex::to_bytes(true_value).ok_or_else(|| NetError::Internal("bad data".to_string()))?[0];
+        let fv = hex::to_bytes(false_value)
+            .ok_or_else(|| NetError::Internal("bad data".to_string()))?[0];
 
         if *val == tv {
             Ok(serde_json::Value::Bool(true))
         } else if *val == fv {
             Ok(serde_json::Value::Bool(false))
         } else {
-            Err(format!("binary_boolean: Invalid binary value: {}", val))
+            Err(NetError::Conversion(format!(
+                "binary_boolean: Invalid binary value: {}",
+                val
+            )))
         }
     }
 
@@ -838,15 +874,19 @@ mod tests {
     #[test]
     fn convert_number_that_exceeds_max_fails() {
         let value = json!(300);
-        let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap_err();
-        assert!(result.contains("greater"));
+        match Converter::convert_json_number(value, 0., 255., 1.) {
+            Err(NetError::Range(err)) => assert!(err.contains("greater")),
+            _ => panic!("expecting range error!"),
+        }
     }
 
     #[test]
     fn convert_number_that_is_less_than_min_fails() {
         let value = json!(-300);
-        let result = Converter::convert_json_number(value, 0., 255., 1.).unwrap_err();
-        assert!(result.contains("less"));
+        match Converter::convert_json_number(value, 0., 255., 1.) {
+            Err(NetError::Range(err)) => assert!(err.contains("less")),
+            _ => panic!("expecting range error!"),
+        }
     }
 
     #[test]
@@ -955,8 +995,10 @@ mod tests {
             "blue": 255000
         });
 
-        let result = obj_conv.convert_json(value).unwrap_err();
-        assert!(result.contains("greater"));
+        match obj_conv.convert_json(value) {
+            Err(NetError::Range(err)) => assert!(err.contains("greater")),
+            _ => panic!("expecting range error!"),
+        }
     }
 
     #[test]

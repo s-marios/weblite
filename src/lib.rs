@@ -222,15 +222,68 @@ fn get_line(backend: &str) -> Result<LineDriver, NetError> {
 #[derive(Debug)]
 pub enum NetError {
     //internal errors
+    Internal(String),
     Comm(String),
     NoBackend,
     NoResponse,
+    ReadNG,
+    WriteNG,
     Conversion(String),
     //404s
     NoProperty,
     NoDevice,
     //400
-    BadRequest,
+    BadRequest(String),
+    Range(String),
+}
+
+impl NetError {
+    fn error(&self) -> ErrorResponse {
+        match self {
+            NetError::NoDevice => ErrorResponse::new("referenceError".to_string())
+                .with_message("No such device!".to_string()),
+            NetError::NoProperty => ErrorResponse::new("referenceError".to_string())
+                .with_message("No such property!".to_string()),
+            NetError::NoResponse => ErrorResponse::new("timeoutError".to_string()),
+            NetError::ReadNG => ErrorResponse::new("deviceError".to_string()),
+            NetError::WriteNG => ErrorResponse::new("deviceError".to_string()),
+            NetError::Comm(comm_error) => ErrorResponse::new("communicationError".to_string())
+                .with_message(comm_error.clone()),
+            NetError::BadRequest(details) => {
+                ErrorResponse::new("typeError".to_string()).with_message(details.clone())
+            }
+            NetError::Range(details) => {
+                ErrorResponse::new("rangeError".to_string()).with_message(details.clone())
+            }
+            NetError::Internal(details) => {
+                ErrorResponse::new("internalError".to_string()).with_message(details.clone())
+            }
+            _ => ErrorResponse::new("internalError".to_string()),
+        }
+    }
+}
+
+#[derive(Serialize, Debug)]
+struct ErrorResponse {
+    #[serde(rename = "type")]
+    error_type: String,
+    message: Option<String>,
+}
+
+impl ErrorResponse {
+    fn new(error_type: String) -> Self {
+        ErrorResponse {
+            error_type,
+            message: None,
+        }
+    }
+
+    fn with_message(self, message: String) -> Self {
+        ErrorResponse {
+            message: Some(message),
+            ..self
+        }
+    }
 }
 
 async fn read_property(
@@ -245,6 +298,12 @@ async fn read_property(
         .map_err(|err| NetError::Comm(err.to_string()))?;
     let lr = LineResponse::try_from(&res as &str)
         .map_err(|_| NetError::Comm("Bad Line Response".to_string()))?;
+    //check response status & if data is available
+    //did we get an NG?
+    if !lr.is_ok() {
+        return Err(NetError::ReadNG);
+    }
+    //we should have data by this point
     let data_str = lr
         .data
         .ok_or_else(|| NetError::Comm("No data".to_string()))?;
@@ -252,10 +311,7 @@ async fn read_property(
         hex::to_bytes(data_str).ok_or_else(|| NetError::Comm("Data-to-u8".to_string()))?;
 
     let mut context = data_u8[..].into();
-    let value = prop
-        .converter
-        .convert_binary(&mut context)
-        .map_err(NetError::Conversion)?;
+    let value = prop.converter.convert_binary(&mut context)?;
     //we succeded! wrap up the value in a top level value and send it back up
     let mut map = serde_json::map::Map::with_capacity(1);
     map.insert(prop.name.clone(), value);
@@ -293,15 +349,15 @@ async fn write_property(
     //we're receiving an object
     //get the the value of the property out of it
     let value = value.into_inner();
-    let value = value.as_object().ok_or_else(|| NetError::BadRequest)?;
-    let value = value.get(&prop.name).ok_or_else(|| NetError::BadRequest)?;
+    let value = value
+        .as_object()
+        .ok_or_else(|| NetError::BadRequest("not an object!".to_string()))?;
+    let value = value
+        .get(&prop.name)
+        .ok_or_else(|| NetError::BadRequest("no such value!".to_string()))?;
     //convert from value first
 
-    let hex_data = hex::to_string(
-        prop.converter
-            .convert_json(value.clone())
-            .map_err(NetError::Conversion)?,
-    );
+    let hex_data = hex::to_string(prop.converter.convert_json(value.clone())?);
 
     //generate command
     let command = format!("{}:{},{}", dev.hosteoj(), prop.epc, hex_data);
@@ -316,7 +372,7 @@ async fn write_property(
         //this will be unused, but for signature's sake put something in
         Ok(serde_json::Value::Null)
     } else {
-        Err(NetError::Comm("Set command failed!".to_string()))
+        Err(NetError::WriteNG)
     }
 }
 
@@ -326,16 +382,28 @@ fn to_response(res: Result<serde_json::Value, NetError>) -> impl Responder {
         Err(NetError::NoBackend) => {
             HttpResponse::InternalServerError().body("no backend".to_string())
         }
-        Err(NetError::NoResponse) => HttpResponse::InternalServerError().body("no response"),
+        Err(NetError::NoResponse) => {
+            HttpResponse::InternalServerError().json(res.unwrap_err().error())
+        }
         Err(NetError::Comm(err)) => {
             HttpResponse::InternalServerError().body(format!("communications error: {}", err))
         }
         Err(NetError::Conversion(err)) => {
             HttpResponse::InternalServerError().body(format!("conversion error: {}", err))
         }
-        Err(NetError::NoDevice) => HttpResponse::NotFound().body("no such device"),
-        Err(NetError::NoProperty) => HttpResponse::NotFound().body("no such property"),
-        Err(NetError::BadRequest) => HttpResponse::BadRequest().body("bad request"),
+        Err(NetError::NoDevice) => HttpResponse::NotFound().json(res.unwrap_err().error()),
+        Err(NetError::NoProperty) => HttpResponse::NotFound().json(res.unwrap_err().error()),
+        Err(NetError::BadRequest(ref _details)) => {
+            HttpResponse::BadRequest().json(res.unwrap_err().error())
+        }
+        Err(NetError::Range(ref _details)) => {
+            HttpResponse::BadRequest().json(res.unwrap_err().error())
+        }
+        Err(NetError::ReadNG) => HttpResponse::MethodNotAllowed().json(res.unwrap_err().error()),
+        Err(NetError::WriteNG) => HttpResponse::MethodNotAllowed().json(res.unwrap_err().error()),
+        Err(NetError::Internal(ref _details)) => {
+            HttpResponse::InternalServerError().json(res.unwrap_err().error())
+        }
     }
 }
 
