@@ -1,4 +1,3 @@
-use byteorder::{BigEndian, ByteOrder};
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::net::TcpStream;
 use std::time::Duration;
@@ -37,31 +36,12 @@ impl LineDriver {
         Ok(())
     }
 
-    fn get_owned_utf8(utf16: &str) -> String {
-        //ooof this is horror, remove trailling newline
-        let utf16 = utf16.trim_end_matches("\x00\n");
-        //size checks
-        let len = utf16.len();
-        assert!(len > 0);
-        assert_eq!(len % 2, 0);
-        let size_for_u16 = len / 2;
-        //setup accepting buffer
-        let mut dst = Vec::<u16>::with_capacity(size_for_u16);
-        for _ in 0..size_for_u16 {
-            dst.push(0);
-        }
-        //read from the u16 buffer
-        BigEndian::read_u16_into(utf16.as_bytes(), &mut dst);
-        String::from_utf16_lossy(&dst)
-    }
-
     ///execute a command using the backend
     pub fn exec(&mut self, command: &str) -> io::Result<String> {
         self.send(command)?;
         let mut response = String::new();
         let _len = self.r.read_line(&mut response)?;
-        let response = LineDriver::get_owned_utf8(&response).trim().to_string();
-        Ok(response)
+        Ok(response.trim().to_string())
     }
 
     //TODO what's with the result that never fails? think about it
@@ -75,7 +55,7 @@ impl LineDriver {
                 Err(_) => break,
                 Ok(len) => {
                     if len > 0 {
-                        responses.push(LineDriver::get_owned_utf8(&response))
+                        responses.push(response.trim().to_string())
                     }
                 }
             };
