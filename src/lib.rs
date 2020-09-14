@@ -23,7 +23,7 @@ use lineproto::LineResponse;
 pub struct AppData {
     pub config: Config,
     pub instances: Vec<EchonetDevice>,
-    pub updated_descriptions: Vec<DeviceDescription>,
+    pub updated_descriptions: HashMap<String, DeviceDescription>,
     //pub descriptions: Descriptions,
     //pub superclass_dd: DeviceDescription,
 }
@@ -97,7 +97,6 @@ pub fn init() -> std::io::Result<AppData> {
         )
     });
 
-    //TODO
     //for each instantiated device, generate an updated device description.
     //we'll have to use the device descriptions array, the superclass device description
     //and the instances
@@ -117,13 +116,15 @@ fn generate_updated_device_descriptions(
     descriptions: Vec<DeviceDescription>,
     superclass_dd: DeviceDescription,
     instances: &[EchonetDevice],
-) -> Vec<DeviceDescription> {
+) -> HashMap<String, DeviceDescription> {
     instances
         .iter()
         .filter_map(|instance| {
             Some((
                 instance,
-                descriptions.iter().find(|d| d.eoj == instance.eoj)?,
+                descriptions
+                    .iter()
+                    .find(|d| instance.eoj.starts_with(&d.eoj))?,
             ))
         })
         .map(|(instance, description)| adjust(instance, description, &superclass_dd))
@@ -134,13 +135,20 @@ fn adjust(
     instance: &EchonetDevice,
     description: &DeviceDescription,
     superclass_dd: &DeviceDescription,
-) -> DeviceDescription {
+) -> (String, DeviceDescription) {
     let mut adjusted_dd = description.clone();
-    adjusted_dd.properties = adjusted_dd.properties.into_iter() //properties iterated
+    adjusted_dd.properties = adjusted_dd
+        .properties
+        .into_iter() //properties iterated
         .chain(superclass_dd.properties.clone().into_iter()) //and chain the superclass properties..
-        .filter(|(_name, prop)| instance.properties.iter().find(|iprop| iprop.epc == prop.epc).is_some())
+        .filter(|(_name, prop)| {
+            instance
+                .properties
+                .iter()
+                .any(|iprop| iprop.epc == prop.epc)
+        })
         .collect();
-    adjusted_dd
+    (instance.hosteoj(), adjusted_dd)
 }
 
 fn instantiate_devices(
@@ -228,14 +236,27 @@ pub async fn controllers() -> impl Responder {
     HttpResponse::Ok().body("TODO: controllers here")
 }
 
-pub async fn device(info: web::Path<String>) -> impl Responder {
-    let response = format!("Details for device: {}", info);
-    HttpResponse::Ok().body(response)
+pub async fn device(info: web::Path<String>, data: web::Data<AppData>) -> impl Responder {
+    to_response_string(device_inner(info, data).await)
 }
 
-pub async fn properties(info: web::Path<String>) -> impl Responder {
-    let response = format!("Properties of device: {}", info);
-    HttpResponse::Ok().body(response)
+async fn device_inner(
+    device: web::Path<String>,
+    data: web::Data<AppData>,
+) -> Result<String, NetError> {
+    Ok(serde_json::to_string_pretty(
+        &data
+            .updated_descriptions
+            .iter()
+            .find(|(dev, _desc)| &device.as_ref() == dev)
+            .ok_or_else(|| NetError::NoDevice)?
+            .1,
+    )
+    .map_err(|internal| NetError::Internal(internal.to_string()))?)
+}
+
+pub async fn properties(_info: web::Path<String>, _data: web::Data<AppData>) -> impl Responder {
+    HttpResponse::Ok().body("TODO: properties here")
 }
 
 async fn get_property_inner(
@@ -299,6 +320,31 @@ impl NetError {
                 ErrorResponse::new("internalError".to_string()).with_message(details.clone())
             }
             _ => ErrorResponse::new("internalError".to_string()),
+        }
+    }
+
+    fn to_response(&self) -> actix_web::web::HttpResponse {
+        match self {
+            NetError::NoBackend => {
+                HttpResponse::InternalServerError().body("no backend".to_string())
+            }
+
+            NetError::NoResponse => HttpResponse::InternalServerError().json(self.error()),
+            NetError::Comm(err) => {
+                HttpResponse::InternalServerError().body(format!("communications error: {}", err))
+            }
+            NetError::Conversion(err) => {
+                HttpResponse::InternalServerError().body(format!("conversion error: {}", err))
+            }
+            NetError::NoDevice => HttpResponse::NotFound().json(self.error()),
+            NetError::NoProperty => HttpResponse::NotFound().json(self.error()),
+            NetError::BadRequest(ref _details) => HttpResponse::BadRequest().json(self.error()),
+            NetError::Range(ref _details) => HttpResponse::BadRequest().json(self.error()),
+            NetError::ReadNG => HttpResponse::MethodNotAllowed().json(self.error()),
+            NetError::WriteNG => HttpResponse::MethodNotAllowed().json(self.error()),
+            NetError::Internal(ref _details) => {
+                HttpResponse::InternalServerError().json(self.error())
+            }
         }
     }
 }
@@ -419,31 +465,14 @@ async fn write_property(
 fn to_response(res: Result<serde_json::Value, NetError>) -> impl Responder {
     match res {
         Ok(data) => HttpResponse::Ok().json(data),
-        Err(NetError::NoBackend) => {
-            HttpResponse::InternalServerError().body("no backend".to_string())
-        }
-        Err(NetError::NoResponse) => {
-            HttpResponse::InternalServerError().json(res.unwrap_err().error())
-        }
-        Err(NetError::Comm(err)) => {
-            HttpResponse::InternalServerError().body(format!("communications error: {}", err))
-        }
-        Err(NetError::Conversion(err)) => {
-            HttpResponse::InternalServerError().body(format!("conversion error: {}", err))
-        }
-        Err(NetError::NoDevice) => HttpResponse::NotFound().json(res.unwrap_err().error()),
-        Err(NetError::NoProperty) => HttpResponse::NotFound().json(res.unwrap_err().error()),
-        Err(NetError::BadRequest(ref _details)) => {
-            HttpResponse::BadRequest().json(res.unwrap_err().error())
-        }
-        Err(NetError::Range(ref _details)) => {
-            HttpResponse::BadRequest().json(res.unwrap_err().error())
-        }
-        Err(NetError::ReadNG) => HttpResponse::MethodNotAllowed().json(res.unwrap_err().error()),
-        Err(NetError::WriteNG) => HttpResponse::MethodNotAllowed().json(res.unwrap_err().error()),
-        Err(NetError::Internal(ref _details)) => {
-            HttpResponse::InternalServerError().json(res.unwrap_err().error())
-        }
+        Err(error) => error.to_response(),
+    }
+}
+
+fn to_response_string(res: Result<String, NetError>) -> impl Responder {
+    match res {
+        Ok(data) => HttpResponse::Ok().body(data),
+        Err(error) => error.to_response(),
     }
 }
 

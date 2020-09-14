@@ -1,52 +1,61 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TextDescription {
     pub ja: String,
     pub en: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DeviceProperty {
     pub epc: String,
     pub descriptions: TextDescription,
     pub writable: bool,
     pub observable: bool,
     pub schema: Schema,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<TextDescription>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PropertyValue<T> {
     pub value: T,
     pub descriptions: TextDescription,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub edt: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum TypedSchema {
     Boolean {
         values: Vec<PropertyValue<bool>>,
     },
     String {
+        #[serde(skip_serializing_if = "Option::is_none")]
         format: Option<String>,
         #[serde(rename = "enum")]
+        #[serde(skip_serializing_if = "Option::is_none")]
         enumlist: Option<Vec<String>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         values: Option<Vec<PropertyValue<String>>>,
     },
     Number {
+        #[serde(skip_serializing_if = "Option::is_none")]
         unit: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         minimum: Option<f32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         maximum: Option<f32>,
         #[serde(rename = "multipleOf")]
         multiple_of: Option<f32>,
     },
     Null {
+        #[serde(skip_serializing_if = "Option::is_none")]
         edt: Option<String>,
     },
     Object {
@@ -54,27 +63,29 @@ pub enum TypedSchema {
     },
     Array {
         #[serde(rename = "minItems")]
+        #[serde(skip_serializing_if = "Option::is_none")]
         min_items: Option<u32>,
         #[serde(rename = "maxItems")]
+        #[serde(skip_serializing_if = "Option::is_none")]
         max_items: Option<u32>,
         items: Box<Schema>,
     },
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 pub struct Options {
     #[serde(rename = "oneOf")]
     pub one_of: Vec<Schema>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum Schema {
     T(TypedSchema),
     OneOf(Options),
 }
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceDescription {
     pub device_type: String,
