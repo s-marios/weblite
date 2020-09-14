@@ -23,6 +23,7 @@ use lineproto::LineResponse;
 pub struct AppData {
     pub config: Config,
     pub instances: Vec<EchonetDevice>,
+    pub updated_descriptions: Vec<DeviceDescription>,
     //pub descriptions: Descriptions,
     //pub superclass_dd: DeviceDescription,
 }
@@ -62,12 +63,13 @@ pub fn init() -> std::io::Result<AppData> {
     let descriptions = available_descriptions
         .into_iter()
         .filter(|desc| classes.contains(&desc.eoj))
-        //add the superclass thingie
-        .chain(std::iter::once(superclass_dd))
+        //add the superclass thingie (copy, will be used later)
+        .chain(std::iter::once(superclass_dd.clone()))
         .collect::<Vec<DeviceDescription>>();
+
     //2. for the above descriptions, generate Converters
     //TODO enter clone-city.. (fix this)
-    let prop_sets = fuse_them(descriptions, ais);
+    let prop_sets = fuse_them(descriptions.clone(), ais);
     println!("\nEOJ: converters");
     prop_sets.iter().for_each(|(name, props)| {
         print!("conv: {}, props: ", name);
@@ -95,12 +97,50 @@ pub fn init() -> std::io::Result<AppData> {
         )
     });
 
+    //TODO
+    //for each instantiated device, generate an updated device description.
+    //we'll have to use the device descriptions array, the superclass device description
+    //and the instances
+    let updated_descriptions =
+        generate_updated_device_descriptions(descriptions, superclass_dd, &instances);
+
     Ok(AppData {
         config,
         instances,
+        updated_descriptions,
         //descriptions,
         //superclass_dd,
     })
+}
+
+fn generate_updated_device_descriptions(
+    descriptions: Vec<DeviceDescription>,
+    superclass_dd: DeviceDescription,
+    instances: &[EchonetDevice],
+) -> Vec<DeviceDescription> {
+    instances
+        .iter()
+        .filter_map(|instance| {
+            Some((
+                instance,
+                descriptions.iter().find(|d| d.eoj == instance.eoj)?,
+            ))
+        })
+        .map(|(instance, description)| adjust(instance, description, &superclass_dd))
+        .collect()
+}
+
+fn adjust(
+    instance: &EchonetDevice,
+    description: &DeviceDescription,
+    superclass_dd: &DeviceDescription,
+) -> DeviceDescription {
+    let mut adjusted_dd = description.clone();
+    adjusted_dd.properties = adjusted_dd.properties.into_iter() //properties iterated
+        .chain(superclass_dd.properties.clone().into_iter()) //and chain the superclass properties..
+        .filter(|(_name, prop)| instance.properties.iter().find(|iprop| iprop.epc == prop.epc).is_some())
+        .collect();
+    adjusted_dd
 }
 
 fn instantiate_devices(

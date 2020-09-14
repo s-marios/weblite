@@ -17,6 +17,7 @@ pub struct DeviceProperty {
     pub writable: bool,
     pub observable: bool,
     pub schema: Schema,
+    pub note: Option<TextDescription>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
