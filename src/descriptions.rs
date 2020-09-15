@@ -52,6 +52,7 @@ pub enum TypedSchema {
         #[serde(skip_serializing_if = "Option::is_none")]
         maximum: Option<f32>,
         #[serde(rename = "multipleOf")]
+        #[serde(skip_serializing_if = "Option::is_none")]
         multiple_of: Option<f32>,
     },
     Null {

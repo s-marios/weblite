@@ -148,6 +148,8 @@ fn adjust(
                 .any(|iprop| iprop.epc == prop.epc)
         })
         .collect();
+    //set the eoj to the instance eoj
+    adjusted_dd.eoj = instance.eoj.clone();
     (instance.hosteoj(), adjusted_dd)
 }
 

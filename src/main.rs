@@ -15,8 +15,13 @@ async fn main() -> std::io::Result<()> {
                 .route("/v1/controllers", web::get().to(controllers))
                 .route("/v1/devices", web::get().to(devices))
                 .route("/v1/devices/{deviceid}", web::get().to(device))
+                .route("/v1/devices/{deviceid}/", web::get().to(device))
                 .route(
                     "/v1/devices/{deviceid}/properties",
+                    web::get().to(properties),
+                )
+                .route(
+                    "/v1/devices/{deviceid}/properties/",
                     web::get().to(properties),
                 )
                 .route(
