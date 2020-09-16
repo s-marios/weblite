@@ -257,8 +257,23 @@ async fn device_inner(
     .map_err(|internal| NetError::Internal(internal.to_string()))?)
 }
 
-pub async fn properties(_info: web::Path<String>, _data: web::Data<AppData>) -> impl Responder {
-    HttpResponse::Ok().body("TODO: properties here")
+pub async fn properties(info: web::Path<String>, data: web::Data<AppData>) -> impl Responder {
+    to_response(properties_inner(info, data).await)
+}
+
+async fn properties_inner(
+    info: web::Path<String>,
+    data: web::Data<AppData>,
+) -> Result<serde_json::Value, NetError> {
+    let dev = get_device(&data.instances, &info).ok_or_else(|| NetError::NoDevice)?;
+    let mut line = get_line(&data.config.backend)?;
+    let mut results = serde_json::Map::with_capacity(dev.properties.len());
+
+    for prop in &dev.properties {
+        let result = read_property(&mut line, dev, prop).await?;
+        results.insert(prop.name.clone(), result);
+    }
+    Ok(serde_json::Value::Object(results))
 }
 
 async fn get_property_inner(
