@@ -1,4 +1,4 @@
-use crate::echoinfo::DeviceInfo;
+use crate::echoinfo::{DeviceInfo, DeviceProtocolInfo};
 use crate::hex;
 use crate::line_driver::LineDriver;
 use std::collections::{HashMap, HashSet};
@@ -115,7 +115,7 @@ pub(super) fn class_intersect(
 
     let intersection = available.intersection(discovered);
 
-    //we need to map to "0x00000" format
+    //we need to map to "0x0000" format
     intersection
         .map(|class| format!("0x{}", class))
         .collect::<HashSet<String>>()
@@ -212,6 +212,47 @@ fn parse_binary_map(property_map: &[u8]) -> Option<Vec<u8>> {
                 acc
             }),
     )
+}
+
+pub(super) fn scan_protoinfo(
+    classes: HashSet<String>,
+    driver: &mut LineDriver,
+    //eojs have "0x" prefix in the response
+) -> std::io::Result<Vec<DeviceProtocolInfo>> {
+    let protoinfocommand = "224.0.23.0:0ef000:0x82\n".to_string();
+    let manufacturercommand = "224.0.23.0:0ef000:0x8A\n".to_string();
+    let appendixinfocommand = classes
+        .iter()
+        .map(|class| format!("224.0.23.0:{}00:0x82\n", class))
+        .collect::<String>();
+    let command = std::iter::once(protoinfocommand)
+        .chain(std::iter::once(manufacturercommand))
+        .chain(std::iter::once(appendixinfocommand))
+        .collect::<String>();
+
+    println!("scan_protoinfo command:\n{}", command);
+    let res = driver.exec_multi(&command)?;
+    let responses = res
+        .iter()
+        .map(|response| {
+            LineResponse::try_from(response.as_ref()).expect("died when collecting information")
+        })
+        .collect::<Vec<LineResponse<'_>>>();
+    //now, use the appendix info to get stuff done first
+    let infos = responses
+        .iter()
+        .filter(|lr| lr.property == "0x82" && !lr.eoj.starts_with("0ef0"))
+        .map(|lr| (lr, DeviceProtocolInfo::new(lr.hosteoj())))
+        .map(|(lr, info)| {
+            if let Some(data) = lr.data {
+                info.with_appendix(data.to_string())
+            } else {
+                info
+            }
+        })
+        //TODO process the rest of the stuff
+        .collect::<Vec<_>>();
+    Ok(infos)
 }
 
 #[cfg(test)]

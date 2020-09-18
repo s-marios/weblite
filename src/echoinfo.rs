@@ -1,4 +1,6 @@
 use crate::converters::Converter;
+use crate::descriptions::TextDescription;
+use serde::Serialize;
 #[derive(Debug)]
 pub(crate) struct DeviceInfo {
     pub host: String,
@@ -78,4 +80,83 @@ impl EchonetProperty {
             converter,
         }
     }
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct DeviceProtocolInfo {
+    pub id: String,
+    pub device_type: String,
+    pub protocol: ProtocolInfo,
+    pub manufacturer: ManufacturerInfo,
+}
+
+impl DeviceProtocolInfo {
+    pub fn new(id: String) -> DeviceProtocolInfo {
+        DeviceProtocolInfo {
+            id,
+            device_type: String::from("unavailable"),
+            protocol: ProtocolInfo {
+                protocol: String::from("N/A"),
+                appendix: String::from("N/A"),
+            },
+            manufacturer: ManufacturerInfo {
+                code: String::from("N/A"),
+                descriptions: TextDescription {
+                    en: String::from("N/A"),
+                    ja: String::from("不明"),
+                },
+            },
+        }
+    }
+
+    pub fn with_type(self, device_type: String) -> Self {
+        DeviceProtocolInfo {
+            device_type,
+            ..self
+        }
+    }
+
+    pub fn with_protocol(self, protocol: String) -> Self {
+        DeviceProtocolInfo {
+            protocol: ProtocolInfo {
+                protocol,
+                ..self.protocol
+            },
+            ..self
+        }
+    }
+
+    pub fn with_appendix(self, appendix: String) -> Self {
+        DeviceProtocolInfo {
+            protocol: ProtocolInfo {
+                appendix,
+                ..self.protocol
+            },
+            ..self
+        }
+    }
+
+    pub fn with_code(self, code: String) -> Self {
+        DeviceProtocolInfo {
+            manufacturer: ManufacturerInfo {
+                code,
+                ..self.manufacturer
+            },
+            ..self
+        }
+    }
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct ProtocolInfo {
+    #[serde(rename = "type")]
+    pub protocol: String,
+    #[serde(rename = "version")]
+    pub appendix: String,
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct ManufacturerInfo {
+    pub code: String,
+    pub descriptions: TextDescription,
 }

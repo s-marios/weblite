@@ -394,7 +394,7 @@ impl Converter {
         false_value: &str,
     ) -> Result<serde_json::Value, NetError> {
         //get our value
-        let val = context.data.get(0).ok_or_else(|| NetError::WriteNG)?;
+        let val = context.data.get(0).ok_or(NetError::WriteNG)?;
         //advance
         context.data = &context.data[1..];
 

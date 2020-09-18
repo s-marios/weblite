@@ -24,6 +24,7 @@ pub struct AppData {
     pub config: Config,
     pub instances: Vec<EchonetDevice>,
     pub updated_descriptions: HashMap<String, DeviceDescription>,
+    pub device_information: String,
     //pub descriptions: Descriptions,
     //pub superclass_dd: DeviceDescription,
 }
@@ -79,7 +80,7 @@ pub fn init() -> std::io::Result<AppData> {
         println!();
     });
 
-    let scanned_devices = lineproto::scan_classes(classes, &mut driver);
+    let scanned_devices = lineproto::scan_classes(classes.clone(), &mut driver);
 
     let devices = scanned_devices
         .into_iter()
@@ -103,10 +104,20 @@ pub fn init() -> std::io::Result<AppData> {
     let updated_descriptions =
         generate_updated_device_descriptions(descriptions, superclass_dd, &instances);
 
+    //let's search for the protocol & appendix version
+    let device_infos = lineproto::scan_protoinfo(classes, &mut driver)?;
+
+    //stringify them ready the devices API
+    let mut dev_def = HashMap::new();
+    dev_def.insert("devices", device_infos);
+    let device_information = serde_json::to_string_pretty(&dev_def)?;
+    println!("device_information:\n{}", device_information);
+
     Ok(AppData {
         config,
         instances,
         updated_descriptions,
+        device_information,
         //descriptions,
         //superclass_dd,
     })
@@ -230,8 +241,10 @@ pub async fn versions() -> impl Responder {
 pub async fn resources() -> impl Responder {
     HttpResponse::Ok().body("TODO: resources here")
 }
-pub async fn devices() -> impl Responder {
-    HttpResponse::Ok().body("TODO: devices here")
+pub async fn devices(data: web::Data<AppData>) -> impl Responder {
+    HttpResponse::Ok()
+        .set_header(actix_web::http::header::CONTENT_TYPE, "application/json")
+        .body(&data.device_information)
 }
 
 pub async fn controllers() -> impl Responder {
@@ -251,7 +264,7 @@ async fn device_inner(
             .updated_descriptions
             .iter()
             .find(|(dev, _desc)| &device.as_ref() == dev)
-            .ok_or_else(|| NetError::NoDevice)?
+            .ok_or(NetError::NoDevice)?
             .1,
     )
     .map_err(|internal| NetError::Internal(internal.to_string()))?)
@@ -265,7 +278,7 @@ async fn properties_inner(
     info: web::Path<String>,
     data: web::Data<AppData>,
 ) -> Result<serde_json::Value, NetError> {
-    let dev = get_device(&data.instances, &info).ok_or_else(|| NetError::NoDevice)?;
+    let dev = get_device(&data.instances, &info).ok_or(NetError::NoDevice)?;
     let mut line = get_line(&data.config.backend)?;
     let mut results = serde_json::Map::with_capacity(dev.properties.len());
 
@@ -280,8 +293,8 @@ async fn get_property_inner(
     info: web::Path<(String, String)>,
     data: web::Data<AppData>,
 ) -> Result<serde_json::Value, NetError> {
-    let dev = get_device(&data.instances, &info.0).ok_or_else(|| NetError::NoDevice)?;
-    let prop = get_dev_prop(&dev, &info.1).ok_or_else(|| NetError::NoProperty)?;
+    let dev = get_device(&data.instances, &info.0).ok_or(NetError::NoDevice)?;
+    let prop = get_dev_prop(&dev, &info.1).ok_or(NetError::NoProperty)?;
     let mut line = get_line(&data.config.backend)?;
     read_property(&mut line, dev, prop).await
 }
@@ -434,8 +447,8 @@ async fn set_property_inner(
     data: web::Data<AppData>,
     value: web::Json<serde_json::Value>,
 ) -> Result<serde_json::Value, NetError> {
-    let dev = get_device(&data.instances, &info.0).ok_or_else(|| NetError::NoDevice)?;
-    let prop = get_dev_prop(&dev, &info.1).ok_or_else(|| NetError::NoProperty)?;
+    let dev = get_device(&data.instances, &info.0).ok_or(NetError::NoDevice)?;
+    let prop = get_dev_prop(&dev, &info.1).ok_or(NetError::NoProperty)?;
     let mut line = get_line(&data.config.backend)?;
     //we've got to serialize there two... right?
     //I hope I'm right..
@@ -540,7 +553,7 @@ fn generate_commands(
                 let mut cmd = String::new();
                 cmd.push_str(&device);
                 cmd.push_str(&format!(":{}", op.epc));
-                cmd.push_str("\n");
+                cmd.push('\n');
                 v.push(cmd);
                 v
             })),
