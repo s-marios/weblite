@@ -280,11 +280,14 @@ async fn properties_inner(
 ) -> Result<serde_json::Value, NetError> {
     let dev = get_device(&data.instances, &info).ok_or(NetError::NoDevice)?;
     let mut line = get_line(&data.config.backend)?;
-    let mut results = serde_json::Map::with_capacity(dev.properties.len());
+    let mut results = serde_json::Map::new();
 
     for prop in &dev.properties {
-        let result = read_property(&mut line, dev, prop).await?;
-        results.insert(prop.name.clone(), result);
+        let mut result = read_property(&mut line, dev, prop).await?;
+        //copy the hashmap of our property into the bigger object reply
+        //read property always returns an serde_json::value::object
+        //so unwrap is fine here
+        results.append(result.as_object_mut().unwrap());
     }
     Ok(serde_json::Value::Object(results))
 }
