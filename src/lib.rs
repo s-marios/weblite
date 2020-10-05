@@ -104,8 +104,19 @@ pub fn init() -> std::io::Result<AppData> {
     let updated_descriptions =
         generate_updated_device_descriptions(descriptions, superclass_dd, &instances);
 
-    //let's search for the protocol & appendix version
+    //let's search for manufacturer code, protocol & appendix version
     let device_infos = lineproto::scan_protoinfo(classes, &mut driver)?;
+    //update device type
+    let device_infos = device_infos
+        .into_iter()
+        .map(|info| {
+            let device_type = updated_descriptions
+                .get(&info.id)
+                .map(|i| i.device_type.clone())
+                .unwrap_or_else(|| "unavailable".to_string());
+            info.with_type(device_type)
+        })
+        .collect::<Vec<_>>();
 
     //stringify them ready the devices API
     let mut dev_def = HashMap::new();
@@ -231,7 +242,7 @@ pub fn init_config() -> std::io::Result<Config> {
     Ok(config)
 }
 
-pub fn init_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Descriptions> {
+pub fn init_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Vec<DeviceDescription>> {
     read_device_descriptions(dir)
 }
 

@@ -219,6 +219,34 @@ pub(super) fn scan_protoinfo(
     driver: &mut LineDriver,
     //eojs have "0x" prefix in the response
 ) -> std::io::Result<Vec<DeviceProtocolInfo>> {
+    fn map_info(info: DeviceProtocolInfo, responses: &[LineResponse]) -> DeviceProtocolInfo {
+        //get protocol info
+        let info = if let Some(proto_resp) = responses.iter().find(|resp| {
+            info.id.starts_with(resp.host)
+                && resp.is_ok()
+                && resp.property == "0x82"
+                && resp.data.is_some()
+        }) {
+            info.with_protocol(proto_resp.data.unwrap().to_string())
+        } else {
+            info
+        };
+
+        //get manufacturer code
+        let info = if let Some(man_resp) = responses.iter().find(|resp| {
+            info.id.starts_with(resp.host)
+                && resp.is_ok()
+                && resp.property == "0x8A"
+                && resp.data.is_some()
+        }) {
+            info.with_code(man_resp.data.unwrap().to_string())
+        } else {
+            info
+        };
+
+        info
+    }
+
     let protoinfocommand = "224.0.23.0:0ef000:0x82\n".to_string();
     let manufacturercommand = "224.0.23.0:0ef000:0x8A\n".to_string();
     let appendixinfocommand = classes
@@ -251,6 +279,13 @@ pub(super) fn scan_protoinfo(
             }
         })
         //TODO process the rest of the stuff
+        .collect::<Vec<_>>();
+    let infos = infos
+        .into_iter()
+        .map(|info| {
+            //for each piece we have, update it by looking into the responses
+            map_info(info, &responses)
+        })
         .collect::<Vec<_>>();
     Ok(infos)
 }
