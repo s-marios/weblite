@@ -1,0 +1,2763 @@
+{
+  "deviceType": "washerDryer",
+  "eoj": "0x03D3",
+  "descriptions": {
+    "ja": "洗濯乾燥機",
+    "en": "Washer and Dryer"
+  },
+  "properties": {
+    "doorOpenStatus": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "扉・蓋開閉状態",
+        "en": "Door/cover open/close status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "扉・蓋開",
+              "en": "Door/cover open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "扉・蓋閉",
+              "en": "Door/cover closed"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "runningStatus": {
+      "epc": "0xB2",
+      "descriptions": {
+        "ja": "洗濯・乾燥設定",
+        "en": "Washer and dryer setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "run",
+          "pause",
+          "stop"
+        ],
+        "values": [
+          {
+            "value": "run",
+            "descriptions": {
+              "ja": "洗濯乾燥開始・再開／洗濯乾燥運転中",
+              "en": "Start/restart(ed) or in progress"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "pause",
+            "descriptions": {
+              "ja": "洗濯乾燥一時停止",
+              "en": "Suspend(ed)"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "stop",
+            "descriptions": {
+              "ja": "洗濯乾燥停止",
+              "en": "Stop(ped)"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    },
+    "washerDryerCycle1": {
+      "epc": "0xD0",
+      "descriptions": {
+        "ja": "洗濯乾燥コース設定 1",
+        "en": "Washer and dryer cycle setting 1"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "washDryStandard",
+          "washDrySilent",
+          "washDryHeavilySoiled",
+          "washDryHardToRemove",
+          "washDryPresoaking",
+          "washDryBlankets",
+          "washDrySoft",
+          "washDryDrymark",
+          "washDryCleanRinsing",
+          "washDryIroning",
+          "washDryHangDrying",
+          "washDryThick",
+          "washDryDisinfection",
+          "washDryOilStrains",
+          "washDryMemory",
+          "washDryDetergentSaving",
+          "washDryLightlySoiled",
+          "washDrySmallAmountQuick",
+          "washStandard",
+          "washSilent",
+          "washHeavilySoiled",
+          "washHardToRemove",
+          "washPresoaking",
+          "washBlankets",
+          "washSoft",
+          "washDrymark",
+          "washCleanRinsing",
+          "washDisinfection",
+          "washOilStrains",
+          "washMemory",
+          "washDetergentSaving",
+          "washLightlySoiled",
+          "washSmallAmountQuick",
+          "washTankCleaning",
+          "dryStandard",
+          "dryBlankets",
+          "drySoft",
+          "dryDrymark",
+          "dryIroning",
+          "dryHangDrying",
+          "dryThick",
+          "dryDisinfection",
+          "dryShrinkageMinimization",
+          "dryFinishing",
+          "dryStationaryDrying",
+          "dryUserDefinedTime",
+          "dryWarming",
+          "dryTankDrying"
+        ],
+        "values": [
+          {
+            "value": "washDryStandard",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞標準",
+              "en": "<Washing and drying course>Standard"
+            },
+            "edt": "0x21"
+          },
+          {
+            "value": "washDrySilent",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞静音",
+              "en": "<Washing and drying course>silent"
+            },
+            "edt": "0x22"
+          },
+          {
+            "value": "washDryHeavilySoiled",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞汚れ大",
+              "en": "<Washing and drying course>heavily soiled"
+            },
+            "edt": "0x23"
+          },
+          {
+            "value": "washDryHardToRemove",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞しつこい汚れ",
+              "en": "<Washing and drying course>hard-to-remove stains"
+            },
+            "edt": "0x24"
+          },
+          {
+            "value": "washDryPresoaking",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞つけおき",
+              "en": "<Washing and drying course>presoaking"
+            },
+            "edt": "0x25"
+          },
+          {
+            "value": "washDryBlankets",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞毛布",
+              "en": "<Washing and drying course>blankets"
+            },
+            "edt": "0x26"
+          },
+          {
+            "value": "washDrySoft",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞ソフト",
+              "en": "<Washing and drying course>soft"
+            },
+            "edt": "0x27"
+          },
+          {
+            "value": "washDryDrymark",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞ドライ",
+              "en": "<Washing and drying course>dry"
+            },
+            "edt": "0x28"
+          },
+          {
+            "value": "washDryCleanRinsing",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞清潔すすぎ",
+              "en": "<Washing and drying course>clean rinsing"
+            },
+            "edt": "0x29"
+          },
+          {
+            "value": "washDryIroning",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞アイロン／Y シャツ",
+              "en": "<Washing and drying course>ironing/business shirts"
+            },
+            "edt": "0x2A"
+          },
+          {
+            "value": "washDryHangDrying",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞吊り干し",
+              "en": "<Washing and drying course>hang drying"
+            },
+            "edt": "0x2B"
+          },
+          {
+            "value": "washDryThick",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞厚物",
+              "en": "<Washing and drying course>thick clothes"
+            },
+            "edt": "0x2C"
+          },
+          {
+            "value": "washDryDisinfection",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞除菌",
+              "en": "<Washing and drying course>disinfection"
+            },
+            "edt": "0x2D"
+          },
+          {
+            "value": "washDryOilStrains",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞油汚れ",
+              "en": "<Washing and drying course>oil stains"
+            },
+            "edt": "0x2E"
+          },
+          {
+            "value": "washDryMemory",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞メモリー",
+              "en": "<Washing and drying course>memory"
+            },
+            "edt": "0x2F"
+          },
+          {
+            "value": "washDryDetergentSaving",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞省洗剤",
+              "en": "<Washing and drying course>detergent saving"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": "washDryLightlySoiled",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞汚れ少",
+              "en": "<Washing and drying course>lightly soiled clothes"
+            },
+            "edt": "0x31"
+          },
+          {
+            "value": "washDrySmallAmountQuick",
+            "descriptions": {
+              "ja": "＜洗濯乾燥コース＞少量短時間",
+              "en": "<Washing and drying course>quick wash of small amount of laundry"
+            },
+            "edt": "0x32"
+          },
+          {
+            "value": "washStandard",
+            "descriptions": {
+              "ja": "＜洗濯コース＞標準",
+              "en": "<Washing course>Standard"
+            },
+            "edt": "0x61"
+          },
+          {
+            "value": "washSilent",
+            "descriptions": {
+              "ja": "＜洗濯コース＞静音",
+              "en": "<Washing course>silent"
+            },
+            "edt": "0x62"
+          },
+          {
+            "value": "washHeavilySoiled",
+            "descriptions": {
+              "ja": "＜洗濯コース＞汚れ大",
+              "en": "<Washing course>heavily soiled clothes"
+            },
+            "edt": "0x63"
+          },
+          {
+            "value": "washHardToRemove",
+            "descriptions": {
+              "ja": "＜洗濯コース＞しつこい汚れ",
+              "en": "<Washing course>hard-to-remove stains"
+            },
+            "edt": "0x64"
+          },
+          {
+            "value": "washPresoaking",
+            "descriptions": {
+              "ja": "＜洗濯コース＞つけおき",
+              "en": "<Washing course>presoaking"
+            },
+            "edt": "0x65"
+          },
+          {
+            "value": "washBlankets",
+            "descriptions": {
+              "ja": "＜洗濯コース＞毛布",
+              "en": "<Washing course>blankets"
+            },
+            "edt": "0x66"
+          },
+          {
+            "value": "washSoft",
+            "descriptions": {
+              "ja": "＜洗濯コース＞ソフト",
+              "en": "<Washing course>soft"
+            },
+            "edt": "0x67"
+          },
+          {
+            "value": "washDrymark",
+            "descriptions": {
+              "ja": "＜洗濯コース＞ドライ",
+              "en": "<Washing course>dry"
+            },
+            "edt": "0x68"
+          },
+          {
+            "value": "washCleanRinsing",
+            "descriptions": {
+              "ja": "＜洗濯コース＞清潔すすぎ",
+              "en": "<Washing course>clean rinsing"
+            },
+            "edt": "0x69"
+          },
+          {
+            "value": "washDisinfection",
+            "descriptions": {
+              "ja": "＜洗濯コース＞除菌",
+              "en": "<Washing course>disinfection"
+            },
+            "edt": "0x6A"
+          },
+          {
+            "value": "washOilStrains",
+            "descriptions": {
+              "ja": "＜洗濯コース＞油汚れ",
+              "en": "<Washing course>oil stains"
+            },
+            "edt": "0x6B"
+          },
+          {
+            "value": "washMemory",
+            "descriptions": {
+              "ja": "＜洗濯コース＞メモリ",
+              "en": "<Washing course>memory"
+            },
+            "edt": "0x6C"
+          },
+          {
+            "value": "washDetergentSaving",
+            "descriptions": {
+              "ja": "＜洗濯コース＞省洗剤",
+              "en": "<Washing course>detergent saving"
+            },
+            "edt": "0x6D"
+          },
+          {
+            "value": "washLightlySoiled",
+            "descriptions": {
+              "ja": "＜洗濯コース＞汚れ少",
+              "en": "<Washing course>lightly soiled clothes"
+            },
+            "edt": "0x6E"
+          },
+          {
+            "value": "washSmallAmountQuick",
+            "descriptions": {
+              "ja": "＜洗濯コース＞少量短時間",
+              "en": "<Washing course>quick wash of small amount of laundry"
+            },
+            "edt": "0x6F"
+          },
+          {
+            "value": "washTankCleaning",
+            "descriptions": {
+              "ja": "＜洗濯コース＞槽洗浄",
+              "en": "<Washing course>tank cleaning"
+            },
+            "edt": "0x7F"
+          },
+          {
+            "value": "dryStandard",
+            "descriptions": {
+              "ja": "＜乾燥コース＞標準",
+              "en": "<Drying course>Standard"
+            },
+            "edt": "0xA1"
+          },
+          {
+            "value": "dryBlankets",
+            "descriptions": {
+              "ja": "＜乾燥コース＞毛布",
+              "en": "<Drying course>blankets"
+            },
+            "edt": "0xA2"
+          },
+          {
+            "value": "drySoft",
+            "descriptions": {
+              "ja": "＜乾燥コース＞ソフト",
+              "en": "<Drying course>soft"
+            },
+            "edt": "0xA3"
+          },
+          {
+            "value": "dryDrymark",
+            "descriptions": {
+              "ja": "＜乾燥コース＞ドライ",
+              "en": "<Drying course>dry"
+            },
+            "edt": "0xA4"
+          },
+          {
+            "value": "dryIroning",
+            "descriptions": {
+              "ja": "＜乾燥コース＞アイロン／Y シャツ",
+              "en": "<Drying course>ironing/business shirts"
+            },
+            "edt": "0xA5"
+          },
+          {
+            "value": "dryHangDrying",
+            "descriptions": {
+              "ja": "＜乾燥コース＞吊り干し",
+              "en": "<Drying course>hang drying"
+            },
+            "edt": "0xA6"
+          },
+          {
+            "value": "dryThick",
+            "descriptions": {
+              "ja": "＜乾燥コース＞厚物",
+              "en": "<Drying course>thick clothes"
+            },
+            "edt": "0xA7"
+          },
+          {
+            "value": "dryDisinfection",
+            "descriptions": {
+              "ja": "＜乾燥コース＞除菌",
+              "en": "<Drying course>disinfection"
+            },
+            "edt": "0xA8"
+          },
+          {
+            "value": "dryShrinkageMinimization",
+            "descriptions": {
+              "ja": "＜乾燥コース＞縮み低減",
+              "en": "<Drying course>shrinkage minimization"
+            },
+            "edt": "0xA9"
+          },
+          {
+            "value": "dryFinishing",
+            "descriptions": {
+              "ja": "＜乾燥コース＞仕上げ",
+              "en": "<Drying course>finishing"
+            },
+            "edt": "0xAA"
+          },
+          {
+            "value": "dryStationaryDrying",
+            "descriptions": {
+              "ja": "＜乾燥コース＞静止乾燥",
+              "en": "<Drying course>stationary drying"
+            },
+            "edt": "0xAB"
+          },
+          {
+            "value": "dryUserDefinedTime",
+            "descriptions": {
+              "ja": "＜乾燥コース＞時間指定",
+              "en": "<Drying course>user definition of drying time"
+            },
+            "edt": "0xAC"
+          },
+          {
+            "value": "dryWarming",
+            "descriptions": {
+              "ja": "＜乾燥コース＞衣類あたため",
+              "en": "<Drying course>garment warming"
+            },
+            "edt": "0xAD"
+          },
+          {
+            "value": "dryTankDrying",
+            "descriptions": {
+              "ja": "＜乾燥コース＞槽乾燥",
+              "en": "<Drying course>tank drying"
+            },
+            "edt": "0xBF"
+          }
+        ]
+      }
+    },
+    "washerDryerCycle2": {
+      "epc": "0xD1",
+      "descriptions": {
+        "ja": "洗濯乾燥コース設定２",
+        "en": "Washer and dryer cycle setting 2"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "washDryNoWash",
+          "washDryStandard",
+          "washDrySilent",
+          "washDryHeavilySoiled",
+          "washDryHardToRemove",
+          "washDryPresoaking",
+          "washDryBlankets",
+          "washDrySoft",
+          "washDryDrymark",
+          "washDryCleanRinsing",
+          "washDryDisinfection",
+          "washDryOilStrains",
+          "washDryMemory",
+          "washDryDetergentSaving",
+          "washDryLightlySoiled",
+          "washDrySmallAmountQuick",
+          "washDryTankCleaning"
+        ],
+        "values": [
+          {
+            "value": "washDryNoWash",
+            "descriptions": {
+              "ja": "洗濯なし",
+              "en": "No washing"
+            },
+            "edt": "0x20"
+          },
+          {
+            "value": "washDryStandard",
+            "descriptions": {
+              "ja": "標準",
+              "en": "standard"
+            },
+            "edt": "0x21"
+          },
+          {
+            "value": "washDrySilent",
+            "descriptions": {
+              "ja": "静音",
+              "en": "silent"
+            },
+            "edt": "0x22"
+          },
+          {
+            "value": "washDryHeavilySoiled",
+            "descriptions": {
+              "ja": "汚れ大",
+              "en": "heavily soiled clothes"
+            },
+            "edt": "0x23"
+          },
+          {
+            "value": "washDryHardToRemove",
+            "descriptions": {
+              "ja": "しつこい汚れ",
+              "en": "hard-to-remove stains"
+            },
+            "edt": "0x24"
+          },
+          {
+            "value": "washDryPresoaking",
+            "descriptions": {
+              "ja": "つけおき",
+              "en": "presoaking"
+            },
+            "edt": "0x25"
+          },
+          {
+            "value": "washDryBlankets",
+            "descriptions": {
+              "ja": "毛布",
+              "en": "blankets"
+            },
+            "edt": "0x26"
+          },
+          {
+            "value": "washDrySoft",
+            "descriptions": {
+              "ja": "ソフト",
+              "en": "soft"
+            },
+            "edt": "0x27"
+          },
+          {
+            "value": "washDryDrymark",
+            "descriptions": {
+              "ja": "ドライ",
+              "en": "dry"
+            },
+            "edt": "0x28"
+          },
+          {
+            "value": "washDryCleanRinsing",
+            "descriptions": {
+              "ja": "清潔すすぎ",
+              "en": "clean rinsing"
+            },
+            "edt": "0x29"
+          },
+          {
+            "value": "washDryDisinfection",
+            "descriptions": {
+              "ja": "除菌",
+              "en": "disinfection"
+            },
+            "edt": "0x2D"
+          },
+          {
+            "value": "washDryOilStrains",
+            "descriptions": {
+              "ja": "油汚れ",
+              "en": "oil stains"
+            },
+            "edt": "0x2E"
+          },
+          {
+            "value": "washDryMemory",
+            "descriptions": {
+              "ja": "メモリー",
+              "en": "memory"
+            },
+            "edt": "0x2F"
+          },
+          {
+            "value": "washDryDetergentSaving",
+            "descriptions": {
+              "ja": "省洗剤",
+              "en": "detergent saving"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": "washDryLightlySoiled",
+            "descriptions": {
+              "ja": "汚れ少",
+              "en": "lightly soiled clothes"
+            },
+            "edt": "0x31"
+          },
+          {
+            "value": "washDrySmallAmountQuick",
+            "descriptions": {
+              "ja": "少量短時間",
+              "en": "quick wash of small amount of laundry"
+            },
+            "edt": "0x32"
+          },
+          {
+            "value": "washDryTankCleaning",
+            "descriptions": {
+              "ja": "槽洗浄",
+              "en": "tank cleaning"
+            },
+            "edt": "0x3F"
+          }
+        ]
+      }
+    },
+    "dryerCycle": {
+      "epc": "0xD2",
+      "descriptions": {
+        "ja": "乾燥方法設定",
+        "en": "Drying cycle setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "dryNoDrying",
+          "dryStandard",
+          "dryBlankets",
+          "drySoft",
+          "dryDrymark",
+          "dryIroning",
+          "dryHangDrying",
+          "dryThick",
+          "dryDisinfection",
+          "dryShrinkageMinimization",
+          "dryFinishing",
+          "dryStationaryDrying",
+          "dryUserDefinedTime",
+          "dryWarming",
+          "dryHeaterCurrentLimit",
+          "dryTankDrying"
+        ],
+        "values": [
+          {
+            "value": "dryNoDrying",
+            "descriptions": {
+              "ja": "乾燥なし",
+              "en": "No drying"
+            },
+            "edt": "0xA0"
+          },
+          {
+            "value": "dryStandard",
+            "descriptions": {
+              "ja": "標準",
+              "en": "standard"
+            },
+            "edt": "0xA1"
+          },
+          {
+            "value": "dryBlankets",
+            "descriptions": {
+              "ja": "毛布",
+              "en": "blankets"
+            },
+            "edt": "0xA2"
+          },
+          {
+            "value": "drySoft",
+            "descriptions": {
+              "ja": "ソフト",
+              "en": "soft"
+            },
+            "edt": "0xA3"
+          },
+          {
+            "value": "dryDrymark",
+            "descriptions": {
+              "ja": "ドライ",
+              "en": "dry"
+            },
+            "edt": "0xA4"
+          },
+          {
+            "value": "dryIroning",
+            "descriptions": {
+              "ja": "アイロン／Y シャツ",
+              "en": "ironing/business shirts"
+            },
+            "edt": "0xA5"
+          },
+          {
+            "value": "dryHangDrying",
+            "descriptions": {
+              "ja": "吊り干し",
+              "en": "hang drying"
+            },
+            "edt": "0xA6"
+          },
+          {
+            "value": "dryThick",
+            "descriptions": {
+              "ja": "厚物",
+              "en": "thick clothes"
+            },
+            "edt": "0xA7"
+          },
+          {
+            "value": "dryDisinfection",
+            "descriptions": {
+              "ja": "除菌",
+              "en": "disinfection"
+            },
+            "edt": "0xA8"
+          },
+          {
+            "value": "dryShrinkageMinimization",
+            "descriptions": {
+              "ja": "縮み低減",
+              "en": "shrinkage minimization"
+            },
+            "edt": "0xA9"
+          },
+          {
+            "value": "dryFinishing",
+            "descriptions": {
+              "ja": "仕上げ",
+              "en": "finishing"
+            },
+            "edt": "0xAA"
+          },
+          {
+            "value": "dryStationaryDrying",
+            "descriptions": {
+              "ja": "静止乾燥",
+              "en": "stationary drying"
+            },
+            "edt": "0xAB"
+          },
+          {
+            "value": "dryUserDefinedTime",
+            "descriptions": {
+              "ja": "時間指定",
+              "en": "user definition of drying time"
+            },
+            "edt": "0xC"
+          },
+          {
+            "value": "dryWarming",
+            "descriptions": {
+              "ja": "衣類あたため",
+              "en": "garment warming"
+            },
+            "edt": "0xAD"
+          },
+          {
+            "value": "dryHeaterCurrentLimit",
+            "descriptions": {
+              "ja": "ヒータ入力制限",
+              "en": "heater current limit"
+            },
+            "edt": "0xAE"
+          },
+          {
+            "value": "dryTankDrying",
+            "descriptions": {
+              "ja": "槽乾燥",
+              "en": "tank drying"
+            },
+            "edt": "0xBF"
+          }
+        ]
+      }
+    },
+    "washerDryerCycleOptions1": {
+      "epc": "0xD3",
+      "descriptions": {
+        "ja": "設定可能コース情報１",
+        "en": "Washer and dryer cycle option list 1"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "washDryStandard",
+            "washDrySilent",
+            "washDryHeavilySoiled",
+            "washDryHardToRemove",
+            "washDryPresoaking",
+            "washDryBlankets",
+            "washDrySoft",
+            "washDryDrymark",
+            "washDryCleanRinsing",
+            "washDryIroning",
+            "washDryHangDrying",
+            "washDryThick",
+            "washDryDisinfection",
+            "washDryOilStrains",
+            "washDryMemory",
+            "washDryDetergentSaving",
+            "washDryLightlySoiled",
+            "washDrySmallAmountQuick",
+            "washStandard",
+            "washSilent",
+            "washHeavilySoiled",
+            "washHardToRemove",
+            "washPresoaking",
+            "washBlankets",
+            "washSoft",
+            "washDrymark",
+            "washCleanRinsing",
+            "washDisinfection",
+            "washOilStrains",
+            "washMemory",
+            "washDetergentSaving",
+            "washLightlySoiled",
+            "washSmallAmountQuick",
+            "washTankCleaning",
+            "dryStandard",
+            "dryBlankets",
+            "drySoft",
+            "dryDrymark",
+            "dryIroning",
+            "dryHangDrying",
+            "dryThick",
+            "dryDisinfection",
+            "dryShrinkageMinimization",
+            "dryFinishing",
+            "dryStationaryDrying",
+            "dryUserDefinedTime",
+            "dryWarming",
+            "dryTankDrying"
+          ],
+          "values": [
+            {
+              "value": "washDryStandard",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞標準",
+                "en": "<Washing and drying course>Standard"
+              },
+              "edt": "0x21"
+            },
+            {
+              "value": "washDrySilent",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞静音",
+                "en": "<Washing and drying course>silent"
+              },
+              "edt": "0x22"
+            },
+            {
+              "value": "washDryHeavilySoiled",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞汚れ大",
+                "en": "<Washing and drying course>heavily soiled"
+              },
+              "edt": "0x23"
+            },
+            {
+              "value": "washDryHardToRemove",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞しつこい汚れ",
+                "en": "<Washing and drying course>hard-to-remove stains"
+              },
+              "edt": "0x24"
+            },
+            {
+              "value": "washDryPresoaking",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞つけおき",
+                "en": "<Washing and drying course>presoaking"
+              },
+              "edt": "0x25"
+            },
+            {
+              "value": "washDryBlankets",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞毛布",
+                "en": "<Washing and drying course>blankets"
+              },
+              "edt": "0x26"
+            },
+            {
+              "value": "washDrySoft",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞ソフト",
+                "en": "<Washing and drying course>soft"
+              },
+              "edt": "0x27"
+            },
+            {
+              "value": "washDryDrymark",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞ドライ",
+                "en": "<Washing and drying course>dry"
+              },
+              "edt": "0x28"
+            },
+            {
+              "value": "washDryCleanRinsing",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞清潔すすぎ",
+                "en": "<Washing and drying course>clean rinsing"
+              },
+              "edt": "0x29"
+            },
+            {
+              "value": "washDryIroning",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞アイロン／Y シャツ",
+                "en": "<Washing and drying course>ironing/business shirts"
+              },
+              "edt": "0x2A"
+            },
+            {
+              "value": "washDryHangDrying",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞吊り干し",
+                "en": "<Washing and drying course>hang drying"
+              },
+              "edt": "0x2B"
+            },
+            {
+              "value": "washDryThick",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞厚物",
+                "en": "<Washing and drying course>thick clothes"
+              },
+              "edt": "0x2C"
+            },
+            {
+              "value": "washDryDisinfection",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞除菌",
+                "en": "<Washing and drying course>disinfection"
+              },
+              "edt": "0x2D"
+            },
+            {
+              "value": "washDryOilStrains",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞油汚れ",
+                "en": "<Washing and drying course>oil stains"
+              },
+              "edt": "0x2E"
+            },
+            {
+              "value": "washDryMemory",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞メモリー",
+                "en": "<Washing and drying course>memory"
+              },
+              "edt": "0x2F"
+            },
+            {
+              "value": "washDryDetergentSaving",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞省洗剤",
+                "en": "<Washing and drying course>detergent saving"
+              },
+              "edt": "0x30"
+            },
+            {
+              "value": "washDryLightlySoiled",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞汚れ少",
+                "en": "<Washing and drying course>lightly soiled clothes"
+              },
+              "edt": "0x31"
+            },
+            {
+              "value": "washDrySmallAmountQuick",
+              "descriptions": {
+                "ja": "＜洗濯乾燥コース＞少量短時間",
+                "en": "<Washing and drying course>quick wash of small amount of laundry"
+              },
+              "edt": "0x32"
+            },
+            {
+              "value": "washStandard",
+              "descriptions": {
+                "ja": "＜洗濯コース＞標準",
+                "en": "<Washing course>Standard"
+              },
+              "edt": "0x61"
+            },
+            {
+              "value": "washSilent",
+              "descriptions": {
+                "ja": "＜洗濯コース＞静音",
+                "en": "<Washing course>silent"
+              },
+              "edt": "0x62"
+            },
+            {
+              "value": "washHeavilySoiled",
+              "descriptions": {
+                "ja": "＜洗濯コース＞汚れ大",
+                "en": "<Washing course>heavily soiled clothes"
+              },
+              "edt": "0x63"
+            },
+            {
+              "value": "washHardToRemove",
+              "descriptions": {
+                "ja": "＜洗濯コース＞しつこい汚れ",
+                "en": "<Washing course>hard-to-remove stains"
+              },
+              "edt": "0x64"
+            },
+            {
+              "value": "washPresoaking",
+              "descriptions": {
+                "ja": "＜洗濯コース＞つけおき",
+                "en": "<Washing course>presoaking"
+              },
+              "edt": "0x65"
+            },
+            {
+              "value": "washBlankets",
+              "descriptions": {
+                "ja": "＜洗濯コース＞毛布",
+                "en": "<Washing course>blankets"
+              },
+              "edt": "0x66"
+            },
+            {
+              "value": "washSoft",
+              "descriptions": {
+                "ja": "＜洗濯コース＞ソフト",
+                "en": "<Washing course>soft"
+              },
+              "edt": "0x67"
+            },
+            {
+              "value": "washDrymark",
+              "descriptions": {
+                "ja": "＜洗濯コース＞ドライ",
+                "en": "<Washing course>dry"
+              },
+              "edt": "0x68"
+            },
+            {
+              "value": "washCleanRinsing",
+              "descriptions": {
+                "ja": "＜洗濯コース＞清潔すすぎ",
+                "en": "<Washing course>clean rinsing"
+              },
+              "edt": "0x69"
+            },
+            {
+              "value": "washDisinfection",
+              "descriptions": {
+                "ja": "＜洗濯コース＞除菌",
+                "en": "<Washing course>disinfection"
+              },
+              "edt": "0x6A"
+            },
+            {
+              "value": "washOilStrains",
+              "descriptions": {
+                "ja": "＜洗濯コース＞油汚れ",
+                "en": "<Washing course>oil stains"
+              },
+              "edt": "0x6B"
+            },
+            {
+              "value": "washMemory",
+              "descriptions": {
+                "ja": "＜洗濯コース＞メモリ",
+                "en": "<Washing course>memory"
+              },
+              "edt": "0x6C"
+            },
+            {
+              "value": "washDetergentSaving",
+              "descriptions": {
+                "ja": "＜洗濯コース＞省洗剤",
+                "en": "<Washing course>detergent saving"
+              },
+              "edt": "0x6D"
+            },
+            {
+              "value": "washLightlySoiled",
+              "descriptions": {
+                "ja": "＜洗濯コース＞汚れ少",
+                "en": "<Washing course>lightly soiled clothes"
+              },
+              "edt": "0x6E"
+            },
+            {
+              "value": "washSmallAmountQuick",
+              "descriptions": {
+                "ja": "＜洗濯コース＞少量短時間",
+                "en": "<Washing course>quick wash of small amount of laundry"
+              },
+              "edt": "0x6F"
+            },
+            {
+              "value": "washTankCleaning",
+              "descriptions": {
+                "ja": "＜洗濯コース＞槽洗浄",
+                "en": "<Washing course>tank cleaning"
+              },
+              "edt": "0x7F"
+            },
+            {
+              "value": "dryStandard",
+              "descriptions": {
+                "ja": "＜乾燥コース＞標準",
+                "en": "<Drying course>Standard"
+              },
+              "edt": "0xA1"
+            },
+            {
+              "value": "dryBlankets",
+              "descriptions": {
+                "ja": "＜乾燥コース＞毛布",
+                "en": "<Drying course>blankets"
+              },
+              "edt": "0xA2"
+            },
+            {
+              "value": "drySoft",
+              "descriptions": {
+                "ja": "＜乾燥コース＞ソフト",
+                "en": "<Drying course>soft"
+              },
+              "edt": "0xA3"
+            },
+            {
+              "value": "dryDrymark",
+              "descriptions": {
+                "ja": "＜乾燥コース＞ドライ",
+                "en": "<Drying course>dry"
+              },
+              "edt": "0xA4"
+            },
+            {
+              "value": "dryIroning",
+              "descriptions": {
+                "ja": "＜乾燥コース＞アイロン／Y シャツ",
+                "en": "<Drying course>ironing/business shirts"
+              },
+              "edt": "0xA5"
+            },
+            {
+              "value": "dryHangDrying",
+              "descriptions": {
+                "ja": "＜乾燥コース＞吊り干し",
+                "en": "<Drying course>hang drying"
+              },
+              "edt": "0xA6"
+            },
+            {
+              "value": "dryThick",
+              "descriptions": {
+                "ja": "＜乾燥コース＞厚物",
+                "en": "<Drying course>thick clothes"
+              },
+              "edt": "0xA7"
+            },
+            {
+              "value": "dryDisinfection",
+              "descriptions": {
+                "ja": "＜乾燥コース＞除菌",
+                "en": "<Drying course>disinfection"
+              },
+              "edt": "0xA8"
+            },
+            {
+              "value": "dryShrinkageMinimization",
+              "descriptions": {
+                "ja": "＜乾燥コース＞縮み低減",
+                "en": "<Drying course>shrinkage minimization"
+              },
+              "edt": "0xA9"
+            },
+            {
+              "value": "dryFinishing",
+              "descriptions": {
+                "ja": "＜乾燥コース＞仕上げ",
+                "en": "<Drying course>finishing"
+              },
+              "edt": "0xAA"
+            },
+            {
+              "value": "dryStationaryDrying",
+              "descriptions": {
+                "ja": "＜乾燥コース＞静止乾燥",
+                "en": "<Drying course>stationary drying"
+              },
+              "edt": "0xAB"
+            },
+            {
+              "value": "dryUserDefinedTime",
+              "descriptions": {
+                "ja": "＜乾燥コース＞時間指定",
+                "en": "<Drying course>user definition of drying time"
+              },
+              "edt": "0xAC"
+            },
+            {
+              "value": "dryWarming",
+              "descriptions": {
+                "ja": "＜乾燥コース＞衣類あたため",
+                "en": "<Drying course>garment warming"
+              },
+              "edt": "0xAD"
+            },
+            {
+              "value": "dryTankDrying",
+              "descriptions": {
+                "ja": "＜乾燥コース＞槽乾燥",
+                "en": "<Drying course>tank drying"
+              },
+              "edt": "0xBF"
+            }
+          ]
+        }
+      }
+    },
+    "washerDryerCycleOptions2": {
+      "epc": "0xD4",
+      "descriptions": {
+        "ja": "設定可能コース情報２",
+        "en": "Washer and dryer cycle option list 2"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "washDryNoWash",
+            "washDryStandard",
+            "washDrySilent",
+            "washDryHeavilySoiled",
+            "washDryHardToRemove",
+            "washDryPresoaking",
+            "washDryBlankets",
+            "washDrySoft",
+            "washDryDrymark",
+            "washDryCleanRinsing",
+            "washDryDisinfection",
+            "washDryOilStrains",
+            "washDryMemory",
+            "washDryDetergentSaving",
+            "washDryLightlySoiled",
+            "washDrySmallAmountQuick",
+            "washDryTankCleaning"
+          ],
+          "values": [
+            {
+              "value": "washDryNoWash",
+              "descriptions": {
+                "ja": "洗濯なし",
+                "en": "No washing"
+              },
+              "edt": "0x20"
+            },
+            {
+              "value": "washDryStandard",
+              "descriptions": {
+                "ja": "標準",
+                "en": "standard"
+              },
+              "edt": "0x21"
+            },
+            {
+              "value": "washDrySilent",
+              "descriptions": {
+                "ja": "静音",
+                "en": "silent"
+              },
+              "edt": "0x22"
+            },
+            {
+              "value": "washDryHeavilySoiled",
+              "descriptions": {
+                "ja": "汚れ大",
+                "en": "heavily soiled clothes"
+              },
+              "edt": "0x23"
+            },
+            {
+              "value": "washDryHardToRemove",
+              "descriptions": {
+                "ja": "しつこい汚れ",
+                "en": "hard-to-remove stains"
+              },
+              "edt": "0x24"
+            },
+            {
+              "value": "washDryPresoaking",
+              "descriptions": {
+                "ja": "つけおき",
+                "en": "presoaking"
+              },
+              "edt": "0x25"
+            },
+            {
+              "value": "washDryBlankets",
+              "descriptions": {
+                "ja": "毛布",
+                "en": "blankets"
+              },
+              "edt": "0x26"
+            },
+            {
+              "value": "washDrySoft",
+              "descriptions": {
+                "ja": "ソフト",
+                "en": "soft"
+              },
+              "edt": "0x27"
+            },
+            {
+              "value": "washDryDrymark",
+              "descriptions": {
+                "ja": "ドライ",
+                "en": "dry"
+              },
+              "edt": "0x28"
+            },
+            {
+              "value": "washDryCleanRinsing",
+              "descriptions": {
+                "ja": "清潔すすぎ",
+                "en": "clean rinsing"
+              },
+              "edt": "0x29"
+            },
+            {
+              "value": "washDryDisinfection",
+              "descriptions": {
+                "ja": "除菌",
+                "en": "disinfection"
+              },
+              "edt": "0x2D"
+            },
+            {
+              "value": "washDryOilStrains",
+              "descriptions": {
+                "ja": "油汚れ",
+                "en": "oil stains"
+              },
+              "edt": "0x2E"
+            },
+            {
+              "value": "washDryMemory",
+              "descriptions": {
+                "ja": "メモリー",
+                "en": "memory"
+              },
+              "edt": "0x2F"
+            },
+            {
+              "value": "washDryDetergentSaving",
+              "descriptions": {
+                "ja": "省洗剤",
+                "en": "detergent saving"
+              },
+              "edt": "0x30"
+            },
+            {
+              "value": "washDryLightlySoiled",
+              "descriptions": {
+                "ja": "汚れ少",
+                "en": "lightly soiled clothes"
+              },
+              "edt": "0x31"
+            },
+            {
+              "value": "washDrySmallAmountQuick",
+              "descriptions": {
+                "ja": "少量短時間",
+                "en": "quick wash of small amount of laundry"
+              },
+              "edt": "0x32"
+            },
+            {
+              "value": "washDryTankCleaning",
+              "descriptions": {
+                "ja": "槽洗浄",
+                "en": "tank cleaning"
+              },
+              "edt": "0x3F"
+            }
+          ]
+        }
+      }
+    },
+    "washerDryerCycleOptions3": {
+      "epc": "0xD5",
+      "descriptions": {
+        "ja": "設定可能コース情報３",
+        "en": "Washer and dryer cycle option list 3"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "dryNoDrying",
+            "dryStandard",
+            "dryBlankets",
+            "drySoft",
+            "dryDrymark",
+            "dryIroning",
+            "dryHangDrying",
+            "dryThick",
+            "dryDisinfection",
+            "dryShrinkageMinimization",
+            "dryFinishing",
+            "dryStationaryDrying",
+            "dryUserDefinedTime",
+            "dryWarming",
+            "dryHeaterCurrentLimit",
+            "dryTankDrying"
+          ],
+          "values": [
+            {
+              "value": "dryNoDrying",
+              "descriptions": {
+                "ja": "乾燥なし",
+                "en": "No drying"
+              },
+              "edt": "0xA0"
+            },
+            {
+              "value": "dryStandard",
+              "descriptions": {
+                "ja": "標準",
+                "en": "standard"
+              },
+              "edt": "0xA1"
+            },
+            {
+              "value": "dryBlankets",
+              "descriptions": {
+                "ja": "毛布",
+                "en": "blankets"
+              },
+              "edt": "0xA2"
+            },
+            {
+              "value": "drySoft",
+              "descriptions": {
+                "ja": "ソフト",
+                "en": "soft"
+              },
+              "edt": "0xA3"
+            },
+            {
+              "value": "dryDrymark",
+              "descriptions": {
+                "ja": "ドライ",
+                "en": "dry"
+              },
+              "edt": "0xA4"
+            },
+            {
+              "value": "dryIroning",
+              "descriptions": {
+                "ja": "アイロン／Y シャツ",
+                "en": "ironing/business shirts"
+              },
+              "edt": "0xA5"
+            },
+            {
+              "value": "dryHangDrying",
+              "descriptions": {
+                "ja": "吊り干し",
+                "en": "hang drying"
+              },
+              "edt": "0xA6"
+            },
+            {
+              "value": "dryThick",
+              "descriptions": {
+                "ja": "厚物",
+                "en": "thick clothes"
+              },
+              "edt": "0xA7"
+            },
+            {
+              "value": "dryDisinfection",
+              "descriptions": {
+                "ja": "除菌",
+                "en": "disinfection"
+              },
+              "edt": "0xA8"
+            },
+            {
+              "value": "dryShrinkageMinimization",
+              "descriptions": {
+                "ja": "縮み低減",
+                "en": "shrinkage minimization"
+              },
+              "edt": "0xA9"
+            },
+            {
+              "value": "dryFinishing",
+              "descriptions": {
+                "ja": "仕上げ",
+                "en": "finishing"
+              },
+              "edt": "0xAA"
+            },
+            {
+              "value": "dryStationaryDrying",
+              "descriptions": {
+                "ja": "静止乾燥",
+                "en": "stationary drying"
+              },
+              "edt": "0xAB"
+            },
+            {
+              "value": "dryUserDefinedTime",
+              "descriptions": {
+                "ja": "時間指定",
+                "en": "user definition of drying time"
+              },
+              "edt": "0xC"
+            },
+            {
+              "value": "dryWarming",
+              "descriptions": {
+                "ja": "衣類あたため",
+                "en": "garment warming"
+              },
+              "edt": "0xAD"
+            },
+            {
+              "value": "dryHeaterCurrentLimit",
+              "descriptions": {
+                "ja": "ヒータ入力制限",
+                "en": "heater current limit"
+              },
+              "edt": "0xAE"
+            },
+            {
+              "value": "dryTankDrying",
+              "descriptions": {
+                "ja": "槽乾燥",
+                "en": "tank drying"
+              },
+              "edt": "0xBF"
+            }
+          ]
+        }
+      }
+    },
+    "waterFlowRate": {
+      "epc": "0xD6",
+      "descriptions": {
+        "ja": "水流設定",
+        "en": "Water flow rate setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "minimum": 1,
+                "maximum": 16,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "minimum": -8,
+                "maximum": 8,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "spinDryingRotationSpeed": {
+      "epc": "0xD7",
+      "descriptions": {
+        "ja": "脱水回転数設定値",
+        "en": "Rotation speed for spin drying setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "unit": "r/min",
+                "minimum": 0,
+                "maximum": 4095,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "unit": "r/min",
+                "minimum": -2048,
+                "maximum": 2048,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "dryingDegree": {
+      "epc": "0xD8",
+      "descriptions": {
+        "ja": "乾燥度設定",
+        "en": "“Degree of drying” setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "minimum": 1,
+                "maximum": 16,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "minimum": -8,
+                "maximum": 8,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "washingTimeRemaining": {
+      "epc": "0xDB",
+      "descriptions": {
+        "ja": "洗濯残り時間",
+        "en": "Remaining washing time"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "unit": "minute",
+            "minimum": 0,
+            "maximum": 15299
+          },
+          {
+            "type": "string",
+            "enum": [
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "残り時間不明",
+                  "en": "Remaining time unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dryingTimeRemaining": {
+      "epc": "0xDC",
+      "descriptions": {
+        "ja": "乾燥残り時間",
+        "en": "Remaining drying time"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "unit": "minute",
+            "minimum": 0,
+            "maximum": 15299
+          },
+          {
+            "type": "string",
+            "enum": [
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "残り時間不明",
+                  "en": "Remaining time unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "onTimerElapsed": {
+      "epc": "0xDF",
+      "descriptions": {
+        "ja": "ON タイマ経過時間",
+        "en": "Elapsed time on the ON timer"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "minute",
+        "minimum": 0,
+        "maximum": 15359
+      }
+    },
+    "presoakingTime": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "つけおき行程時間設定値",
+        "en": "Presoaking time setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": 0,
+                "maximum": 1439,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": -60,
+                "maximum": 60,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "currentStage": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "洗濯乾燥遷移状態",
+        "en": "Current stage of washer and dryer cycle"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "washing",
+          "rinsing",
+          "spinDrying",
+          "suspended",
+          "washingCompleted",
+          "washingDryingCompleted",
+          "drying",
+          "wrinkleMinimizing",
+          "dryingWrinkleMinimizingCompleted",
+          "standby",
+          "1stRinsing",
+          "2ndRinsing",
+          "3rdRinsing",
+          "4thRinsing",
+          "5thRinsing",
+          "6thRinsing",
+          "7thRinsing",
+          "8thRinsing",
+          "1stSpinDrying",
+          "2ndSpinDrying",
+          "3rdSpinDrying",
+          "4thSpinDrying",
+          "5thSpinDrying",
+          "6thSpinDrying",
+          "7thSpinDrying",
+          "8thSpinDrying",
+          "preheatSpinDrying"
+        ],
+        "values": [
+          {
+            "value": "washing",
+            "descriptions": {
+              "ja": "洗い",
+              "en": "Washing"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "rinsing",
+            "descriptions": {
+              "ja": "すすぎ",
+              "en": "Rinsing"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "spinDrying",
+            "descriptions": {
+              "ja": "脱水",
+              "en": "Spin drying"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "suspended",
+            "descriptions": {
+              "ja": "一時停止",
+              "en": "Suspended"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "washingCompleted",
+            "descriptions": {
+              "ja": "洗濯完了",
+              "en": "Washing completed"
+            },
+            "edt": "0x45"
+          },
+          {
+            "value": "washingDryingCompleted",
+            "descriptions": {
+              "ja": "洗濯／乾燥（ソフトキープなし）完了",
+              "en": "Washing/drying (without wrinkling minimization) completed"
+            },
+            "edt": "0x51"
+          },
+          {
+            "value": "drying",
+            "descriptions": {
+              "ja": "乾燥",
+              "en": "Drying"
+            },
+            "edt": "0x52"
+          },
+          {
+            "value": "wrinkleMinimizing",
+            "descriptions": {
+              "ja": "ソフトキープ",
+              "en": "Wrinkling minimization"
+            },
+            "edt": "0x53"
+          },
+          {
+            "value": "dryingWrinkleMinimizingCompleted",
+            "descriptions": {
+              "ja": "乾燥（ソフトキープあり）完了",
+              "en": "Drying (with wrinkling minimization) completed"
+            },
+            "edt": "0x54"
+          },
+          {
+            "value": "standby",
+            "descriptions": {
+              "ja": "運転前待機中",
+              "en": "Standing by to start"
+            },
+            "edt": "0x61"
+          },
+          {
+            "value": "1stRinsing",
+            "descriptions": {
+              "ja": "第1すすぎ",
+              "en": "1st rinsing"
+            },
+            "edt": "0x71"
+          },
+          {
+            "value": "2ndRinsing",
+            "descriptions": {
+              "ja": "第2すすぎ",
+              "en": "2nd rinsing"
+            },
+            "edt": "0x72"
+          },
+          {
+            "value": "3rdRinsing",
+            "descriptions": {
+              "ja": "第3すすぎ",
+              "en": "3rd rinsing"
+            },
+            "edt": "0x73"
+          },
+          {
+            "value": "4thRinsing",
+            "descriptions": {
+              "ja": "第4すすぎ",
+              "en": "4th rinsing"
+            },
+            "edt": "0x74"
+          },
+          {
+            "value": "5thRinsing",
+            "descriptions": {
+              "ja": "第5すすぎ",
+              "en": "5th rinsing"
+            },
+            "edt": "0x75"
+          },
+          {
+            "value": "6thRinsing",
+            "descriptions": {
+              "ja": "第6すすぎ",
+              "en": "6th rinsing"
+            },
+            "edt": "0x76"
+          },
+          {
+            "value": "7thRinsing",
+            "descriptions": {
+              "ja": "第7すすぎ",
+              "en": "7th rinsing"
+            },
+            "edt": "0x77"
+          },
+          {
+            "value": "8thRinsing",
+            "descriptions": {
+              "ja": "第8すすぎ",
+              "en": "8th rinsing"
+            },
+            "edt": "0x78"
+          },
+          {
+            "value": "1stSpinDrying",
+            "descriptions": {
+              "ja": "第1脱水",
+              "en": "1st spin drying"
+            },
+            "edt": "0x81"
+          },
+          {
+            "value": "2ndSpinDrying",
+            "descriptions": {
+              "ja": "第2脱水",
+              "en": "2nd spin drying"
+            },
+            "edt": "0x82"
+          },
+          {
+            "value": "3rdSpinDrying",
+            "descriptions": {
+              "ja": "第3脱水",
+              "en": "3rd spin drying"
+            },
+            "edt": "0x83"
+          },
+          {
+            "value": "4thSpinDrying",
+            "descriptions": {
+              "ja": "第4脱水",
+              "en": "4th spin drying"
+            },
+            "edt": "0x84"
+          },
+          {
+            "value": "5thSpinDrying",
+            "descriptions": {
+              "ja": "第5脱水",
+              "en": "5th spin drying"
+            },
+            "edt": "0x85"
+          },
+          {
+            "value": "6thSpinDrying",
+            "descriptions": {
+              "ja": "第6脱水",
+              "en": "6th spin drying"
+            },
+            "edt": "0x86"
+          },
+          {
+            "value": "7thSpinDrying",
+            "descriptions": {
+              "ja": "第7脱水",
+              "en": "7th spin drying"
+            },
+            "edt": "0x87"
+          },
+          {
+            "value": "8thSpinDrying",
+            "descriptions": {
+              "ja": "第8脱水",
+              "en": "8th spin drying"
+            },
+            "edt": "0x88"
+          },
+          {
+            "value": "preheatSpinDrying",
+            "descriptions": {
+              "ja": "プリヒート脱水",
+              "en": "Preheat spin drying"
+            },
+            "edt": "0x91"
+          }
+        ]
+      }
+    },
+    "waterVolumeByLiter": {
+      "epc": "0xE3",
+      "descriptions": {
+        "ja": "水量設定１",
+        "en": "Water volume setting 1"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "unit": "liter",
+                "minimum": 0,
+                "maximum": 127,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "unit": "liter",
+                "minimum": -32,
+                "maximum": 32,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "waterVolumeByStep": {
+      "epc": "0xE4",
+      "descriptions": {
+        "ja": "水量設定２",
+        "en": "Water volume setting 2"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "minimum": 1,
+                "maximum": 16,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "minimum": -8,
+                "maximum": 8,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "washingTime": {
+      "epc": "0xE5",
+      "descriptions": {
+        "ja": "洗い時間設定値",
+        "en": "Washing time setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": 0,
+                "maximum": 1439,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": -60,
+                "maximum": 60,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "rinsingCount": {
+      "epc": "0xE6",
+      "descriptions": {
+        "ja": "すすぎ回数設定値",
+        "en": "“Number of times of rinsing” setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 8
+          },
+          {
+            "type": "string",
+            "enum": [
+              "auto"
+            ],
+            "values": [
+              {
+                "value": "auto",
+                "descriptions": {
+                  "ja": "自動",
+                  "en": "Automatic"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "rinsingProcess": {
+      "epc": "0xE7",
+      "descriptions": {
+        "ja": "すすぎモード設定",
+        "en": "Rinsing process setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "withoutAdditionalWater",
+            "withAdditionalWater",
+            "shower"
+          ],
+          "values": [
+            {
+              "value": "auto",
+              "descriptions": {
+                "ja": "モード自動設定",
+                "en": "Automatic mode"
+              },
+              "edt": "0x00"
+            },
+            {
+              "value": "withoutAdditionalWater",
+              "descriptions": {
+                "ja": "溜めすすぎ",
+                "en": "Rinsing without additional feeding of water from the tap"
+              },
+              "edt": "0x01"
+            },
+            {
+              "value": "withAdditionalWater",
+              "descriptions": {
+                "ja": "流水すすぎ",
+                "en": "Rinsing with additional feeding of water from the tap"
+              },
+              "edt": "0x02"
+            },
+            {
+              "value": "shower",
+              "descriptions": {
+                "ja": "シャワーすすぎ",
+                "en": "Shower rinsing"
+              },
+              "edt": "0x03"
+            }
+          ]
+        },
+        "minItems": 1,
+        "maxItems": 8
+      }
+    },
+    "spinDryingTime": {
+      "epc": "0xE8",
+      "descriptions": {
+        "ja": "脱水時間設定値",
+        "en": "Spin drying time setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": 0,
+                "maximum": 59,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": -32,
+                "maximum": 32,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "dryingTime": {
+      "epc": "0xE9",
+      "descriptions": {
+        "ja": "乾燥時間設定値",
+        "en": "Drying time setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "absolute": {
+                "descriptions": {
+                  "ja": "絶対値指定",
+                  "en": "Absolute setting"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": 0,
+                "maximum": 1439,
+                "multipleOf": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relative": {
+                "descriptions": {
+                  "ja": "自動からの相対指定(0は自動設定)",
+                  "en": "Relative setting relative to the automatic setting(0 means Automatic setting)"
+                },
+                "type": "number",
+                "unit": "minute",
+                "minimum": -60,
+                "maximum": 60,
+                "multipleOf": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "waterTemperature": {
+      "epc": "0xEA",
+      "descriptions": {
+        "ja": "洗い温水設定値",
+        "en": "Warm water setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "unit": "Celsius",
+            "minimum": 0,
+            "maximum": 100
+          },
+          {
+            "type": "string",
+            "enum": [
+              "noWarmWater",
+              "auto"
+            ],
+            "values": [
+              {
+                "value": "noWarmWater",
+                "descriptions": {
+                  "ja": "温水不使用",
+                  "en": "Not to use warm water"
+                },
+                "edt": "0xFE"
+              },
+              {
+                "value": "auto",
+                "descriptions": {
+                  "ja": "温度自動設定",
+                  "en": "Automatic water temperature setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "bathtubWaterRecycle": {
+      "epc": "0xEB",
+      "descriptions": {
+        "ja": "風呂水設定",
+        "en": "Bathtub water recycle setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "none",
+          "washing",
+          "rinsingWithoutFinal",
+          "rinsing",
+          "washingRinsingWithoutFinal",
+          "washingRinsing"
+        ],
+        "values": [
+          {
+            "value": "none",
+            "descriptions": {
+              "ja": "風呂水給水なし",
+              "en": "Bathtub water not used"
+            },
+            "edt": "0x40"
+          },
+          {
+            "value": "washing",
+            "descriptions": {
+              "ja": "洗いのみ",
+              "en": "Washing only"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "rinsingWithoutFinal",
+            "descriptions": {
+              "ja": "すすぎのみ（除く最終すすぎ）",
+              "en": "Rinsing only (excluding the final rinsing)"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "rinsing",
+            "descriptions": {
+              "ja": "全すすぎ",
+              "en": "All rinsing processes"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "washingRinsingWithoutFinal",
+            "descriptions": {
+              "ja": "洗い+すすぎ（除く最終すすぎ）",
+              "en": "Washing + rinsing (excluding the final rinsing)"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "washingRinsing",
+            "descriptions": {
+              "ja": "洗い＋全すすぎ",
+              "en": "Washing + all rinsing processes"
+            },
+            "edt": "0x45"
+          }
+        ]
+      }
+    },
+    "wrinklingMinimization": {
+      "epc": "0xEC",
+      "descriptions": {
+        "ja": "ソフトキープ設定",
+        "en": "Wrinkling minimization setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "enable",
+          "disable"
+        ],
+        "values": [
+          {
+            "value": "enable",
+            "descriptions": {
+              "ja": "ソフトキープ入り",
+              "en": "Wrinkling minimization function ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "disable",
+            "descriptions": {
+              "ja": "ソフトキープ切り",
+              "en": "Wrinkling minimization function OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "washingDryingTimeRemaining": {
+      "epc": "0xED",
+      "descriptions": {
+        "ja": "洗濯乾燥残り時間",
+        "en": "Time remaining to complete washer and dryer cycle"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "unit": "minute",
+            "minimum": 0,
+            "maximum": 15299
+          },
+          {
+            "type": "string",
+            "enum": [
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "残り時間不明",
+                  "en": "Remaining time unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "doorLockStatus": {
+      "epc": "0xEE",
+      "descriptions": {
+        "ja": "運転中扉・蓋ロック設定",
+        "en": "Door/cover lock setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ロック",
+              "en": "Locked"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "アンロック",
+              "en": "Unlocked"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "onTimerReservationStatus": {
+      "epc": "0x90",
+      "descriptions": {
+        "ja": "ON タイマ予約設定",
+        "en": "ON timer reservation setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "enable",
+          "disable"
+        ],
+        "values": [
+          {
+            "value": "enable",
+            "descriptions": {
+              "ja": "予約入",
+              "en": "Reservation ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "disable",
+            "descriptions": {
+              "ja": "予約切",
+              "en": "reservation OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "onTimerAbsolute": {
+      "epc": "0x91",
+      "descriptions": {
+        "ja": "ON タイマ時刻設定値",
+        "en": "ON timer setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "format": "time"
+      },
+      "note": {
+        "ja": "秒の指定は無視される",
+        "en": "Number of seconds is ignored"
+      }
+    },
+    "onTimerRelative": {
+      "epc": "0x92",
+      "descriptions": {
+        "ja": "ON タイマ相対時間設定値",
+        "en": "Relative time-based ON timer setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "minute",
+        "minimum": 0,
+        "maximum": 15359
+      }
+    }
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "deviceType": "instantaneousWaterHeater",
+  "eoj": "0x0272",
+  "descriptions": {
+    "ja": "瞬間式給湯器",
+    "en": "Instantaneous Water Heater"
+  },
+  "properties": {
+    "hotWaterHeatingStatus": {
+      "epc": "0xD0",
+      "descriptions": {
+        "ja": "給湯器燃焼状態",
+        "en": "Hot water heating status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "燃焼状態有",
+              "en": "Heating"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "燃焼状態無",
+              "en": "Not Heating"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "targetSuppliedWaterTemperature": {
+      "epc": "0xD1",
+      "descriptions": {
+        "ja": "給湯温度設定値",
+        "en": "Supplied water temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "targetBathWaterTemperature": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "風呂温度設定値",
+        "en": "Bath water temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "bathWaterHeatingStatus": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "風呂給湯器燃焼状態",
+        "en": "Bath water heater status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "燃焼状態有",
+              "en": "Heating"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "燃焼状態無",
+              "en": "Not Heating"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "automaticBathOperation": {
+      "epc": "0xE3",
+      "descriptions": {
+        "ja": "風呂自動モード設定",
+        "en": "Bath auto mode setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "bathOperationStatus": {
+      "epc": "0xEF",
+      "descriptions": {
+        "ja": "風呂動作状態監視",
+        "en": "Bath operation status monitor"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "runningHotWater",
+          "noOperation",
+          "keepingTemperature"
+        ],
+        "values": [
+          {
+            "value": "runningHotWater",
+            "descriptions": {
+              "ja": "湯張り中",
+              "en": "Running Hot Water"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "noOperation",
+            "descriptions": {
+              "ja": "停止中",
+              "en": "No Operation"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "keepingTemperature",
+            "descriptions": {
+              "ja": "保温中",
+              "en": "Keeping Temperature"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    }
+  }
+}

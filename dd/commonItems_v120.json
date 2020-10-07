@@ -1,0 +1,334 @@
+{
+  "deviceType": "common",
+  "eoj": "0x00",
+  "descriptions": {
+    "ja": "共通項目",
+    "en": "Common items"
+  },
+  "properties": {
+    "operationStatus": {
+      "epc": "0x80",
+      "descriptions": {
+        "ja": "動作状態",
+        "en": "Operation Status"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "installationLocation": {
+      "epc": "0x81",
+      "descriptions": {
+        "ja": "設置場所",
+        "en": "Installation location"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "protocol": {
+      "epc": "0x82",
+      "descriptions": {
+        "ja": "Protocol version情報",
+        "en": "Protocol version information"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "id": {
+      "epc": "0x83",
+      "descriptions": {
+        "ja": "識別番号",
+        "en": "Identification number"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "instantaneousElectricPowerConsumption": {
+      "epc": "0x84",
+      "descriptions": {
+        "ja": "瞬時消費電力計測値",
+        "en": "Measured instantaneous power consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "cumulativeElectricEnergy": {
+      "epc": "0x85",
+      "descriptions": {
+        "ja": "積算消費電力計測値",
+        "en": "Measured cumulative power consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "kWh",
+        "minimum": 0,
+        "maximum": 999999.999,
+        "multipleOf": 0.001
+      }
+    },
+    "manufacturerFaultCode": {
+      "epc": "0x86",
+      "descriptions": {
+        "ja": "メーカー異常コード",
+        "en": "Manufacturer fault code"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "currentLimit": {
+      "epc": "0x87",
+      "descriptions": {
+        "ja": "電流制限設定",
+        "en": "Current limit setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "faultStatus": {
+      "epc": "0x88",
+      "descriptions": {
+        "ja": "異常発生状態",
+        "en": "Fault Status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "異常あり",
+              "en": "Fault"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "異常無し",
+              "en": "No fault"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "faultDescription": {
+      "epc": "0x89",
+      "descriptions": {
+        "ja": "異常内容",
+        "en": "Fault description"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "manufacturer": {
+      "epc": "0x8A",
+      "descriptions": {
+        "ja": "メーカー",
+        "en": "Manufacturer"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "descriptions": {
+            "type": "object",
+            "properties": {
+              "ja": {
+                "type": "string"
+              },
+              "en": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "businessFacilityCode": {
+      "epc": "0x8B",
+      "descriptions": {
+        "ja": "事業場コード",
+        "en": "Business facility code"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "productCode": {
+      "epc": "0x8C",
+      "descriptions": {
+        "ja": "商品コード",
+        "en": "Product code"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "serialNumber": {
+      "epc": "0x8D",
+      "descriptions": {
+        "ja": "製造番号",
+        "en": "Serial number"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "productionDate": {
+      "epc": "0x8E",
+      "descriptions": {
+        "ja": "製造年月日",
+        "en": "Production date"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "powerSaving": {
+      "epc": "0x8F",
+      "descriptions": {
+        "ja": "節電動作設定",
+        "en": "Power-saving operation setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "節電動作",
+              "en": "Power saving operation"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "通常動作",
+              "en": "Normal operation"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "currentDateAndTime": {
+      "epc": "0x98",
+      "descriptions": {
+        "ja": "現在日時",
+        "en": "Current date and time"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "powerLimit": {
+      "epc": "0x99",
+      "descriptions": {
+        "ja": "電力制限設定",
+        "en": "Power limit setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "hourMeter": {
+      "epc": "0x9A",
+      "descriptions": {
+        "ja": "積算運転時間",
+        "en": "Cumulative operation time"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "hour",
+        "minimum": 0,
+        "maximum": 4294967295
+      }
+    }
+  }
+}

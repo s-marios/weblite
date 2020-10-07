@@ -1,0 +1,1305 @@
+{
+  "deviceType": "cookingHeater",
+  "eoj": "0x03B9",
+  "descriptions": {
+    "ja": "クッキングヒータ",
+    "en": "Cooking Heater"
+  },
+  "properties": {
+    "heatingStatus": {
+      "epc": "0xB1",
+      "descriptions": {
+        "ja": "加熱状態",
+        "en": "Heating status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "leftStove": {
+            "type": "string",
+            "enum": [
+              "standingBy",
+              "operating",
+              "temporarilyStopped",
+              "heatingProhibited",
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "standingBy",
+                "descriptions": {
+                  "ja": "待機中",
+                  "en": "Standing by"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "operating",
+                "descriptions": {
+                  "ja": "運転中",
+                  "en": "Operating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopped",
+                "descriptions": {
+                  "ja": "一時停止中",
+                  "en": "Temporarily stopped"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "heatingProhibited",
+                "descriptions": {
+                  "ja": "加熱禁止状態",
+                  "en": "Heating prohibited"
+                },
+                "edt": "0x50"
+              },
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "不明",
+                  "en": "Unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "rightStove": {
+            "type": "string",
+            "enum": [
+              "standingBy",
+              "operating",
+              "temporarilyStopped",
+              "heatingProhibited",
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "standingBy",
+                "descriptions": {
+                  "ja": "待機中",
+                  "en": "Standing by"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "operating",
+                "descriptions": {
+                  "ja": "運転中",
+                  "en": "Operating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopped",
+                "descriptions": {
+                  "ja": "一時停止中",
+                  "en": "Temporarily stopped"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "heatingProhibited",
+                "descriptions": {
+                  "ja": "加熱禁止状態",
+                  "en": "Heating prohibited"
+                },
+                "edt": "0x50"
+              },
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "不明",
+                  "en": "Unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "farSideStove": {
+            "type": "string",
+            "enum": [
+              "standingBy",
+              "operating",
+              "temporarilyStopped",
+              "heatingProhibited",
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "standingBy",
+                "descriptions": {
+                  "ja": "待機中",
+                  "en": "Standing by"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "operating",
+                "descriptions": {
+                  "ja": "運転中",
+                  "en": "Operating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopped",
+                "descriptions": {
+                  "ja": "一時停止中",
+                  "en": "Temporarily stopped"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "heatingProhibited",
+                "descriptions": {
+                  "ja": "加熱禁止状態",
+                  "en": "Heating prohibited"
+                },
+                "edt": "0x50"
+              },
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "不明",
+                  "en": "Unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "roaster": {
+            "type": "string",
+            "enum": [
+              "standingBy",
+              "operating",
+              "temporarilyStopped",
+              "heatingProhibited",
+              "unknown"
+            ],
+            "values": [
+              {
+                "value": "standingBy",
+                "descriptions": {
+                  "ja": "待機中",
+                  "en": "Standing by"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "operating",
+                "descriptions": {
+                  "ja": "運転中",
+                  "en": "Operating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopped",
+                "descriptions": {
+                  "ja": "一時停止中",
+                  "en": "Temporarily stopped"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "heatingProhibited",
+                "descriptions": {
+                  "ja": "加熱禁止状態",
+                  "en": "Heating prohibited"
+                },
+                "edt": "0x50"
+              },
+              {
+                "value": "unknown",
+                "descriptions": {
+                  "ja": "不明",
+                  "en": "Unknown"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "heatingOperation": {
+      "epc": "0xB2",
+      "descriptions": {
+        "ja": "加熱設定",
+        "en": "Heating setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "leftStove": {
+            "type": "string",
+            "enum": [
+              "stopHeating",
+              "startOrResumeHeating",
+              "temporarilyStopHeating",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "stopHeating",
+                "descriptions": {
+                  "ja": "加熱停止",
+                  "en": "Stop heating"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "startOrResumeHeating",
+                "descriptions": {
+                  "ja": "加熱開始・再開",
+                  "en": "Start/resume heating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopHeating",
+                "descriptions": {
+                  "ja": "加熱一時停止",
+                  "en": "Temporarily stop heating"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "rightStove": {
+            "type": "string",
+            "enum": [
+              "stopHeating",
+              "startOrResumeHeating",
+              "temporarilyStopHeating",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "stopHeating",
+                "descriptions": {
+                  "ja": "加熱停止",
+                  "en": "Stop heating"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "startOrResumeHeating",
+                "descriptions": {
+                  "ja": "加熱開始・再開",
+                  "en": "Start/resume heating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopHeating",
+                "descriptions": {
+                  "ja": "加熱一時停止",
+                  "en": "Temporarily stop heating"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "farSideStove": {
+            "type": "string",
+            "enum": [
+              "stopHeating",
+              "startOrResumeHeating",
+              "temporarilyStopHeating",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "stopHeating",
+                "descriptions": {
+                  "ja": "加熱停止",
+                  "en": "Stop heating"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "startOrResumeHeating",
+                "descriptions": {
+                  "ja": "加熱開始・再開",
+                  "en": "Start/resume heating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopHeating",
+                "descriptions": {
+                  "ja": "加熱一時停止",
+                  "en": "Temporarily stop heating"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "roaster": {
+            "type": "string",
+            "enum": [
+              "stopHeating",
+              "startOrResumeHeating",
+              "temporarilyStopHeating",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "stopHeating",
+                "descriptions": {
+                  "ja": "加熱停止",
+                  "en": "Stop heating"
+                },
+                "edt": "0x40"
+              },
+              {
+                "value": "startOrResumeHeating",
+                "descriptions": {
+                  "ja": "加熱開始・再開",
+                  "en": "Start/resume heating"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "temporarilyStopHeating",
+                "descriptions": {
+                  "ja": "加熱一時停止",
+                  "en": "Temporarily stop heating"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "heatingPower": {
+      "epc": "0xE7",
+      "descriptions": {
+        "ja": "加熱出力設定",
+        "en": "Heating power setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "leftStove": {
+            "type": "object",
+            "properties": {
+              "oneOf": [
+                {
+                  "wattage": {
+                    "descriptions": {
+                      "ja": "出力設定形式",
+                      "en": "output wattage"
+                    },
+                    "type": "number",
+                    "unit": "W",
+                    "minimum": 0,
+                    "maximum": 10000,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "level": {
+                    "descriptions": {
+                      "ja": "レベル設定形式",
+                      "en": "level"
+                    },
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 16,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "stateOfFlame": {
+                    "descriptions": {
+                      "ja": "状態表現形式",
+                      "en": "the state of flame"
+                    },
+                    "type": "string",
+                    "enum": [
+                      "veryLowFlame",
+                      "lowFlame",
+                      "mediumFlame",
+                      "highFlame",
+                      "highPower"
+                    ],
+                    "values": [
+                      {
+                        "value": "veryLowFlame",
+                        "descriptions": {
+                          "ja": "とろ火",
+                          "en": "Very low flame"
+                        },
+                        "edt": "0x4002"
+                      },
+                      {
+                        "value": "lowFlame",
+                        "descriptions": {
+                          "ja": "弱火",
+                          "en": "Low flame"
+                        },
+                        "edt": "0x4004"
+                      },
+                      {
+                        "value": "mediumFlame",
+                        "descriptions": {
+                          "ja": "中火",
+                          "en": "Medium flame"
+                        },
+                        "edt": "0x4006"
+                      },
+                      {
+                        "value": "highFlame",
+                        "descriptions": {
+                          "ja": "強火",
+                          "en": "High flame"
+                        },
+                        "edt": "0x4008"
+                      },
+                      {
+                        "value": "highPower",
+                        "descriptions": {
+                          "ja": "ハイパワー",
+                          "en": "High power"
+                        },
+                        "edt": "0x400A"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "noSetting": {
+                    "descriptions": {
+                      "ja": "未設定",
+                      "en": "No Setting"
+                    },
+                    "type": "null",
+                    "edt": "0xFFFF"
+                  }
+                }
+              ]
+            }
+          },
+          "rightStove": {
+            "type": "object",
+            "properties": {
+              "oneOf": [
+                {
+                  "wattage": {
+                    "descriptions": {
+                      "ja": "出力設定形式",
+                      "en": "output wattage"
+                    },
+                    "type": "number",
+                    "unit": "W",
+                    "minimum": 0,
+                    "maximum": 10000,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "level": {
+                    "descriptions": {
+                      "ja": "レベル設定形式",
+                      "en": "level"
+                    },
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 16,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "stateOfFlame": {
+                    "descriptions": {
+                      "ja": "状態表現形式",
+                      "en": "the state of flame"
+                    },
+                    "type": "string",
+                    "enum": [
+                      "veryLowFlame",
+                      "lowFlame",
+                      "mediumFlame",
+                      "highFlame",
+                      "highPower"
+                    ],
+                    "values": [
+                      {
+                        "value": "veryLowFlame",
+                        "descriptions": {
+                          "ja": "とろ火",
+                          "en": "Very low flame"
+                        },
+                        "edt": "0x4002"
+                      },
+                      {
+                        "value": "lowFlame",
+                        "descriptions": {
+                          "ja": "弱火",
+                          "en": "Low flame"
+                        },
+                        "edt": "0x4004"
+                      },
+                      {
+                        "value": "mediumFlame",
+                        "descriptions": {
+                          "ja": "中火",
+                          "en": "Medium flame"
+                        },
+                        "edt": "0x4006"
+                      },
+                      {
+                        "value": "highFlame",
+                        "descriptions": {
+                          "ja": "強火",
+                          "en": "High flame"
+                        },
+                        "edt": "0x4008"
+                      },
+                      {
+                        "value": "highPower",
+                        "descriptions": {
+                          "ja": "ハイパワー",
+                          "en": "High power"
+                        },
+                        "edt": "0x400A"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "noSetting": {
+                    "descriptions": {
+                      "ja": "未設定",
+                      "en": "No Setting"
+                    },
+                    "type": "null",
+                    "edt": "0xFFFF"
+                  }
+                }
+              ]
+            }
+          },
+          "farSideStove": {
+            "type": "object",
+            "properties": {
+              "oneOf": [
+                {
+                  "wattage": {
+                    "descriptions": {
+                      "ja": "出力設定形式",
+                      "en": "output wattage"
+                    },
+                    "type": "number",
+                    "unit": "W",
+                    "minimum": 0,
+                    "maximum": 10000,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "level": {
+                    "descriptions": {
+                      "ja": "レベル設定形式",
+                      "en": "level"
+                    },
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 16,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "stateOfFlame": {
+                    "descriptions": {
+                      "ja": "状態表現形式",
+                      "en": "the state of flame"
+                    },
+                    "type": "string",
+                    "enum": [
+                      "veryLowFlame",
+                      "lowFlame",
+                      "mediumFlame",
+                      "highFlame",
+                      "highPower"
+                    ],
+                    "values": [
+                      {
+                        "value": "veryLowFlame",
+                        "descriptions": {
+                          "ja": "とろ火",
+                          "en": "Very low flame"
+                        },
+                        "edt": "0x4002"
+                      },
+                      {
+                        "value": "lowFlame",
+                        "descriptions": {
+                          "ja": "弱火",
+                          "en": "Low flame"
+                        },
+                        "edt": "0x4004"
+                      },
+                      {
+                        "value": "mediumFlame",
+                        "descriptions": {
+                          "ja": "中火",
+                          "en": "Medium flame"
+                        },
+                        "edt": "0x4006"
+                      },
+                      {
+                        "value": "highFlame",
+                        "descriptions": {
+                          "ja": "強火",
+                          "en": "High flame"
+                        },
+                        "edt": "0x4008"
+                      },
+                      {
+                        "value": "highPower",
+                        "descriptions": {
+                          "ja": "ハイパワー",
+                          "en": "High power"
+                        },
+                        "edt": "0x400A"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "noSetting": {
+                    "descriptions": {
+                      "ja": "未設定",
+                      "en": "No Setting"
+                    },
+                    "type": "null",
+                    "edt": "0xFFFF"
+                  }
+                }
+              ]
+            }
+          },
+          "roaster": {
+            "type": "object",
+            "properties": {
+              "oneOf": [
+                {
+                  "wattage": {
+                    "descriptions": {
+                      "ja": "出力設定形式",
+                      "en": "output wattage"
+                    },
+                    "type": "number",
+                    "unit": "W",
+                    "minimum": 0,
+                    "maximum": 10000,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "level": {
+                    "descriptions": {
+                      "ja": "レベル設定形式",
+                      "en": "level"
+                    },
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 16,
+                    "multipleOf": 1
+                  }
+                },
+                {
+                  "stateOfFlame": {
+                    "descriptions": {
+                      "ja": "状態表現形式",
+                      "en": "the state of flame"
+                    },
+                    "type": "string",
+                    "enum": [
+                      "veryLowFlame",
+                      "lowFlame",
+                      "mediumFlame",
+                      "highFlame",
+                      "highPower"
+                    ],
+                    "values": [
+                      {
+                        "value": "veryLowFlame",
+                        "descriptions": {
+                          "ja": "とろ火",
+                          "en": "Very low flame"
+                        },
+                        "edt": "0x4002"
+                      },
+                      {
+                        "value": "lowFlame",
+                        "descriptions": {
+                          "ja": "弱火",
+                          "en": "Low flame"
+                        },
+                        "edt": "0x4004"
+                      },
+                      {
+                        "value": "mediumFlame",
+                        "descriptions": {
+                          "ja": "中火",
+                          "en": "Medium flame"
+                        },
+                        "edt": "0x4006"
+                      },
+                      {
+                        "value": "highFlame",
+                        "descriptions": {
+                          "ja": "強火",
+                          "en": "High flame"
+                        },
+                        "edt": "0x4008"
+                      },
+                      {
+                        "value": "highPower",
+                        "descriptions": {
+                          "ja": "ハイパワー",
+                          "en": "High power"
+                        },
+                        "edt": "0x400A"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "noSetting": {
+                    "descriptions": {
+                      "ja": "未設定",
+                      "en": "No Setting"
+                    },
+                    "type": "null",
+                    "edt": "0xFFFF"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "heatingTemperature": {
+      "epc": "0xE3",
+      "descriptions": {
+        "ja": "加熱温度設定値",
+        "en": "Heating temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "leftStove": {
+            "oneOf": [
+              {
+                "type": "number",
+                "unit": "Celsius",
+                "minimum": 50,
+                "maximum": 250
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "noSetting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          },
+          "rightStove": {
+            "oneOf": [
+              {
+                "type": "number",
+                "unit": "Celsius",
+                "minimum": 50,
+                "maximum": 250
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "noSetting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          },
+          "farSideStove": {
+            "oneOf": [
+              {
+                "type": "number",
+                "unit": "Celsius",
+                "minimum": 50,
+                "maximum": 250
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "noSetting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "heatingModesOfStoves": {
+      "epc": "0xE0",
+      "descriptions": {
+        "ja": "コンロ加熱モード設定",
+        "en": "Heating modes of stoves"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "leftStove": {
+            "type": "string",
+            "enum": [
+              "heatingPowerControl",
+              "deepFrying",
+              "waterHeating",
+              "riceBoiling",
+              "stirFrying",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "heatingPowerControl",
+                "descriptions": {
+                  "ja": "加熱出力制御モード",
+                  "en": "Heating power control mode"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "deepFryingMode",
+                "descriptions": {
+                  "ja": "天ぷら（揚げ物）",
+                  "en": "Deep-frying mode"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "waterHeating",
+                "descriptions": {
+                  "ja": "湯沸し",
+                  "en": "Water heating mode"
+                },
+                "edt": "0x43"
+              },
+              {
+                "value": "riceBoiling",
+                "descriptions": {
+                  "ja": "炊飯",
+                  "en": "Rice boiling mode"
+                },
+                "edt": "0x44"
+              },
+              {
+                "value": "stirFrying",
+                "descriptions": {
+                  "ja": "炒め物",
+                  "en": "Stir-frying mode"
+                },
+                "edt": "0x45"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No Setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "rightStove": {
+            "type": "string",
+            "enum": [
+              "heatingPowerControl",
+              "deepFrying",
+              "waterHeating",
+              "riceBoiling",
+              "stirFrying",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "heatingPowerControl",
+                "descriptions": {
+                  "ja": "加熱出力制御モード",
+                  "en": "Heating power control mode"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "deepFryingMode",
+                "descriptions": {
+                  "ja": "天ぷら（揚げ物）",
+                  "en": "Deep-frying mode"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "waterHeating",
+                "descriptions": {
+                  "ja": "湯沸し",
+                  "en": "Water heating mode"
+                },
+                "edt": "0x43"
+              },
+              {
+                "value": "riceBoiling",
+                "descriptions": {
+                  "ja": "炊飯",
+                  "en": "Rice boiling mode"
+                },
+                "edt": "0x44"
+              },
+              {
+                "value": "stirFrying",
+                "descriptions": {
+                  "ja": "炒め物",
+                  "en": "Stir-frying mode"
+                },
+                "edt": "0x45"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No Setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          },
+          "farSideStove": {
+            "type": "string",
+            "enum": [
+              "heatingPowerControl",
+              "deepFrying",
+              "waterHeating",
+              "riceBoiling",
+              "stirFrying",
+              "noSetting"
+            ],
+            "values": [
+              {
+                "value": "heatingPowerControl",
+                "descriptions": {
+                  "ja": "加熱出力制御モード",
+                  "en": "Heating power control mode"
+                },
+                "edt": "0x41"
+              },
+              {
+                "value": "deepFryingMode",
+                "descriptions": {
+                  "ja": "天ぷら（揚げ物）",
+                  "en": "Deep-frying mode"
+                },
+                "edt": "0x42"
+              },
+              {
+                "value": "waterHeating",
+                "descriptions": {
+                  "ja": "湯沸し",
+                  "en": "Water heating mode"
+                },
+                "edt": "0x43"
+              },
+              {
+                "value": "riceBoiling",
+                "descriptions": {
+                  "ja": "炊飯",
+                  "en": "Rice boiling mode"
+                },
+                "edt": "0x44"
+              },
+              {
+                "value": "stirFrying",
+                "descriptions": {
+                  "ja": "炒め物",
+                  "en": "Stir-frying mode"
+                },
+                "edt": "0x45"
+              },
+              {
+                "value": "noSetting",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "No Setting"
+                },
+                "edt": "0xFF"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "relativeTimeOfOffTimers": {
+      "epc": "0x96",
+      "descriptions": {
+        "ja": "切タイマ相対時間設定値",
+        "en": "Relative time settings of OFF timers"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "leftStove": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "No Setting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          },
+          "rightStove": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "No Setting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          },
+          "farSideStove": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "No Setting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          },
+          "roaster": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "noSetting"
+                ],
+                "values": [
+                  {
+                    "value": "noSetting",
+                    "descriptions": {
+                      "ja": "設定なし",
+                      "en": "No Setting"
+                    },
+                    "edt": "0xFF"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "childLock": {
+      "epc": "0xA1",
+      "descriptions": {
+        "ja": "チャイルドロック設定",
+        "en": "Child lock setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "チャイルドロックON",
+              "en": "Child lock ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "チャイルドロックOFF",
+              "en": "Child lock OFF"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "radiantHeaterLock": {
+      "epc": "0xA2",
+      "descriptions": {
+        "ja": "ラジエントヒータロック設定",
+        "en": "Radiant heater lock setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ラジエントヒータロックON",
+              "en": "Radiant heater lock ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "ラジエントヒータロックOFF",
+              "en": "Radiant heater lock OFF"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    }
+  },
+  "actions": {
+    "allStop": {
+      "epc": "0xB3",
+      "descriptions": {
+        "ja": "一括停止設定",
+        "en": "All stop setting"
+      },
+      "schema": {},
+      "note": {
+        "ja": "ECHONET LiteではSet only property",
+        "en": "Access rule of the corresponding ECHONET Lite property is Set only"
+      }
+    }
+  }
+}

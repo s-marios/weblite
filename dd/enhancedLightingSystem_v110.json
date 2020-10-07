@@ -1,0 +1,122 @@
+{
+  "deviceType": "enhancedLightingSystem",
+  "eoj": "0x02A4",
+  "descriptions": {
+    "ja": "拡張照明システム",
+    "en": "Enhanced Lighting System"
+  },
+  "properties": {
+    "brightness": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "照度レベル設定",
+        "en": "Illuminance level"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "sceneId": {
+      "epc": "0xC0",
+      "descriptions": {
+        "ja": "シーン制御設定",
+        "en": "Scene Control Setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 253
+      },
+      "note": {
+        "ja": "最大値はmaxNumberOfsceneControlの値",
+        "en": "Maximum value is the value of maxNumberOfsceneControl"
+      }
+    },
+    "maximumNumberOfSceneId": {
+      "epc": "0xC1",
+      "descriptions": {
+        "ja": "シーン制御設定可能数",
+        "en": "Number that can assign scene control setting"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 253
+      }
+    },
+    "powerConsumptionRateList": {
+      "epc": "0xC2",
+      "descriptions": {
+        "ja": "電力消費率リスト",
+        "en": "Power Consumption Rate List"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 253,
+        "items": {
+          "type": "number",
+          "unit": "%",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "powerConsumptionAtFullLighting": {
+      "epc": "0xC3",
+      "descriptions": {
+        "ja": "全灯時消費電力",
+        "en": "Power Consumption at Full Lighting"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "powerConsumptionWillBeSaved": {
+      "epc": "0xC4",
+      "descriptions": {
+        "ja": "節電可能消費電力",
+        "en": "Power Saving Power Consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "powerConsumptionLimitSetting": {
+      "epc": "0xC5",
+      "descriptions": {
+        "ja": "消費電力制限設定",
+        "en": "Power Consumption Limit Setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    }
+  }
+}

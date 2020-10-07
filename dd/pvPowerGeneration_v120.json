@@ -1,0 +1,470 @@
+{
+  "deviceType": "pvPowerGeneration",
+  "eoj": "0x0279",
+  "descriptions": {
+    "ja": "住宅用太陽光発電",
+    "en": "PV Power Generation"
+  },
+  "properties": {
+    "outputPowerControl1": {
+      "epc": "0xA0",
+      "descriptions": {
+        "ja": "出力制御設定１",
+        "en": "Output power control setting 1"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "outputPowerControl2": {
+      "epc": "0xA1",
+      "descriptions": {
+        "ja": "出力制御設定２",
+        "en": "Output power control setting 2"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "surplusPurchaseControl": {
+      "epc": "0xA2",
+      "descriptions": {
+        "ja": "余剰買取制御機能設定",
+        "en": "Function to control purchase surplus electricity setting"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "outputPowerControlSchedule": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "出力制御スケジュール",
+        "en": "Output power controlling schedule"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "startDateAndTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "intervalTime": {
+            "type": "number",
+            "unit": "minute",
+            "minimun": 0,
+            "maximum": 60,
+            "multipleOf": 30
+          },
+          "powerControlRatio": {
+            "type": "array",
+            "minItems": 96,
+            "maxItems": 96,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "unit": "%",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "undefined"
+                  ],
+                  "values": [
+                    {
+                      "value": "undefined",
+                      "descriptions": {
+                        "ja": "出力制御スケジュールが取得できていない",
+                        "en": "the output power controlling schedule has not acquired"
+                      },
+                      "edt": "0xFF"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "updateScheduleDateAndTime": {
+      "epc": "0xB1",
+      "descriptions": {
+        "ja": "次回アクセス時",
+        "en": "Next access date and time"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "surplusPurchaseControlType": {
+      "epc": "0xB2",
+      "descriptions": {
+        "ja": "余剰買取制御機能タイプ",
+        "en": "Function to control the type of surplus electricity purchase"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "upperLimitClip": {
+      "epc": "0xB4",
+      "descriptions": {
+        "ja": "上限クリップ設定値",
+        "en": "Upper limit clip setting value"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "contractType": {
+      "epc": "0xC1",
+      "descriptions": {
+        "ja": "FIT契約タイプ",
+        "en": "FIT contract type"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "FIT",
+          "nonFIT",
+          "undefined"
+        ],
+        "values": [
+          {
+            "value": "FIT",
+            "descriptions": {
+              "ja": "FIT",
+              "en": "FIT"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "nonFIT",
+            "descriptions": {
+              "ja": "非FIT",
+              "en": "Non-FIT"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "undefined",
+            "descriptions": {
+              "ja": "未設定",
+              "en": "No setting"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    },
+    "selfConsumptionType": {
+      "epc": "0xC2",
+      "descriptions": {
+        "ja": "自家消費タイプ",
+        "en": "Self-consumption type"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "withSelfConsumption",
+          "withoutSelfConsumption",
+          "unknown"
+        ],
+        "calues": [
+          {
+            "value": "withSelfConsumption",
+            "descriptions": {
+              "ja": "自家消費有",
+              "en": "With self-consumption"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "withoutSelfConsumption",
+            "descriptions": {
+              "ja": "自家消費無",
+              "en": "Without self-consumption"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "unknown",
+            "descriptions": {
+              "ja": "不明",
+              "en": "Unknown"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    },
+    "approvedCapacity": {
+      "epc": "0xC3",
+      "descriptions": {
+        "ja": "設備認定容量",
+        "en": "Capacity approved by equipment"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "conversionCoefficient": {
+      "epc": "0xC4",
+      "descriptions": {
+        "ja": "換算係数",
+        "en": "Conversion coefficientx"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "powerSystemInterconnectionStatus": {
+      "epc": "0xD0",
+      "descriptions": {
+        "ja": "系統連携状態",
+        "en": "System-interconnected type"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "reversePowerFlowAccseptable",
+          "Independent",
+          "reversePowerFlowNotAccseptable",
+          "unknown"
+        ],
+        "calues": [
+          {
+            "value": "reversePowerFlowAccseptable",
+            "descriptions": {
+              "ja": "系統連系（逆潮流可）",
+              "en": "Sytem-inetconnect type(revrse power flow accseptable)"
+            },
+            "edt": "0x00"
+          },
+          {
+            "value": "Independent",
+            "descriptions": {
+              "ja": "独立",
+              "en": "Independent type"
+            },
+            "edt": "0x01"
+          },
+          {
+            "value": "reversePowerFlowNotAccseptable",
+            "descriptions": {
+              "ja": "系統連系（逆潮流不可）",
+              "en": "Sytem-inetconnect type(revrse power flow not accseptable)"
+            },
+            "edt": "0x02"
+          },
+          {
+            "value": "unknown",
+            "descriptions": {
+              "ja": "不明",
+              "en": "Unknown"
+            },
+            "edt": "0x03"
+          }
+        ]
+      }
+    },
+    "outputPowerRestraintStatus": {
+      "epc": "0xD1",
+      "descriptions": {
+        "ja": "出力抑制状態",
+        "en": "Output power restraint status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "outputControl",
+          "exceptControl",
+          "reasonUnknown",
+          "notPowerRestraint",
+          "unknown"
+        ],
+        "calues": [
+          {
+            "value": "outputControl",
+            "descriptions": {
+              "ja": "抑制中（出力制御）",
+              "en": "Ongoing restraint (output power control)"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "exceptControl",
+            "descriptions": {
+              "ja": "抑制中（出力制御以外）",
+              "en": "Ongoing restraint (except output power control)"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "reasonUnknown",
+            "descriptions": {
+              "ja": "抑制中（抑制要因不明）",
+              "en": "Ongoing restraint (reason for restraint is unknown)"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "notPowerRestraint",
+            "descriptions": {
+              "ja": "抑制未実施",
+              "en": "Not restraining"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "unknown",
+            "descriptions": {
+              "ja": "不明",
+              "en": "Unknown"
+            },
+            "edt": "0x45"
+          }
+        ]
+      }
+    },
+    "instantaneousElectricPowerGeneration": {
+      "epc": "0xE0",
+      "descriptions": {
+        "ja": "瞬時発電電力計測値",
+        "en": "Measured instantaneous amount of electricity generated"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W"
+      }
+    },
+    "cumulativeElectricEnergyOfGeneration": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "積算発電電力量計測値",
+        "en": "Measured cumulative amount of electric energy generated"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "kWh",
+        "magnification": 0.001
+      }
+    },
+    "ratedElectricPowerOfGenerationt": {
+      "epc": "0xE8",
+      "descriptions": {
+        "ja": "定格発電電力値（系統連携時）",
+        "en": "Rated Power generation output (System-interconnected)"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "ratedElectricPowerOfGenerationIndependent": {
+      "epc": "0xE9",
+      "descriptions": {
+        "ja": "定格発電電力値（独立時）",
+        "en": "Rated power generation output (Independent)"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    }
+  }
+}

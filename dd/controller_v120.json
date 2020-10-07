@@ -1,0 +1,111 @@
+{
+  "deviceType": "controller",
+  "eoj": "0x05FF",
+  "descriptions": {
+    "ja": "コントローラ",
+    "en": "Controller"
+  },
+  "properties": {
+    "controllerId": {
+      "epc": "0xC0",
+      "descriptions": {
+        "ja": "コントローラID",
+        "en": "Controller ID"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "numberOfDevices": {
+      "epc": "0xC1",
+      "descriptions": {
+        "ja": "管理台数",
+        "en": "Number of devices controlled"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "deviceList": {
+      "epc": "0xC2",
+      "descriptions": {
+        "ja": "機器情報リスト",
+        "en": "List of device information"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "minItems": 0,
+        "maxItems": 65533,
+        "items": {
+          "type": "object",
+          "properties": {
+            "deviceId": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "connection": {
+              "type": "string",
+              "enum": [
+                "connected",
+                "disconnected",
+                "notRegistered",
+                "deleted"
+              ],
+              "values": [
+                {
+                  "value": "connected",
+                  "descriptions": {
+                    "ja": "接続中",
+                    "en": "Connected"
+                  },
+                  "edt": "0x41"
+                },
+                {
+                  "value": "disconnected",
+                  "descriptions": {
+                    "ja": "離脱中",
+                    "en": "Disconnected"
+                  },
+                  "edt": "0x42"
+                },
+                {
+                  "value": "notRegistered",
+                  "descriptions": {
+                    "ja": "未登録",
+                    "en": "Not registered"
+                  },
+                  "edt": "0x43"
+                },
+                {
+                  "value": "deleted",
+                  "descriptions": {
+                    "ja": "削除",
+                    "en": "Deleted"
+                  },
+                  "edt": "0x44"
+                }
+              ]
+            },
+            "manufactureCode": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "note": {
+        "ja": "EPC=0xC2, C3, C4, C6, C7に対応した値をobjectのarrayで表現する",
+        "en": "This property deal with info from 0xC2, C3, C4, C6 and 0xC7 altogether."
+      }
+    }
+  }
+}

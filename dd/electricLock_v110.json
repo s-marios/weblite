@@ -1,0 +1,281 @@
+{
+  "deviceType": "electricLock",
+  "eoj": "0x026F",
+  "descriptions": {
+    "ja": "電気錠",
+    "en": "electric lock"
+  },
+  "properties": {
+    "mainElectricLock": {
+      "epc": "0xE0",
+      "descriptions": {
+        "ja": "施錠設定１（主電気錠）",
+        "en": "Lock/unlock of main electric lock"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "施錠",
+              "en": "Lock"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "解錠",
+              "en": "Unlock"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "subElectricLock": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "施錠設定２（副電気錠）",
+        "en": "Lock/unlock of sub electric lock"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "施錠",
+              "en": "Lock"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "解錠",
+              "en": "Unlock"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "doorGuardLocked": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "ドアガード施錠状態",
+        "en": "Lock status of door guard"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "施錠",
+              "en": "Lock"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "解錠",
+              "en": "Unlock"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "doorOpened": {
+      "epc": "0xE3",
+      "descriptions": {
+        "ja": "扉開閉状態",
+        "en": "Open/close status of door"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "開",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "閉",
+              "en": "Close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "occupant": {
+      "epc": "0xE4",
+      "descriptions": {
+        "ja": "在室・不在状態",
+        "en": "Occupant/ non-occupant status of persons"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "在室",
+              "en": "Occupant"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "不在",
+              "en": "Non-occupant"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "alarmStatus": {
+      "epc": "0xE5",
+      "descriptions": {
+        "ja": "警報状態",
+        "en": "Alarm status of electric lock"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "breakOpen",
+          "doorOpen",
+          "manualUnlocked",
+          "tampered"
+        ],
+        "values": [
+          {
+            "value": "normal",
+            "descriptions": {
+              "ja": "通常状態（警報なし）",
+              "en": "Normal"
+            },
+            "edt": "0x40"
+          },
+          {
+            "value": "breakOpen",
+            "descriptions": {
+              "ja": "こじ開け",
+              "en": "Break open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "doorOpen",
+            "descriptions": {
+              "ja": "扉開放",
+              "en": "Door open"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "manualUnlocked",
+            "descriptions": {
+              "ja": "手動解錠",
+              "en": "Manual unlocked"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "tampered",
+            "descriptions": {
+              "ja": "タンパ",
+              "en": "Tampered"
+            },
+            "edt": "0x44"
+          }
+        ]
+      }
+    },
+    "autoLockMode": {
+      "epc": "0xE6",
+      "descriptions": {
+        "ja": "自動施錠モード設定",
+        "en": "Auto lock mode setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "入",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "切",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "replaceBatteryLevel": {
+      "epc": "0xE7",
+      "descriptions": {
+        "ja": "電池残量状態",
+        "en": "Indicates the battery level to get the status of a battery level lower and in need of replacement."
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "交換通知有",
+              "en": "need of replacement"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "通常",
+              "en": "Ordinary"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    }
+  }
+}

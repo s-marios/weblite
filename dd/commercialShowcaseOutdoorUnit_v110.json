@@ -1,0 +1,180 @@
+{
+  "deviceType": "commercialShowcaseOutdoorUnit",
+  "eoj": "0x03D4",
+  "descriptions": {
+    "ja": "業務用ショーケース向け室外機",
+    "en": "Commercial Showcase Outdoor Unit"
+  },
+  "properties": {
+    "exceptionalStatus": {
+      "epc": "0xAA",
+      "descriptions": {
+        "ja": "特殊状態",
+        "en": "Indicates that the showcase freezer is in an exceptional status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "除霜状態",
+              "en": "Defrosting status"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "通常状態",
+              "en": "Normal status"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "operationMode": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "運転モード設定",
+        "en": "Operation mode setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "cooling",
+          "non-cooling"
+        ],
+        "values": [
+          {
+            "value": "cooling",
+            "descriptions": {
+              "ja": "冷却",
+              "en": "Cooling"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "non-cooling",
+            "descriptions": {
+              "ja": "非冷",
+              "en": "Non-cooling"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "outdoorAirTemperature": {
+      "epc": "0xBE",
+      "descriptions": {
+        "ja": "外気温度計測値",
+        "en": "Used to acquire measurements of outdoor air temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125,
+        "multipleOf": 1
+      }
+    },
+    "compressorOperationStatus": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "コンプレッサ動作状態",
+        "en": "Indicates compressor ON/OFF status"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "groupInformation": {
+      "epc": "0xCA",
+      "descriptions": {
+        "ja": "グループ情報",
+        "en": "Group Information"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 253
+          },
+          {
+            "type": "string",
+            "enum": [
+              "none"
+            ],
+            "values": [
+              {
+                "value": "none",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "None"
+                },
+                "edt": "0x00"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "groupDeviceList": {
+      "descriptions": {
+        "ja": "グループ内デバイスリスト",
+        "en": "List of devices in group"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "deviceId": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "note": {
+        "ja": "WebAPIの'devices'で管理されている機器のIDおよびその'deviceType'を記述",
+        "en": "Describe the ID of the device managed in 'devices' of WebAPI and its 'deviceType'"
+      }
+    }
+  }
+}

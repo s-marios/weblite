@@ -1,0 +1,189 @@
+{
+  "deviceType": "homeAirConditioner",
+  "eoj": "0x0130",
+  "descriptions": {
+    "ja": "家庭用エアコン",
+    "en": "Home Air Conditioner"
+  },
+  "properties": {
+    "airFlowLevel": {
+      "epc": "0xA0",
+      "descriptions": {
+        "ja": "風量設定",
+        "en": "Air flow rate setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 8
+          },
+          {
+            "type": "string",
+            "enum": [
+              "auto"
+            ],
+            "values": [
+              {
+                "value": "auto",
+                "descriptions": {
+                  "ja": "自動",
+                  "en": "Auto"
+                },
+                "edt": "0x41"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "operationMode": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "運転モード設定",
+        "en": "Operation mode setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "cooling",
+          "heating",
+          "dehumidification",
+          "circulation",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "auto",
+            "descriptions": {
+              "ja": "自動",
+              "en": "Auto"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "cooling",
+            "descriptions": {
+              "ja": "冷房",
+              "en": "Cooling"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "heating",
+            "descriptions": {
+              "ja": "暖房",
+              "en": "Heating"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "dehumidification",
+            "descriptions": {
+              "ja": "除湿",
+              "en": "Dehumidification"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "circulation",
+            "descriptions": {
+              "ja": "送風",
+              "en": "Circulation"
+            },
+            "edt": "0x45"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "Other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "targetTemperature": {
+      "epc": "0xB3",
+      "descriptions": {
+        "ja": "温度設定値",
+        "en": "Set temperature value"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": 0,
+        "maximum": 50
+      }
+    },
+    "humidity": {
+      "epc": "0xBA",
+      "descriptions": {
+        "ja": "室内相対湿度計測値",
+        "en": "Measured value of room relative humidity"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "roomTemperature": {
+      "epc": "0xBB",
+      "descriptions": {
+        "ja": "室内温度計測値",
+        "en": "Measured value of room temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125
+      }
+    },
+    "airFlowTemperature": {
+      "epc": "0xBD",
+      "descriptions": {
+        "ja": "吹き出し温度計測値",
+        "en": "Measured cooled air temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125
+      }
+    },
+    "outdoorTemperature": {
+      "epc": "0xBE",
+      "descriptions": {
+        "ja": "外気温度計測値",
+        "en": "Measured outdoor air temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125
+      }
+    }
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "deviceType": "hybridWaterHeater",
+  "eoj": "0x02A6",
+  "descriptions": {
+    "ja": "ハイブリッド給湯機",
+    "en": "hybrid water heater"
+  },
+  "properties": {
+    "automaticWaterHeating": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "沸き上げ自動設定",
+        "en": "Automatic water heating setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "manualNoHeating",
+          "manualHeating"
+        ],
+        "values": [
+          {
+            "value": "auto",
+            "descriptions": {
+              "ja": "自動沸き上げ",
+              "en": "Automatic water heating"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "manualNotHeating",
+            "descriptions": {
+              "ja": "手動沸き上げ停止",
+              "en": "Water heating manual stop"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "manualHeating",
+            "descriptions": {
+              "ja": "手動沸き上げ",
+              "en": "Manual water heating"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "waterHeatingStatus": {
+      "epc": "0xB2",
+      "descriptions": {
+        "ja": "給湯沸き上げ中状態",
+        "en": "Water heating status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "沸き上げ中",
+              "en": "Water is heating"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "沸き上げ無し",
+              "en": "Water is not heating"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "heaterStatus": {
+      "epc": "0xB3",
+      "descriptions": {
+        "ja": "暖房沸き上げ中状態",
+        "en": "Heater status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "沸き上げ中",
+              "en": "Water is heating"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "沸き上げ無し",
+              "en": "Water is not heating"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "hotWaterSupplyModeForAuxiliaryHeatSourceMachine": {
+      "epc": "0xB6",
+      "descriptions": {
+        "ja": "補助熱源機給湯モード設定",
+        "en": "Hot water supply mode setting for auxiliary heat source machine"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "doNotRunHeatPump",
+          "runHeatPump"
+        ],
+        "values": [
+          {
+            "value": "doNotRunHeatPump",
+            "descriptions": {
+              "ja": "設定する(ヒートポンプ運転しない)",
+              "en": "Set(do not run Heat Pump)"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "runHeatPump",
+            "descriptions": {
+              "ja": "設定しない",
+              "en": "No setting"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "heaterModeForAuxiliaryHeatSourceMachine": {
+      "epc": "0xB7",
+      "descriptions": {
+        "ja": "補助熱源機暖房モード設定",
+        "en": "Heater mode setting for auxiliary heat source machine"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "doNotRunHeatPump",
+          "runHeatPump"
+        ],
+        "values": [
+          {
+            "value": "notToUseHeatPump",
+            "descriptions": {
+              "ja": "設定する(ヒートポンプ運転しない)",
+              "en": "Set(do not run Heat Pump)"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "runHeatPump",
+            "descriptions": {
+              "ja": "設定しない",
+              "en": "No setting"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "linkageModeForSolarPowerGeneration": {
+      "epc": "0xB8",
+      "descriptions": {
+        "ja": "太陽光発電連携モード設定",
+        "en": "Linkage mode setting for solar power generation"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "modeOff",
+          "householdConsumption",
+          "prioritizingElectricitySales",
+          "economicEfficiency"
+        ],
+        "values": [
+          {
+            "value": "modeOff",
+            "descriptions": {
+              "ja": "モード切",
+              "en": "Mode off"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "householdConsumption",
+            "descriptions": {
+              "ja": "自家消費",
+              "en": "Household consumption"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "prioritizingElectricitySales",
+            "descriptions": {
+              "ja": "売電優先",
+              "en": "Prioritizing electricity sales"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "economicEfficiency",
+            "descriptions": {
+              "ja": "経済",
+              "en": "Economic efficiency"
+            },
+            "edt": "0x44"
+          }
+        ]
+      }
+    },
+    "solarPowerGenerationsUtilizationTime": {
+      "epc": "0xB9",
+      "descriptions": {
+        "ja": "太陽光発電利用時間",
+        "en": "Solar power generations utilization time"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "time"
+          }
+        }
+      },
+      "note": {
+        "ja": "秒の指定は無視される",
+        "en": "number of seconds is ignored"
+      }
+    },
+    "hotWaterSupplyStatus": {
+      "epc": "0xC3",
+      "descriptions": {
+        "ja": "給湯中状態",
+        "en": "Hot water supply status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "給湯中",
+              "en": "Supplying hot water"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "非給湯中",
+              "en": "not supplying hot water"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "remainingWater": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "残湯量計測値",
+        "en": "Measured amount of hot water remaining in tank"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "liter",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "tankCapacity": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "タンク容量値",
+        "en": "Tank capacity"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "liter",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    }
+  }
+}

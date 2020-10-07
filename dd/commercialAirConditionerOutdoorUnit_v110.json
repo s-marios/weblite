@@ -1,0 +1,220 @@
+{
+  "deviceType": "commercialAirConditionerOutdoorUnit",
+  "eoj": "0x0157",
+  "descriptions": {
+    "ja": "業務用エアコン室外機",
+    "en": "Commercial Air Conditioner Outdoor Unit"
+  },
+  "properties": {
+    "operationStatus": {
+      "epc": "0x80",
+      "descriptions": {
+        "ja": "動作状態",
+        "en": "Operation Status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "ratedPowerConsumption": {
+      "epc": "0xB8",
+      "descriptions": {
+        "ja": "定格消費電力",
+        "en": "Rated power consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 4294967293
+      }
+    },
+    "outdoorTemperature": {
+      "epc": "0xBE",
+      "descriptions": {
+        "ja": "室外温度計測値",
+        "en": "Measured value of Outdoor temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125
+      }
+    },
+    "specialState": {
+      "epc": "0xAB",
+      "descriptions": {
+        "ja": "特殊状態",
+        "en": "Special State"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "通常状態",
+              "en": "Normal operation"
+            },
+            "edt": "0x40"
+          },
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "特殊状態",
+              "en": "Special State"
+            },
+            "edt": "0x41"
+          }
+        ]
+      }
+    },
+    "groupInformation": {
+      "epc": "0xCA",
+      "descriptions": {
+        "ja": "グループ情報",
+        "en": "Group Information"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 253
+          },
+          {
+            "type": "string",
+            "enum": [
+              "none"
+            ],
+            "values": [
+              {
+                "value": "none",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "None"
+                },
+                "edt": "0x00"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "groupDeviceList": {
+      "descriptions": {
+        "ja": "グループ内デバイスリスト",
+        "en": "List of devices in group"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "deviceId": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "note": {
+        "ja": "WebAPIの'devices'で管理されている機器のIDおよびその'deviceType'を記述",
+        "en": "Describe the ID of the device managed in 'devices' of WebAPI and its 'deviceType'"
+      }
+    },
+    "powerConsumption": {
+      "epc": "0xDB",
+      "descriptions": {
+        "ja": "消費電力計測値",
+        "en": "Measured power consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 4294967293
+      }
+    },
+    "powerConsumptionWillBeSaved": {
+      "epc": "0xDD",
+      "descriptions": {
+        "ja": "節電可能消費電力",
+        "en": "Power Consumption that will be saved"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 4294967293
+      }
+    },
+    "powerConsumptionLimit": {
+      "epc": "0xDE",
+      "descriptions": {
+        "ja": "消費電力制限設定",
+        "en": "Power Consumption Limit Setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 4294967293
+      }
+    },
+    "restrictedMinimumPowerConsumption": {
+      "epc": "0xDF",
+      "descriptions": {
+        "ja": "抑制最低消費電力",
+        "en": "Minimum power consumption for restricted outdoor unit"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 4294967293
+      }
+    }
+  }
+}

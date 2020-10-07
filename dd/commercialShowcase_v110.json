@@ -1,0 +1,733 @@
+{
+  "deviceType": "commercialShowcase",
+  "eoj": "0x03CE",
+  "descriptions": {
+    "ja": "業務用ショーケース",
+    "en": "Commercial Showcase"
+  },
+  "properties": {
+    "operationMode": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "運転モード設定",
+        "en": "Operation mode setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "cooling",
+          "non-cooling",
+          "defrosting",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "cooling",
+            "descriptions": {
+              "ja": "冷却",
+              "en": "Cooling"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "non-cooling",
+            "descriptions": {
+              "ja": "非冷",
+              "en": "Non-cooling"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "defrosting",
+            "descriptions": {
+              "ja": "霜取り",
+              "en": "defrosting"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "Other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "dischargeTemperature": {
+      "epc": "0xBD",
+      "descriptions": {
+        "ja": "吐出温度計測値",
+        "en": "Used to acquire measurements of discharge temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125,
+        "multipleOf": 1
+      }
+    },
+    "groupInformation": {
+      "epc": "0xCA",
+      "descriptions": {
+        "ja": "グループ情報",
+        "en": "Group Information"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 253
+          },
+          {
+            "type": "string",
+            "enum": [
+              "none"
+            ],
+            "values": [
+              {
+                "value": "none",
+                "descriptions": {
+                  "ja": "設定なし",
+                  "en": "None"
+                },
+                "edt": "0x00"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "groupDeviceList": {
+      "descriptions": {
+        "ja": "グループ内デバイスリスト",
+        "en": "List of devices in group"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "deviceId": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "note": {
+        "ja": "WebAPIの'devices'で管理されている機器のIDおよびその'deviceType'を記述",
+        "en": "Describe the ID of the device managed in 'devices' of WebAPI and its 'deviceType'"
+      }
+    },
+    "internalLightingOperationStatus": {
+      "epc": "0xE0",
+      "descriptions": {
+        "ja": "庫内照明動作状態",
+        "en": "Indicates ON/OFF status of lighting installed inside the showcase"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "externalLightingOperationStatus": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "庫外照明動作状態",
+        "en": "Indicates ON/OFF status of lighting installed outside the showcase"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "compressorOperationStatus": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "コンプレッサ動作状態",
+        "en": "Indicates ON/OFF status of compressor when showcase and compressor are a single unit"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "internalTemperature": {
+      "epc": "0xE3",
+      "descriptions": {
+        "ja": "庫内温度計測値",
+        "en": "Used to acquire internal temperature measurements inside the showcase"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 125,
+        "multipleOf": 1
+      }
+    },
+    "ratedElectricPowerForFreezing": {
+      "epc": "0xE4",
+      "descriptions": {
+        "ja": "冷却時に要する定格消費電力（冷凍能力値）",
+        "en": "Indicates rated power consumption necessary when showcase is cooling"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533,
+        "multipleOf": 1
+      }
+    },
+    "ratedElectricPowerForDefrostingHeater": {
+      "epc": "0xE5",
+      "descriptions": {
+        "ja": "霜取りヒータ稼働時の定格消費電力",
+        "en": "Indicates rated power consumption when heater is operating during showcase defrosting"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533,
+        "multipleOf": 1
+      }
+    },
+    "ratedElectricPowerForFanMotor": {
+      "epc": "0xE6",
+      "descriptions": {
+        "ja": "ファンモータ稼働時の定格消費電力",
+        "en": "Indicates rated power consumption when showcase is operating fan motor"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533,
+        "multipleOf": 1
+      }
+    },
+    "heaterOperationStatus": {
+      "epc": "0xE7",
+      "descriptions": {
+        "ja": "ホット用ヒーター動作状態（ヒーターモード）",
+        "en": "Indicates ON/OFF status of showcases with heater for hot function"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ON",
+              "en": "ON"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "OFF",
+              "en": "OFF"
+            },
+            "edt": "0x31"
+          }
+        ]
+      }
+    },
+    "insideLightingType": {
+      "epc": "0xEB",
+      "descriptions": {
+        "ja": "庫内照明タイプ",
+        "en": "Indicates type of lighting installed inside the showcase"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "fluorescent",
+          "LED",
+          "no-lighting",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "fluorescent",
+            "descriptions": {
+              "ja": "蛍光灯",
+              "en": "Fluorescent lights"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "LED",
+            "descriptions": {
+              "ja": "LED",
+              "en": "LED"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "no-lighting",
+            "descriptions": {
+              "ja": "照明無し",
+              "en": "No lighting"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "Other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "outsideLightingType": {
+      "epc": "0xEC",
+      "descriptions": {
+        "ja": "庫外照明タイプ",
+        "en": "Indicates type of lighting installed outside the showcase"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "fluorescent",
+          "LED",
+          "no-lighting",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "fluorescent",
+            "descriptions": {
+              "ja": "蛍光灯",
+              "en": "Fluorescent lights"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "LED",
+            "descriptions": {
+              "ja": "LED",
+              "en": "LED"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "no-lighting",
+            "descriptions": {
+              "ja": "照明無し",
+              "en": "No lighting"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "Other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "targetInsideBrightness": {
+      "epc": "0xED",
+      "descriptions": {
+        "ja": "庫内照明照度レベル設定",
+        "en": "Indicates lighting level in % installed inside of the showcase"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "targetOutsideBrightness": {
+      "epc": "0xEE",
+      "descriptions": {
+        "ja": "庫外照明照度レベル設定",
+        "en": "Indicates lighting level in % installed outside of the showcase"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100,
+        "multipleOf": 1
+      }
+    },
+    "targetInsideTemperature": {
+      "epc": "0xEF",
+      "descriptions": {
+        "ja": "庫内温度設定値",
+        "en": "Set temperature setting of inside the case and acquire the current setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126,
+        "multipleOf": 1
+      }
+    },
+    "showcaseType": {
+      "epc": "0xD0",
+      "descriptions": {
+        "ja": "ショーケースタイプ情報",
+        "en": "This property indicates the type of the showcase"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "nonFluorocarbonInverter",
+          "inverter",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "nonFluorocarbonInverter ",
+            "descriptions": {
+              "ja": "ノンフロンインバータ（CO2）",
+              "en": "Non-fluorocarbon inverter (CO2) "
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "inverter",
+            "descriptions": {
+              "ja": "インバータ",
+              "en": "inverter"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "doorType": {
+      "epc": "0xD1",
+      "descriptions": {
+        "ja": "ドアタイプ情報",
+        "en": "This property indicates the type of the showcase door"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "オープン",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "closed",
+            "descriptions": {
+              "ja": "クローズ",
+              "en": "Closed"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "refrigeratorType": {
+      "epc": "0xD2",
+      "descriptions": {
+        "ja": "冷凍機内蔵型か冷凍機別置型かを示すショーケース構成情報",
+        "en": "This property indicates refrigerator type, such as built-in or separate"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "separate",
+          "built-in"
+        ],
+        "values": [
+          {
+            "value": "separate",
+            "descriptions": {
+              "ja": "別置型",
+              "en": "Separate type"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "built-in",
+            "descriptions": {
+              "ja": "内蔵型",
+              "en": "Built-in type"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "shapeType": {
+      "epc": "0xD3",
+      "descriptions": {
+        "ja": "ショーケース形状情報",
+        "en": "This property indicates the shape of the showcase"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "box",
+          "desktop",
+          "tripleGlass ",
+          "quadrupleQuintupleGlass",
+          "reach-in",
+          "glassTop",
+          "multistageOpenAndCeilingBlowoff",
+          "multistageOpenAndBacksideBlowoff",
+          "flat",
+          "walk-in",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "box",
+            "descriptions": {
+              "ja": "箱形",
+              "en": "Box type"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "desktop",
+            "descriptions": {
+              "ja": "卓上形",
+              "en": "Desktop type"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "tripleGlass",
+            "descriptions": {
+              "ja": "三面ガラス式",
+              "en": "Triple glass type"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "quadrupleQuintupleGlass",
+            "descriptions": {
+              "ja": "四面（五面）ガラス式",
+              "en": "Quadruple (quintuple) glass type"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "reach-in",
+            "descriptions": {
+              "ja": "リーチイン",
+              "en": "Reach-in type"
+            },
+            "edt": "0x45"
+          },
+          {
+            "value": "glassTop",
+            "descriptions": {
+              "ja": "ガラストップ",
+              "en": "Glass top type"
+            },
+            "edt": "0x46"
+          },
+          {
+            "value": "multistageOpenAndCeilingBlowoff",
+            "descriptions": {
+              "ja": "多段形オープン（天井吹出形）",
+              "en": "Multistage open (ceiling blowoff type) "
+            },
+            "edt": "0x47"
+          },
+          {
+            "value": "multistageOpenAndBacksideBlowoff",
+            "descriptions": {
+              "ja": "多段形オープン（背面吹出形）",
+              "en": "Multistage open (backside blowoff type)"
+            },
+            "edt": "0x48"
+          },
+          {
+            "value": "flat",
+            "descriptions": {
+              "ja": "平形",
+              "en": "Flat type"
+            },
+            "edt": "0x49"
+          },
+          {
+            "value": "walk-in",
+            "descriptions": {
+              "ja": "ウォークイン",
+              "en": "Walk-in type"
+            },
+            "edt": "0x4A"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "Other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "purposeType": {
+      "epc": "0xD4",
+      "descriptions": {
+        "ja": "冷蔵用途か冷凍用途かを示す庫内温度帯情報",
+        "en": "This property indicates the purpose of the showcase, either refrigeration or freezing"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "refrigeration",
+          "freezing"
+        ],
+        "values": [
+          {
+            "value": "refrigeration",
+            "descriptions": {
+              "ja": "冷蔵",
+              "en": "Refrigeration"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "freezing",
+            "descriptions": {
+              "ja": "冷凍",
+              "en": "Freezing"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    }
+  }
+}

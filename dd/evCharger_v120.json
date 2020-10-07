@@ -1,0 +1,451 @@
+{
+  "deviceType": "evCharger",
+  "eoj": "0x02A1",
+  "descriptions": {
+    "ja": "電気自動車充電器",
+    "en": "EV Charger"
+  },
+  "properties": {
+    "ratedChargeElectricPower": {
+      "epc": "0xC5",
+      "descriptions": {
+        "ja": "定格充電能力",
+        "en": "Rated charge capacity"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 999999999
+      }
+    },
+    "chargeStatus": {
+      "epc": "0xC7",
+      "descriptions": {
+        "ja": "車両接続・充電可否状態",
+        "en": "Vehicle connection and chargeable status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "undefined",
+          "notConnected",
+          "notChargeable",
+          "chargeable",
+          "unknown"
+        ],
+        "values": [
+          {
+            "value": "undefined",
+            "descriptions": {
+              "ja": "不定",
+              "en": "Undefined"
+            },
+            "edt": "0xFF"
+          },
+          {
+            "value": "notConnected",
+            "descriptions": {
+              "ja": "車両未接続",
+              "en": "Not Connected"
+            },
+            "edt": "0x30"
+          },
+          {
+            "value": "notChargeable",
+            "descriptions": {
+              "ja": "車両接続・充電不可",
+              "en": "Not Chargeable"
+            },
+            "edt": "0x40"
+          },
+          {
+            "value": "chargeable",
+            "descriptions": {
+              "ja": "車両接続・充電可",
+              "en": "Chargeable"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "unknown",
+            "descriptions": {
+              "ja": "車両接続・充電可否不明",
+              "en": "Unknown"
+            },
+            "edt": "0x44"
+          }
+        ]
+      }
+    },
+    "minimumAndMaximumChargingElectricPower": {
+      "epc": "0xC8",
+      "descriptions": {
+        "ja": "最小最大充電電力値",
+        "en": "Minimum/maximum charging electric energy"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "minimumElectricPower": {
+            "type": "number",
+            "unit": "W",
+            "minimum": 0,
+            "maximum": 999999999
+          },
+          "maximumElectricPower": {
+            "type": "number",
+            "unit": "W",
+            "minimum": 0,
+            "maximum": 999999999
+          }
+        }
+      }
+    },
+    "minimumAndMaximumChargingCurrent": {
+      "epc": "0xCA",
+      "descriptions": {
+        "ja": "最小最大充電電流値",
+        "en": "Minimum/maximum charging electric current"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "minimumCurrent": {
+            "type": "number",
+            "unit": "A",
+            "minimum": 0,
+            "maximum": 3276.6,
+            "multipleOf": 0.1
+          },
+          "maximumCurrent": {
+            "type": "number",
+            "unit": "A",
+            "minimum": 0,
+            "maximum": 3276.6,
+            "multipleOf": 0.1
+          }
+        }
+      }
+    },
+    "equipmentType": {
+      "epc": "0xCC",
+      "descriptions": {
+        "ja": "充放電器タイプ",
+        "en": "Charger/Discharger type"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "AC_CPLT",
+          "AC_HLC_Charge",
+          "DC_AA_Charge",
+          "DC_BB_Charge",
+          "DC_EE_Charge",
+          "DC_FF_Charge"
+        ],
+        "values": [
+          {
+            "value": "AC_CPLT",
+            "descriptions": {
+              "ja": "AC_CPLT",
+              "en": "AC_CPLT"
+            },
+            "edt": "0x11"
+          },
+          {
+            "value": "AC_HLC_Charge",
+            "descriptions": {
+              "ja": "AC_HLC（充電のみ）",
+              "en": "AC_HLC_Charge"
+            },
+            "edt": "0x12"
+          },
+          {
+            "value": "DC_AA_Charge",
+            "descriptions": {
+              "ja": "DCタイプ_AA（充電のみ）",
+              "en": "DC_AA_Charge"
+            },
+            "edt": "0x21"
+          },
+          {
+            "value": "DC_BB_Charge",
+            "descriptions": {
+              "ja": "DCタイプ_BB（充電のみ）",
+              "en": "DC_BB_Charge"
+            },
+            "edt": "0x31"
+          },
+          {
+            "value": "DC_EE_Charge",
+            "descriptions": {
+              "ja": "DCタイプ_EE（充電のみ）",
+              "en": "DC_EE_Charge"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "DC_FF_Charge",
+            "descriptions": {
+              "ja": "DCタイプ_FF（充電のみ）",
+              "en": "DC_FF_Charge"
+            },
+            "edt": "0x51"
+          }
+        ]
+      }
+    },
+    "chargeableCapacity": {
+      "epc": "0xCE",
+      "descriptions": {
+        "ja": "車載電池の充電可能容量値",
+        "en": "Chargeable capacity of vehicle mounted battery"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Wh",
+        "minimum": 0,
+        "maximum": 999999999
+      }
+    },
+    "remainingChargeableCapacity": {
+      "epc": "0xCF",
+      "descriptions": {
+        "ja": "車載電池の充電可能残容量値",
+        "en": "Remaining Chargeable capacity of vehicle mounted battery"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Wh",
+        "minimum": 0,
+        "maximum": 999999999
+      }
+    },
+    "usedCapacity1": {
+      "epc": "0xD0",
+      "descriptions": {
+        "ja": "車載電池の使用容量値1",
+        "en": "Used capacity of vehicle mounted battery 1"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Wh"
+      }
+    },
+    "ratedVoltage": {
+      "epc": "0xD2",
+      "descriptions": {
+        "ja": "定格電圧",
+        "en": "Rated voltage"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "V",
+        "minimum": 0,
+        "maximum": 32766
+      }
+    },
+    "instantaneousElectricPower": {
+      "epc": "0xD3",
+      "descriptions": {
+        "ja": "瞬時充電電力計測値",
+        "en": "Measured instantaneous charging electric energy"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": -999999999,
+        "maximum": 999999999
+      }
+    },
+    "cumulativeChargingElectricEnergy": {
+      "epc": "0xD8",
+      "descriptions": {
+        "ja": "積算充電電力量計測値",
+        "en": "Measured cumulative amount of charging electric energy"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "kWh",
+        "minimum": 0,
+        "maximum": 999999.999,
+        "multipleOf": 0.001
+      }
+    },
+    "operationMode": {
+      "epc": "0xDA",
+      "descriptions": {
+        "ja": "運転モード設定",
+        "en": "Operation mode setting"
+      },
+      "writable": true,
+      "observable": true,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "charge",
+          "standby",
+          "idle",
+          "other"
+        ],
+        "values": [
+          {
+            "value": "charge",
+            "descriptions": {
+              "ja": "充電",
+              "en": "Charge"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "standby",
+            "descriptions": {
+              "ja": "待機",
+              "en": "Standby"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "idle",
+            "descriptions": {
+              "ja": "停止",
+              "en": "Idle"
+            },
+            "edt": "0x47"
+          },
+          {
+            "value": "other",
+            "descriptions": {
+              "ja": "その他",
+              "en": "Other"
+            },
+            "edt": "0x40"
+          }
+        ]
+      }
+    },
+    "remainingCapacity1": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "車載電池の電池残容量1",
+        "en": "Remaining stored electricity of vehicle mounted battery1"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Wh"
+      }
+    },
+    "remainingCapacity3": {
+      "epc": "0xE4",
+      "descriptions": {
+        "ja": "車載電池の電池残容量3",
+        "en": "Remaining stored electricity of vehicle mounted battery3"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "%",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "vehicleId": {
+      "epc": "0xE6",
+      "descriptions": {
+        "ja": "車両ID",
+        "en": "Vehicle ID"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      }
+    },
+    "targetChargingElectricEnergy": {
+      "epc": "0xE7",
+      "descriptions": {
+        "ja": "充電量設定値",
+        "en": "Charging amount setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Wh",
+        "minimum": 0,
+        "maximum": 999999999
+      }
+    },
+    "chargingElectricPower": {
+      "epc": "0xEB",
+      "descriptions": {
+        "ja": "充電電力設定値",
+        "en": "Charging electric energy setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 999999999
+      }
+    },
+    "chargingCurrent": {
+      "epc": "0xED",
+      "descriptions": {
+        "ja": "充電電流設定値",
+        "en": "Charging current setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "A",
+        "minimum": 0,
+        "maximum": 6553.3,
+        "multipleOf": 0.1
+      }
+    }
+  },
+  "actions": {
+    "resetCumulativeChargingElectricEnergy": {
+      "epc": "0xD9",
+      "descriptions": {
+        "ja": "積算充電電力量リセット設定",
+        "en": "Cumulative amount of discharging electric energy reset setting"
+      },
+      "schema": {},
+      "note": {
+        "ja": "ECHONET LiteではSet only property",
+        "en": "Access rule of the corresponding ECHONET Lite property is Set only"
+      }
+    }
+  }
+}

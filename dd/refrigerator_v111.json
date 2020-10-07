@@ -1,0 +1,913 @@
+{
+  "deviceType": "refrigerator",
+  "eoj": "0x03B7",
+  "descriptions": {
+    "ja": "冷凍冷蔵庫",
+    "en": "Refrigerator"
+  },
+  "properties": {
+    "doorOpenCloseStatus": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "いずれかのドア開状態",
+        "en": "Any of door is open status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "anyOpen",
+          "allClose"
+        ],
+        "values": [
+          {
+            "value": "anyOpen",
+            "descriptions": {
+              "ja": "いずれかのドア開",
+              "en": "Any of door is open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "allclose",
+            "descriptions": {
+              "ja": "全ドア閉",
+              "en": "all door close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "doorOpenWarning": {
+      "epc": "0xB1",
+      "descriptions": {
+        "ja": "ドア開放警告状態",
+        "en": "Door open warning status"
+      },
+      "writable": false,
+      "observable": true,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "ドア開放警告有",
+              "en": "Door open warning found"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "ドア開放警告無",
+              "en": "Door open warning not found"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "refrigeratorCompartmentDoorStatus": {
+      "epc": "0xB2",
+      "descriptions": {
+        "ja": "冷蔵室ドア開閉状態",
+        "en": "Refrigerator compartment door open or closed status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "ドア開",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "ドア閉",
+              "en": "Close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "freezerCompartmentDoorStatus": {
+      "epc": "0xB3",
+      "descriptions": {
+        "ja": "冷凍室ドア開閉状態",
+        "en": "Freezer compartment door open or closed status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "ドア開",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "ドア閉",
+              "en": "Close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "iceCompartmentDoorStatus": {
+      "epc": "0xB4",
+      "descriptions": {
+        "ja": "氷温室ドア開閉状態",
+        "en": "Ice compartment door open or closed status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "ドア開",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "ドア閉",
+              "en": "Close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "vegetableCompartmentDoorStatus": {
+      "epc": "0xB5",
+      "descriptions": {
+        "ja": "野菜室ドア開閉状態",
+        "en": "Vegetable compartment door open or closed status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "ドア開",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "ドア閉",
+              "en": "Close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "multiModeCompartmentDoorStatus": {
+      "epc": "0xB6",
+      "descriptions": {
+        "ja": "切換室ドア開閉状態",
+        "en": "Multi refrigerating mode compartment door open or closed status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "ドア開",
+              "en": "Open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "ドア閉",
+              "en": "Close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "maximumAllowableTemperatureLevel": {
+      "epc": "0xE0",
+      "descriptions": {
+        "ja": "設定可能温度レベル最大値",
+        "en": "Maximum allowable temperature setting level"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "refrigeratorCompartmentLevel": {
+            "descriptions": {
+              "ja": "冷蔵室",
+              "en": "Refrigerator compartment"
+            },
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "freezerCompartmentLevel": {
+            "descriptions": {
+              "ja": "冷凍室",
+              "en": "Freezer compartment"
+            },
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "iceCompartmentLevel": {
+            "descriptions": {
+              "ja": "氷温室",
+              "en": "Ice compartment"
+            },
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "vegetableCompartmentLevel": {
+            "descriptions": {
+              "ja": "野菜室",
+              "en": "Vegetable compartment"
+            },
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "multiModeCompartmentLevel": {
+            "descriptions": {
+              "ja": "切換室",
+              "en": "Multi mode compartment"
+            },
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255
+          }
+        }
+      },
+      "note": {
+        "ja": "値0は室未搭載を表す",
+        "en": "Value 0 represents no compartment"
+      }
+    },
+    "refrigeratorTemperature": {
+      "epc": "0xE2",
+      "descriptions": {
+        "ja": "冷蔵室温度設定値",
+        "en": "Refrigerator compartment temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "freezerTemperature": {
+      "epc": "0xE3",
+      "descriptions": {
+        "ja": "冷凍室温度設定値",
+        "en": "Freezer compartment temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "iceTemperature": {
+      "epc": "0xE4",
+      "descriptions": {
+        "ja": "氷温室温度設定値",
+        "en": "Ice compartment temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "vegetableTemperature": {
+      "epc": "0xE5",
+      "descriptions": {
+        "ja": "野菜室温度設定値",
+        "en": "Vegetable compartment temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "multiModeTemperature": {
+      "epc": "0xE6",
+      "descriptions": {
+        "ja": "切換室温度設定値",
+        "en": "Multi refrigerating mode compartment temperature setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "refrigeratorTemperatureLevel": {
+      "epc": "0xE9",
+      "descriptions": {
+        "ja": "冷蔵室温度レベル設定",
+        "en": "Refrigerator compartment temperature level setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 255
+      },
+      "note": {
+        "ja": "設定可能な温度レベルの最大値は「設定可能温度レベル最大値」で取得する",
+        "en": "The maximum allowable temperature setting level shall be acquired with the “maximum allowable temperature setting level” property"
+      }
+    },
+    "freezerTemperatureLevel": {
+      "epc": "0xEA",
+      "descriptions": {
+        "ja": "冷凍室温度レベル設定",
+        "en": "Freezer compartment temperature level setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 255
+      },
+      "note": {
+        "ja": "設定可能な温度レベルの最大値は「設定可能温度レベル最大値」で取得する",
+        "en": "The maximum allowable temperature setting level shall be acquired with the “maximum allowable temperature setting level” property"
+      }
+    },
+    "iceTemperatureLevel": {
+      "epc": "0xEB",
+      "descriptions": {
+        "ja": "氷温室温度レベル設定",
+        "en": "Ice compartment temperature level setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 255
+      },
+      "note": {
+        "ja": "設定可能な温度レベルの最大値は「設定可能温度レベル最大値」で取得する",
+        "en": "The maximum allowable temperature setting level shall be acquired with the “maximum allowable temperature setting level” property"
+      }
+    },
+    "vegetableTemperatureLevel": {
+      "epc": "0xEC",
+      "descriptions": {
+        "ja": "野菜室温度レベル設定",
+        "en": "Vegetable compartment temperature level setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 255
+      },
+      "note": {
+        "ja": "設定可能な温度レベルの最大値は「設定可能温度レベル最大値」で取得する",
+        "en": "The maximum allowable temperature setting level shall be acquired with the “maximum allowable temperature setting level” property"
+      }
+    },
+    "multiModeTemperatureLevel": {
+      "epc": "0xED",
+      "descriptions": {
+        "ja": "切換室温度レベル設定",
+        "en": "Multi refrigerating mode compartment temperature level setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 255
+      },
+      "note": {
+        "ja": "設定可能な温度レベルの最大値は「設定可能温度レベル最大値」で取得する",
+        "en": "The maximum allowable temperature setting level shall be acquired with the “maximum allowable temperature setting level” property"
+      }
+    },
+    "measuredRefrigeratorTemperature": {
+      "epc": "0xD1",
+      "descriptions": {
+        "ja": "冷蔵室温度計測値",
+        "en": "Measured refrigerator compartment temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "measuredFreezerTemperature": {
+      "epc": "0xD2",
+      "descriptions": {
+        "ja": "冷凍室温度計測値",
+        "en": "Measured freezer compartment temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "measuredIceTemperature": {
+      "epc": "0xD3",
+      "descriptions": {
+        "ja": "氷温室温度計測値",
+        "en": "Measured ice compartment temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "measuredVegetableTemperature": {
+      "epc": "0xD4",
+      "descriptions": {
+        "ja": "野菜室温度計測値",
+        "en": "Measured vegetable compartment temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "measuredMultiModeTemperature": {
+      "epc": "0xD5",
+      "descriptions": {
+        "ja": "切換室温度計測値",
+        "en": "Measured multi refrigerating mode compartment temperature"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "Celsius",
+        "minimum": -127,
+        "maximum": 126
+      }
+    },
+    "compressorRotationSpeed": {
+      "epc": "0xD8",
+      "descriptions": {
+        "ja": "圧縮機回転数レベル",
+        "en": "Compressor rotation speed"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "maximumRotationSpeed": {
+            "descriptions": {
+              "ja": "最大回転数レベル",
+              "en": "Maximum rotation speed"
+            },
+            "type": "number",
+            "minimum": 1,
+            "maximum": 255
+          },
+          "rotationSpeed": {
+            "descriptions": {
+              "ja": "回転数レベル",
+              "en": "Rotation speed"
+            },
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255,
+            "note": {
+              "ja": "0は停止を示す",
+              "en": "Value 0 represents Stop"
+            }
+          }
+        }
+      }
+    },
+    "electricCurrentConsumption": {
+      "epc": "0xDA",
+      "descriptions": {
+        "ja": "消費電流計測値",
+        "en": "Measured electric current consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "A",
+        "minimum": 0,
+        "maximum": 6553.3,
+        "multipleOf": 0.1
+      }
+    },
+    "ratedPowerConsumption": {
+      "epc": "0xDC",
+      "descriptions": {
+        "ja": "定格消費電力値",
+        "en": "Rated power consumption"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "number",
+        "unit": "W",
+        "minimum": 0,
+        "maximum": 65533
+      }
+    },
+    "quickFreeze": {
+      "epc": "0xA0",
+      "descriptions": {
+        "ja": "急速冷凍動作設定",
+        "en": "Quick freeze function setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "quick",
+          "standby"
+        ],
+        "values": [
+          {
+            "value": "normal",
+            "descriptions": {
+              "ja": "通常冷凍",
+              "en": "Normal operation"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "quick",
+            "descriptions": {
+              "ja": "急速冷凍",
+              "en": "Quick freeze"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "standby",
+            "descriptions": {
+              "ja": "急速冷凍待機",
+              "en": "Standby for quick freezing"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    },
+    "quickRefrigeration": {
+      "epc": "0xA1",
+      "descriptions": {
+        "ja": "急速冷蔵動作設定",
+        "en": "Quick refrigeration function setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "quick",
+          "standby"
+        ],
+        "values": [
+          {
+            "value": "normal",
+            "descriptions": {
+              "ja": "通常冷蔵",
+              "en": "Normal operation"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "quick",
+            "descriptions": {
+              "ja": "急速冷蔵",
+              "en": "Quick freeze"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "standby",
+            "descriptions": {
+              "ja": "急速冷蔵待機",
+              "en": "Standby for quick refrigeration"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    },
+    "icemaker": {
+      "epc": "0xA4",
+      "descriptions": {
+        "ja": "製氷許可設定",
+        "en": "Icemaker setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "enable",
+          "disable",
+          "standby"
+        ],
+        "values": [
+          {
+            "value": "enable",
+            "descriptions": {
+              "ja": "製氷許可",
+              "en": "Enable icemaker"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "disable",
+            "descriptions": {
+              "ja": "製氷禁止",
+              "en": "Disable icemaker"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "standby",
+            "descriptions": {
+              "ja": "製氷一定時間禁止",
+              "en": "Temporarily disable icemaker"
+            },
+            "edt": "0x43"
+          }
+        ]
+      }
+    },
+    "icemakerStatus": {
+      "epc": "0xA5",
+      "descriptions": {
+        "ja": "製氷動作状態",
+        "en": "Icemaker operation status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "running",
+          "stopped"
+        ],
+        "values": [
+          {
+            "value": "running",
+            "descriptions": {
+              "ja": "運転中",
+              "en": "Ice making in progreass"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "stopped",
+            "descriptions": {
+              "ja": "停止中",
+              "en": "Ice making stopped"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "icemakerTankStatus": {
+      "epc": "0xA6",
+      "descriptions": {
+        "ja": "製氷用給水タンク状態",
+        "en": "Icemaker tank status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "warning"
+        ],
+        "values": [
+          {
+            "value": "normal",
+            "descriptions": {
+              "ja": "タンク水あり",
+              "en": "Contains water"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "warning",
+            "descriptions": {
+              "ja": "タンクなし水なし",
+              "en": "Tank remove or no water"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "refrigeratorHumidification": {
+      "epc": "0xA8",
+      "descriptions": {
+        "ja": "冷蔵室加湿動作設定",
+        "en": "Refrigerator compartment humidification function setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "on",
+          "off"
+        ],
+        "values": [
+          {
+            "value": "on",
+            "descriptions": {
+              "ja": "加湿ON",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "off",
+            "descriptions": {
+              "ja": "加湿OFF",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "vegetableHumidification": {
+      "epc": "0xA9",
+      "descriptions": {
+        "ja": "野菜室加湿動作設定",
+        "en": "Vegetable compartment humidification function setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "on",
+          "off"
+        ],
+        "values": [
+          {
+            "value": "on",
+            "descriptions": {
+              "ja": "加湿ON",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "off",
+            "descriptions": {
+              "ja": "加湿OFF",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "deodorization": {
+      "epc": "0xAD",
+      "descriptions": {
+        "ja": "脱臭動作設定",
+        "en": "Deodorization function setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "on",
+          "off"
+        ],
+        "values": [
+          {
+            "value": "on",
+            "descriptions": {
+              "ja": "脱臭ON",
+              "en": "ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "off",
+            "descriptions": {
+              "ja": "脱臭OFF",
+              "en": "OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    }
+  }
+}

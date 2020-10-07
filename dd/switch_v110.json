@@ -1,0 +1,26 @@
+{
+  "deviceType": "switch",
+  "eoj": "0x05FD",
+  "descriptions": {
+    "ja": "スイッチ（JEMA/HA端子対応）",
+    "en": "switch"
+  },
+  "properties": {
+    "connectedDevice": {
+      "epc": "0xE0",
+      "descriptions": {
+        "ja": "接続機器",
+        "en": "Connected device"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string"
+      },
+      "note": {
+        "ja": "アスキーコードで保持 (12byte)",
+        "en": "ASCII code (12byte)"
+      }
+    }
+  }
+}

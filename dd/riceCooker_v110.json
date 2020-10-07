@@ -1,0 +1,297 @@
+{
+  "deviceType": "riceCooker",
+  "eoj": "0x03BB",
+  "descriptions": {
+    "ja": "炊飯器",
+    "en": "Rice cooker"
+  },
+  "properties": {
+    "coverStatus": {
+      "epc": "0xB0",
+      "descriptions": {
+        "ja": "蓋開閉状態",
+        "en": "Cover closure status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "open",
+          "close"
+        ],
+        "values": [
+          {
+            "value": "open",
+            "descriptions": {
+              "ja": "蓋開",
+              "en": "Cover open"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "close",
+            "descriptions": {
+              "ja": "蓋閉",
+              "en": "Cover close"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "cookingStatus": {
+      "epc": "0xB1",
+      "descriptions": {
+        "ja": "炊飯状態",
+        "en": "Rice cooking status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "stop",
+          "preheating",
+          "cooking",
+          "steaming",
+          "completion"
+        ],
+        "values": [
+          {
+            "value": "stop",
+            "descriptions": {
+              "ja": "停止",
+              "en": "stop"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "preheating",
+            "descriptions": {
+              "ja": "予熱",
+              "en": "Preheating"
+            },
+            "edt": "0x42"
+          },
+          {
+            "value": "cooking",
+            "descriptions": {
+              "ja": "炊飯",
+              "en": "Rice Cooking"
+            },
+            "edt": "0x43"
+          },
+          {
+            "value": "steaming",
+            "descriptions": {
+              "ja": "蒸らし",
+              "en": "Steaming"
+            },
+            "edt": "0x44"
+          },
+          {
+            "value": "completion",
+            "descriptions": {
+              "ja": "炊飯完了",
+              "en": "Rice cooking completion"
+            },
+            "edt": "0x45"
+          }
+        ]
+      }
+    },
+    "cookingControl": {
+      "epc": "0xB2",
+      "descriptions": {
+        "ja": "炊飯制御設定",
+        "en": "Rice cooking control setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "running",
+          "suspension"
+        ],
+        "values": [
+          {
+            "value": "running",
+            "descriptions": {
+              "ja": "炊飯開始・炊飯再開",
+              "en": "Rice cooking start or restart"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "suspension",
+            "descriptions": {
+              "ja": "炊飯一時停止",
+              "en": "Rice cooking suspension"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "warmerOperation": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "保温設定",
+        "en": "Warmer setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": "true",
+            "descriptions": {
+              "ja": "保温有",
+              "en": "Warmer enabled"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "false",
+            "descriptions": {
+              "ja": "保温無",
+              "en": "Warmer disabled"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "innerPotRemoved": {
+      "epc": "0xE5",
+      "descriptions": {
+        "ja": "内なべ取り外し状態",
+        "en": "Inner pot removal status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": "true",
+            "descriptions": {
+              "ja": "取り外し有",
+              "en": "Removed"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "false",
+            "descriptions": {
+              "ja": "取り外し無",
+              "en": "Not removed"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "coverRemoved": {
+      "epc": "0xE6",
+      "descriptions": {
+        "ja": "蓋取り外し状態",
+        "en": "Cover removal status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": "true",
+            "descriptions": {
+              "ja": "取り外し有",
+              "en": "Removed"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "false",
+            "descriptions": {
+              "ja": "取り外し無",
+              "en": "Not removed"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "reservation": {
+      "epc": "0x90",
+      "descriptions": {
+        "ja": "炊飯予約設定",
+        "en": "Rice cooking reservation setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "on",
+          "off"
+        ],
+        "values": [
+          {
+            "value": "on",
+            "descriptions": {
+              "ja": "予約有",
+              "en": "reservation ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": "off",
+            "descriptions": {
+              "ja": "予約無",
+              "en": "reservation OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "reservationTime": {
+      "epc": "0x91",
+      "descriptions": {
+        "ja": "炊飯予約設定時刻設定値",
+        "en": "Rice cooking reservation time setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "format": "time"
+      },
+      "note": {
+        "ja": "秒の指定は無視される",
+        "en": "number of seconds is ignored"
+      }
+    },
+    "reservationRelativeTime": {
+      "epc": "0x92",
+      "descriptions": {
+        "ja": "炊飯予約設定相対時刻設定値",
+        "en": "Rice cooking reservation relative time setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "string",
+        "format": "time"
+      },
+      "note": {
+        "ja": "秒の指定は無視される",
+        "en": "number of seconds is ignored"
+      }
+    }
+  }
+}

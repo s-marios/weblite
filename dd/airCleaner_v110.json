@@ -1,0 +1,164 @@
+{
+  "deviceType": "airCleaner",
+  "eoj": "0x0135",
+  "descriptions": {
+    "ja": "空気清浄器",
+    "en": "Air Cleaner"
+  },
+  "properties": {
+    "filterChangeNotice": {
+      "epc": "0xE1",
+      "descriptions": {
+        "ja": "フィルター交換通知状態",
+        "en": "Filter change notice"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "通知あり",
+              "en": "Found"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "通知なし",
+              "en": "Not found"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "airFlowRate": {
+      "epc": "0xA0",
+      "descriptions": {
+        "ja": "風量設定",
+        "en": "Air flow rate setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 8
+          },
+          {
+            "type": "string",
+            "enum": [
+              "auto"
+            ],
+            "values": [
+              {
+                "value": "auto",
+                "descriptions": {
+                  "ja": "自動",
+                  "en": "Auto"
+                },
+                "edt": "0x41"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "smokeDetectionStatus": {
+      "epc": "0xC1",
+      "descriptions": {
+        "ja": "煙検知状態",
+        "en": "Smoke detection status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "検知あり",
+              "en": "Found"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "検知なし",
+              "en": "Not found"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "opticalCatalystOperation": {
+      "epc": "0xC2",
+      "descriptions": {
+        "ja": "光触媒動作設定",
+        "en": "Optical catalyst operation setting"
+      },
+      "writable": true,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "光触媒ON",
+              "en": "Optical catalyst ON"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "光触媒OFF",
+              "en": "Optical catalyst OFF"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    },
+    "airPollutionDetectionStatus": {
+      "epc": "0xC0",
+      "descriptions": {
+        "ja": "空気汚れ検知状態",
+        "en": "Air pollution detection status"
+      },
+      "writable": false,
+      "observable": false,
+      "schema": {
+        "type": "boolean",
+        "values": [
+          {
+            "value": true,
+            "descriptions": {
+              "ja": "空気汚れ検知あり",
+              "en": "Air pollution detected"
+            },
+            "edt": "0x41"
+          },
+          {
+            "value": false,
+            "descriptions": {
+              "ja": "空気汚れ検知なし",
+              "en": "Air pollution non-detected"
+            },
+            "edt": "0x42"
+          }
+        ]
+      }
+    }
+  }
+}
