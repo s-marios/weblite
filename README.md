@@ -5,6 +5,8 @@ Introduction
 
 `Weblite` is written in Rust using the `actix-web` framework. 
 
+The latest source code is always available at the [author's github repository](https://github.com/s-marios/weblite).
+
 Compiling the program
 ---------------------
 Assuming that you have `git` and the Rust toolchain installed on your computer you can compile with the following commands:
@@ -14,6 +16,10 @@ git clone https://github.com/s-marios/weblite.git
 cd weblite
 cargo build
 ```
+
+Backend
+-------
+The backend for `weblite` is [`echology`](https://github.com/s-marios/echology). Compile it from source or grab one of the binary distributions available on the release page. Make sure that an `echology` backend is deployed in your home/testing environment before starting up `weblite`. 
 
 Configuration
 -------------
