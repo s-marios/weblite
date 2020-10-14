@@ -40,6 +40,8 @@ pub struct Config {
 pub fn init() -> std::io::Result<AppData> {
     let config = init_config()?;
     let mut driver = LineDriver::from(&config.backend)?;
+
+    println!("reading superclass definition: {} ", &config.superclass_dd);
     let superclass_dd = read_def(&config.superclass_dd)?;
     let available_descriptions = read_device_descriptions(&config.dd_dir)?;
     let ais = converters::read_ais(&config.ai_file)?;
@@ -237,6 +239,7 @@ fn get_ai<'a>(dd: &str, ai: Option<&'a Vec<PropertyInfo>>) -> Option<&'a Additio
 }
 
 pub fn init_config() -> std::io::Result<Config> {
+    println!("reading ./config.json ...");
     let contents = std::fs::read_to_string("./config.json")?;
     let config: Config = serde_json::from_str(&contents)?;
     Ok(config)

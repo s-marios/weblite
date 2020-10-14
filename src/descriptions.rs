@@ -112,6 +112,7 @@ where
 }
 
 pub fn read_device_descriptions<P: AsRef<Path>>(dir: P) -> std::io::Result<Vec<DeviceDescription>> {
+    println!("reading device descriptions from dir: {}", dir.as_ref().display());
     let mut dds = vec![];
     for entry in fs::read_dir(dir)?.filter_map(|x| x.ok()) {
         let path = entry.path();

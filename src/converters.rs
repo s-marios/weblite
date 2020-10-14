@@ -7,6 +7,7 @@ use std::convert::{TryFrom, TryInto};
 use std::path::Path;
 
 pub(crate) fn read_ais<P: AsRef<Path>>(filename: P) -> std::io::Result<Ais> {
+    println!("reading additional information: {}", filename.as_ref().display());
     descriptions::read_def_generic::<P, Ais>(filename)
 }
 
