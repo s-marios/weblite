@@ -1,6 +1,6 @@
 {
   "backend" : "127.0.0.1:3361",
   "dd_dir" : "./dd/",
-  "superclass_dd" : "./dd/commonItems_v110.json",
-  "ai_file" : "./ai/test.json"
+  "superclass_dd" : "./dd/commonItems_v120.json",
+  "ai_file" : "./ai/ai.json"
 }
